@@ -38,3 +38,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local env files
+.env*.local
+.env*.development
+.env*.production
+.env
+
+# files
+/public/uploads
+/public/uploadstest
+/public/editor
+/public/logs
+/public/dummy

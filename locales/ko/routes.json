@@ -1,0 +1,328 @@
+{
+  "main": {
+    "index": {
+      "name": "대시보드1",
+      "desc": "메인페이지1"
+    }
+  },
+  "auth": {
+    "login": {
+      "name": "로그인",
+      "desc": ""
+    },
+    "account": {
+      "name": "계정찾기",
+      "desc": ""
+    },
+    "password": {
+      "name": "비밀번호찾기",
+      "desc": ""
+    },
+    "register": {
+      "name": "계정가입",
+      "desc": ""
+    },
+    "error": {
+      "name": "에러",
+      "desc": ""
+    }
+  },
+  "my": {
+    "profile": {
+      "name": "프로필",
+      "desc": ""
+    },
+    "pwd": {
+      "name": "비밀번호변경",
+      "desc": ""
+    },
+    "settings": {
+      "name": "설정",
+      "desc": ""
+    }
+  },
+  "user": {
+    "index": {
+      "name": "회원",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
+      "desc": ""
+    },
+    "pwd": {
+      "name": "비밀번호",
+      "desc": ""
+    },
+    "partner": {
+      "name": "파트너관리",
+      "desc": ""
+    }
+  },
+  "setting": {
+    "index": {
+      "name": "설정",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
+      "desc": ""
+    }
+  },
+  "company": {
+    "index": {
+      "name": "업체",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
+      "desc": ""
+    }
+  },
+  "device": {
+    "index": {
+      "name": "절감장치",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
+      "desc": ""
+    }
+  },
+  "todo1": {
+    "index": {
+      "name": "Todo",
+      "desc": "할일목록"
+    },
+    "create": {
+      "name": "Create",
+      "desc": "할일생성"
+    },
+    "show": {
+      "name": "Show",
+      "desc": "할일보기"
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": "할일수정"
+    }
+  },
+  "carbonpoint": {
+    "index": {
+      "name": "탄소포인트",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
+      "desc": ""
+    }
+  },
+  "greencard": {
+    "index": {
+      "name": "카드",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
+      "desc": ""
+    }
+  },
+  "gear": {
+    "name": "환경설정"
+  },
+  "popup": {
+    "index": {
+      "name": "팝업",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
+      "desc": ""
+    }
+  },
+  "banner": {
+    "index": {
+      "name": "배너",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
+      "desc": ""
+    }
+  },
+  "config": {
+    "index": {
+      "name": "회사정보",
+      "desc": ""
+    },
+    "edit": {
+      "name": "약관정보",
+      "agree": "이용약관",
+      "person": "개인정보보호방침",
+      "email": "이메일무단수집",
+      "desc": ""
+    }
+  },
+  "agent": {
+    "index": {
+      "name": "접속통계",
+      "desc": ""
+    }
+  },
+  "management": {
+    "index": {
+      "name": "분류관리",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
+      "desc": ""
+    }
+  },
+  "ebill": {
+    "index": {
+      "name": "월요금",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
+      "desc": ""
+    }
+  },
+  "eiot": {
+    "index": {
+      "name": "적산전력",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
+      "desc": ""
+    }
+  },
+  "estat": {
+    "index": {
+      "name": "전력통계",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "period": {
+      "name": "기간",
+      "desc": ""
+    },
+    "daily": {
+      "name": "일간",
+      "desc": ""
+    },
+    "weekly": {
+      "name": "주간",
+      "desc": ""
+    },
+    "monthly": {
+      "name": "월간",
+      "desc": ""
+    },
+    "yearly": {
+      "name": "연간",
+      "desc": ""
+    },
+    "mmSaving": {
+      "name": "전기절감율(월)",
+      "desc": ""
+    },
+    "mmCarbonSaving": {
+      "name": "탄소절감율(월)",
+      "desc": ""
+    }
+  }
+}

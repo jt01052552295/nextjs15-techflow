@@ -1,0 +1,107 @@
+export const routesData = {
+  main: {
+    index: '/main',
+  },
+  auth: {
+    login: '/auth/login',
+    register: '/auth/register',
+    account: '/auth/account',
+    password: '/auth/password',
+    error: '/auth/error',
+  },
+  my: {
+    profile: '/my/profile',
+    pwd: '/my/pwd',
+    settings: '/my/settings',
+  },
+  todo1: {
+    index: '/todo1',
+    create: '/todo1/p/create',
+    show: '/todo1/{id}',
+    edit: '/todo1/{id}/edit',
+  },
+  user: {
+    index: '/user',
+    create: '/user/p/create',
+    show: '/user/{id}',
+    edit: '/user/{id}/edit',
+    pwd: '/user/{id}/pwd',
+    partner: '/user/{id}/partner',
+  },
+  setting: {
+    index: '/setting',
+    create: '/setting/p/create',
+    show: '/setting/{id}',
+    edit: '/setting/{id}/edit',
+  },
+  company: {
+    index: '/company',
+    create: '/company/p/create',
+    show: '/company/{id}',
+    edit: '/company/{id}/edit',
+  },
+  device: {
+    index: '/device',
+    create: '/device/p/create',
+    show: '/device/{id}',
+    edit: '/device/{id}/edit',
+  },
+  greencard: {
+    index: '/greencard',
+    create: '/greencard/p/create',
+    show: '/greencard/{id}',
+    edit: '/greencard/{id}/edit',
+  },
+  carbonpoint: {
+    index: '/carbonpoint',
+    create: '/carbonpoint/p/create',
+    show: '/carbonpoint/{id}',
+    edit: '/carbonpoint/{id}/edit',
+  },
+  popup: {
+    index: '/popup',
+    create: '/popup/p/create',
+    show: '/popup/{id}',
+    edit: '/popup/{id}/edit',
+  },
+  banner: {
+    index: '/banner',
+    create: '/banner/p/create',
+    show: '/banner/{id}',
+    edit: '/banner/{id}/edit',
+  },
+  config: {
+    index: '/config',
+    edit: '/config/{id}/edit',
+  },
+  agent: {
+    index: '/agent',
+  },
+  management: {
+    index: '/management',
+    create: '/management/p/create',
+    show: '/management/{id}',
+    edit: '/management/{id}/edit',
+  },
+  ebill: {
+    index: '/ebill',
+    create: '/ebill/p/create',
+    show: '/ebill/{id}',
+    edit: '/ebill/{id}/edit',
+  },
+  eiot: {
+    index: '/eiot',
+    show: '/eiot/{id}',
+  },
+  estat: {
+    index: '/estat',
+    show: '/estat/{id}',
+    period: '/estat/stats/period',
+    daily: '/estat/stats/daily',
+    weekly: '/estat/stats/weekly',
+    monthly: '/estat/stats/monthly',
+    yearly: '/estat/stats/yearly',
+    mmSaving: '/estat/stats/saving/month',
+    mmCarbonSaving: '/estat/stats/cpsaving/month',
+  },
+};

@@ -1,0 +1,328 @@
+{
+  "main": {
+    "index": {
+      "name": "Dashboard",
+      "desc": "Main Page"
+    }
+  },
+  "auth": {
+    "login": {
+      "name": "Login",
+      "desc": ""
+    },
+    "account": {
+      "name": "Find Account",
+      "desc": ""
+    },
+    "password": {
+      "name": "Find Password",
+      "desc": ""
+    },
+    "register": {
+      "name": "Register",
+      "desc": ""
+    },
+    "error": {
+      "name": "Error",
+      "desc": ""
+    }
+  },
+  "my": {
+    "profile": {
+      "name": "Profile",
+      "desc": ""
+    },
+    "pwd": {
+      "name": "Change Password",
+      "desc": ""
+    },
+    "settings": {
+      "name": "Settings",
+      "desc": ""
+    }
+  },
+  "user": {
+    "index": {
+      "name": "User",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    },
+    "pwd": {
+      "name": "Password",
+      "desc": ""
+    },
+    "partner": {
+      "name": "Partner Management",
+      "desc": ""
+    }
+  },
+  "setting": {
+    "index": {
+      "name": "Settings",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "company": {
+    "index": {
+      "name": "Company",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "device": {
+    "index": {
+      "name": "Reduction Device",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "todo1": {
+    "index": {
+      "name": "Todo",
+      "desc": "Todo List"
+    },
+    "create": {
+      "name": "Create",
+      "desc": "Create Todo"
+    },
+    "show": {
+      "name": "View",
+      "desc": "View Todo"
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": "Edit Todo"
+    }
+  },
+  "carbonpoint": {
+    "index": {
+      "name": "Carbon Point",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "greencard": {
+    "index": {
+      "name": "Card",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "gear": {
+    "name": "Environment Settings"
+  },
+  "popup": {
+    "index": {
+      "name": "Popup",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "banner": {
+    "index": {
+      "name": "Banner",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "config": {
+    "index": {
+      "name": "Company Info",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Terms Info",
+      "agree": "Terms of Use",
+      "person": "Privacy Policy",
+      "email": "Email Collection Policy",
+      "desc": ""
+    }
+  },
+  "agent": {
+    "index": {
+      "name": "Access Statistics",
+      "desc": ""
+    }
+  },
+  "management": {
+    "index": {
+      "name": "Category Management",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "ebill": {
+    "index": {
+      "name": "Monthly Bill",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "eiot": {
+    "index": {
+      "name": "Cumulative Power",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "estat": {
+    "index": {
+      "name": "Power Statistics",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "period": {
+      "name": "Period",
+      "desc": ""
+    },
+    "daily": {
+      "name": "Daily",
+      "desc": ""
+    },
+    "weekly": {
+      "name": "Weekly",
+      "desc": ""
+    },
+    "monthly": {
+      "name": "Monthly",
+      "desc": ""
+    },
+    "yearly": {
+      "name": "Yearly",
+      "desc": ""
+    },
+    "mmSaving": {
+      "name": "Electricity Saving Rate (Monthly)",
+      "desc": ""
+    },
+    "mmCarbonSaving": {
+      "name": "Carbon Saving Rate (Monthly)",
+      "desc": ""
+    }
+  }
+}

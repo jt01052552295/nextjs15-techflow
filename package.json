@@ -3,22 +3,37 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3001",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "cross-env PORT=3001 next start",
+    "lint": "next lint --ignore-path .gitignore",
+    "lint:fix": "next lint --fix --ignore-path .gitignore",
+    "format": "prettier --check --ignore-path .gitignore .",
+    "format:fix": "prettier --write --ignore-path .gitignore ."
+  },
+  "scriptDescriptions": {
+    "lint": "ESLint 실행/검사",
+    "lint:fix": "ESLint 자동 수정",
+    "format": "Prettier 검사",
+    "format:fix": "Prettier 위반된 파일을 수정"
   },
   "dependencies": {
+    "@formatjs/intl-localematcher": "^0.5.9",
+    "next": "15.0.3",
     "react": "19.0.0-rc-66855b96-20241106",
-    "react-dom": "19.0.0-rc-66855b96-20241106",
-    "next": "15.0.3"
+    "react-dom": "19.0.0-rc-66855b96-20241106"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@types/negotiator": "^0.6.3",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
-    "eslint-config-next": "15.0.3"
+    "eslint-config-next": "15.0.3",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "negotiator": "^1.0.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5"
   }
 }
