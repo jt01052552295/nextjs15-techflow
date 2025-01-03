@@ -9,13 +9,17 @@
     "lint": "next lint --ignore-path .gitignore",
     "lint:fix": "next lint --fix --ignore-path .gitignore",
     "format": "prettier --check --ignore-path .gitignore .",
-    "format:fix": "prettier --write --ignore-path .gitignore ."
+    "format:fix": "prettier --write --ignore-path .gitignore .",
+    "lint-and-format": "npm run lint && npm run format",
+    "lint-and-format:fix": "npm run lint:fix && npm run format:fix"
   },
   "scriptDescriptions": {
     "lint": "ESLint 실행/검사",
     "lint:fix": "ESLint 자동 수정",
     "format": "Prettier 검사",
-    "format:fix": "Prettier 위반된 파일을 수정"
+    "format:fix": "Prettier 위반된 파일을 수정",
+    "lint-and-format": "ESLint && Prettier 동시검사",
+    "lint-and-format:fix": "ESLint && Prettier 동시수정"
   },
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.5.9",
