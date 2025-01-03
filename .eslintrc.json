@@ -1,23 +1,24 @@
 {
-    "extends": [
-        "next/core-web-vitals", // Next.js 기본 규칙
-        "next/typescript", // TypeScript 규칙
-        "plugin:prettier/recommended" // Prettier와 충돌 방지
+  "extends": [
+    "next/core-web-vitals", // Next.js 기본 규칙
+    "next/typescript", // TypeScript 규칙
+    "plugin:prettier/recommended" // Prettier와 충돌 방지
+  ],
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": [
+      "error",
+      {
+        "printWidth": 80,
+        "tabWidth": 2,
+        "singleQuote": true,
+        "useTabs": false,
+        "trailingComma": "all",
+        "semi": true,
+        "endOfLine": "auto"
+      }
     ],
-    "plugins": ["prettier"],
-    "rules": {
-        "prettier/prettier": [
-            "error",
-            {
-                "printWidth": 80,
-                "tabWidth": 2,
-                "singleQuote": true,
-                "useTabs": false,
-                "trailingComma": "all",
-                "semi": true
-            }
-        ],
-        "react/jsx-props-no-spreading": "off", // 필요시 추가
-        "react/react-in-jsx-scope": "off" // 필요시 추가
-    }
+    "react/jsx-props-no-spreading": "off", // 필요시 추가
+    "react/react-in-jsx-scope": "off" // 필요시 추가
+  }
 }
