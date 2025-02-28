@@ -1,43 +1,29 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import Negotiator from 'negotiator';
-import { match } from '@formatjs/intl-localematcher';
+import { I18N_CONFIG } from '@/constants/i18n';
+import type { LocaleType } from '@/constants/i18n';
 
-const locales = ['en', 'ko', 'ja', 'zh']; // 지원 언어 목록
-const DEFAULT_LANGUAGE = 'ko'; // 기본 언어 설정
-const DEFAULT_ACCESS_REDIRECT = 'main';
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const pathnameSegments = pathname.split('/').filter(Boolean);
+  const firstSegment = pathnameSegments[0] as LocaleType | undefined;
 
-function getLocale(request: NextRequest): string {
-  const negotiatorHeaders = Object.fromEntries(request.headers.entries());
-  const languages = new Negotiator({ headers: negotiatorHeaders }).languages();
-  return match(languages, locales, DEFAULT_LANGUAGE);
-}
+  // 지원되는 언어가 아닌 경우 기본 언어로 리다이렉트
+  if (!firstSegment || !I18N_CONFIG.locales.includes(firstSegment)) {
+    // 쿠키에서 이전에 선택한 언어 확인
+    const savedLocale = request.cookies.get('NEXT_LOCALE')?.value;
+    const locale =
+      savedLocale && I18N_CONFIG.locales.includes(savedLocale as LocaleType)
+        ? savedLocale
+        : I18N_CONFIG.defaultLocale;
 
-export async function middleware(request: NextRequest) {
-  const { pathname, search } = request.nextUrl;
-  const locale = getLocale(request);
-
-  const response = NextResponse.next();
-
-  console.log(
-    `============================ middleware start ========================================`,
-  );
-
-  const segments = pathname.split('/').filter(Boolean);
-  const firstSegment = segments[0];
-
-  if (!locales.includes(firstSegment)) {
     return NextResponse.redirect(
-      new URL(`/${locale}/${DEFAULT_ACCESS_REDIRECT}`, request.nextUrl),
+      new URL(`/${locale}${pathname === '/' ? '' : pathname}`, request.url),
     );
   }
 
-  // response.cookies.delete('ck_locale');
-  response.cookies.set('ck_locale', firstSegment);
-
-  console.log(
-    `============================ middleware end ========================================`,
-  );
+  const response = NextResponse.next();
+  response.cookies.set('NEXT_LOCALE', firstSegment);
 
   return response;
 }

@@ -1,33 +1,43 @@
 'use client';
-
-import { useRoutes } from '@/components/context/RoutesContext';
 import { useLanguage } from '@/components/context/LanguageContext';
-import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { mergeRoutesWithDictionary } from '@/utils/mergeRoutesWithDictionary';
-import { generateRoutePath } from '@/utils/routes';
+import { getRouteMetadata, getRouteUrl } from '@/utils/routes';
 import { formatMessage } from '@/lib/util';
 
 const Navigation = () => {
-  const routes = useRoutes();
   const { dictionary, locale } = useLanguage();
-  const pathname = usePathname();
 
-  const mergeRoutes = mergeRoutesWithDictionary(); // 병합된 데이터 가져오기
+  // console.log(dictionary.common.greeting);
 
-  // console.log(routes);
+  const menuItems = [
+    'main.index', // 대시보드
+    'auth.login', // 회원 목록
+    'auth.register', // 업체 목록
+    'device.index', // 절감장치
+    'estat.index', // 전력통계
+  ];
 
   return (
-    <nav>
+    <nav data-attr={`${locale}`}>
       <ul>
-        <li>{formatMessage(dictionary.common.greeting, { name: 'world' })}</li>
-        <li>{generateRoutePath(routes.todo1.index.path)}</li>
-        <li>{generateRoutePath(routes.todo1.edit.path, { id: 10 })}</li>
-        {mergeRoutes.map(({ id, path, name }) => (
-          <li key={id} className={pathname === path ? 'active' : ''}>
-            {name} : {path}
-          </li>
-        ))}
+        <li>{formatMessage(dictionary.common.greeting, { name: 'test' })}</li>
+      </ul>
+      <ul>
+        {menuItems.map((path) => {
+          const metadata = getRouteMetadata(path, dictionary, locale);
+          const url = getRouteUrl(path, locale);
+
+          return (
+            <li key={path}>
+              <Link href={url}>
+                {metadata.name}
+                {metadata.desc && (
+                  <small className="menu-description">{metadata.desc}</small>
+                )}
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );

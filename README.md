@@ -51,3 +51,60 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+
+📁 admin
+├── 📁 app
+│   ├── 📁 api
+│   │   └── 📁 test
+│   │       └── route.ts
+│   └── 📁 [language]
+│       ├── layout.tsx
+│       └── 📁 (afterLogin)
+│           └── 📁 main
+│               └── page.tsx
+├── 📁 components
+│   ├── 📁 common
+│   │   └── Navigation.tsx
+│   ├── 📁 context
+│   │   ├── LanguageContext.tsx
+│   │   └── RoutesContext.tsx
+│   ├── 📁 locale
+│   │   └── LanguageSwitcher.tsx
+│   └── 📁 main
+│       └── Main.tsx
+├── 📁 constants
+│   └── routes.ts
+├── 📁 data
+│   └── routesData.ts
+├── 📁 lib
+│   ├── cookie.ts
+│   ├── prisma.ts
+│   └── util.ts
+├── 📁 locales
+│   ├── index.ts
+│   ├── 📁 ko
+│   │   ├── columns.json
+│   │   ├── common.json
+│   │   └── routes.json
+│   └── 📁 en
+│       ├── columns.json
+│       ├── common.json
+│       └── routes.json
+├── 📁 prisma
+│   └── schema.prisma
+├── 📁 types
+│   ├── auth.ts
+│   └── locales.ts
+├── 📁 utils
+│   ├── mergeRoutesWithDictionary.ts
+│   └── routes.ts
+├── .eslintrc.json
+├── .prettierignore
+├── .prettierrc
+├── README.md
+├── env.local
+├── middleware.ts
+├── next.config.ts
+├── package.json
+└── tsconfig.json

@@ -1,25 +1,18 @@
 'use client';
 
-import React, {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-  useEffect,
-} from 'react';
-import { LocaleType } from '@/types/locales';
-
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { LocaleType } from '@/constants/i18n';
+import type { Dictionary } from '@/utils/get-dictionary'; // Dictionary 타입 import
 interface LanguageContextProps {
   locale: LocaleType;
   setLocale: (locale: LocaleType) => void;
-  dictionary: any;
-  setDictionary: (dictionary: any) => void;
+  dictionary: Dictionary;
+  setDictionary: (dictionary: Dictionary) => void;
 }
 
 const LanguageContext = createContext<LanguageContextProps | undefined>(
   undefined,
 );
-
 export const LanguageProvider = ({
   children,
   initialLocale,
@@ -27,15 +20,10 @@ export const LanguageProvider = ({
 }: {
   children: ReactNode;
   initialLocale: LocaleType;
-  initialDictionary: any;
+  initialDictionary: Dictionary;
 }) => {
   const [locale, setLocale] = useState(initialLocale);
   const [dictionary, setDictionary] = useState(initialDictionary);
-
-  useEffect(() => {
-    setLocale(initialLocale);
-    setDictionary(initialDictionary);
-  }, [initialLocale, initialDictionary]);
 
   return (
     <LanguageContext.Provider
@@ -48,7 +36,7 @@ export const LanguageProvider = ({
 
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
   return context;

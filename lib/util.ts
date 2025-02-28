@@ -85,14 +85,30 @@ export const maskingEmail = (email: string | null): string => {
   return maskedName + '@' + maskedDomain;
 };
 
+type FormatMessageParams = Record<string, string | number>;
+
 export const formatMessage = (
   template: string | undefined,
-  params: Record<string, string>,
+  params: FormatMessageParams,
   defaultMessage = 'Translation not available',
 ): string => {
-  const resolvedTemplate = template || defaultMessage;
+  if (!template) {
+    console.warn('[Translation] Template is undefined, using default message');
+    return defaultMessage;
+  }
 
-  return resolvedTemplate.replace(/{(\w+)}/g, (_, key) => params[key] || '');
+  try {
+    return template.replace(/{(\w+)}/g, (match, key) => {
+      if (!(key in params)) {
+        console.warn(`[Translation] Missing parameter "${key}" in template`);
+        return match;
+      }
+      return String(params[key]);
+    });
+  } catch (error) {
+    console.error('[Translation] Error:', error);
+    return defaultMessage;
+  }
 };
 
 export function formatToDateTimeLocal(date: Date): string {

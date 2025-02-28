@@ -7,8 +7,8 @@ const Main = () => {
   return (
     <div>
       <Navigation />
-      <h6>{dictionary.routes.main.index.name}</h6>
-      <p>{dictionary.routes.main.index.desc}</p>
+      <h2>{dictionary.common.main}</h2>
+      <span>Current language: {locale}</span>
     </div>
   );
 };

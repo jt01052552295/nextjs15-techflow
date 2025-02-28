@@ -1,70 +1,68 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { routesData } from '@/data/routesData';
+import type { RoutePattern, RouteMetadata } from '@/types/routes';
 
-export interface iRouteParams {
-  [key: string]: string | number;
-}
+export function getRoutePattern(path: string): RoutePattern {
+  const segments = path.split('.');
+  let current: any = routesData;
 
-export const generateRoutePath = (
-  path?: string,
-  params?: iRouteParams,
-): string => {
-  if (!path) {
-    return '#'; // 기본 경로 처리
-  }
-
-  let resolvedPath = path; // path가 정의된 경우 복사
-  if (params) {
-    Object.entries(params).forEach(([key, value]) => {
-      const regex = new RegExp(`{${key}}`, 'g'); // `{key}` 패턴 매칭
-      resolvedPath = resolvedPath.replace(regex, value.toString());
-    });
-  }
-
-  return resolvedPath;
-};
-
-export interface iRoute {
-  path: string;
-  name: string;
-  desc: string;
-}
-
-export type RouteGroup = Record<string, iRoute>;
-export type AdminRoutes = Record<string, RouteGroup>;
-
-export const createLocalizedRoute = (
-  locale: string,
-  basePath: string,
-  dictionary: any,
-  routeKey: string,
-): iRoute => ({
-  path: `/${locale}${basePath}`,
-  name: dictionary[routeKey]?.name || '',
-  desc: dictionary[routeKey]?.desc || '',
-});
-
-// 라우트 데이터를 생성하는 함수
-export const generateLocalizedRoutes = (
-  locale: string,
-  dictionary: any,
-): AdminRoutes => {
-  const localizedRoutes: AdminRoutes = {};
-
-  Object.entries(routesData).forEach(([groupKey, routes]) => {
-    localizedRoutes[groupKey] = {};
-    Object.entries(routes).forEach(([routeKey, path]) => {
-      const routeDictionary = dictionary.routes[groupKey]?.[routeKey];
-      if (!routeDictionary) {
-        console.warn(`Missing dictionary entry for ${groupKey}.${routeKey}`);
+  try {
+    for (const segment of segments) {
+      if (current && segment in current) {
+        current = current[segment];
+      } else {
+        throw new Error(`Invalid route path: ${path}`);
       }
-      localizedRoutes[groupKey][routeKey] = createLocalizedRoute(
-        locale,
-        path as string,
-        routeDictionary || { name: 'Unknown', desc: 'Unknown' },
-        routeKey,
-      );
-    });
-  });
+    }
 
-  return localizedRoutes;
-};
+    if (typeof current !== 'string') {
+      throw new Error(`Invalid route pattern for path: ${path}`);
+    }
+
+    return current;
+  } catch (error) {
+    console.error('Route resolution error:', error);
+    return '/'; // 기본 경로로 폴백
+  }
+}
+
+export function getRouteUrl(
+  path: string,
+  locale: string,
+  params?: Record<string, string>,
+): string {
+  const pattern = getRoutePattern(path);
+  let url = `/${locale}${pattern}`;
+
+  if (params) {
+    url = url.replace(/{(\w+)}/g, (_, key) => params[key] || '');
+  }
+
+  return url;
+}
+
+export function resolveRoute(
+  pattern: RoutePattern,
+  params?: Record<string, string>,
+): string {
+  if (!params) return pattern;
+  return pattern.replace(/{(\w+)}/g, (_, key) => params[key] || '');
+}
+
+export function getRouteMetadata(
+  path: string,
+  dictionary: any,
+  locale: string,
+): RouteMetadata & { url: string } {
+  const segments = path.split('.');
+  let current = dictionary.routes;
+
+  for (const segment of segments) {
+    current = current[segment];
+  }
+
+  return {
+    ...current,
+    url: `/${locale}${resolveRoute(getRoutePattern(path))}`,
+  };
+}

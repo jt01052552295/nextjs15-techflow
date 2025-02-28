@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import 'server-only';
 import { LocaleType } from '@/types/locales';
 
@@ -13,7 +14,6 @@ const loadAllFilesInDirectory = async (locale: LocaleType): Promise<any> => {
       (module) => module.default,
     ),
   };
-
   return namespaces; // 네임스페이스로 분리된 데이터 반환
 };
 
@@ -21,6 +21,7 @@ export const getDictionary = async (locale: LocaleType): Promise<any> => {
   try {
     return await loadAllFilesInDirectory(locale);
   } catch (error) {
+    console.error(error);
     console.warn(
       `Error loading locale files for ${locale}, falling back to 'ko'`,
     );
