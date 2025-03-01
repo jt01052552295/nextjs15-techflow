@@ -52,6 +52,19 @@ export default async function Page({ params }: Props) {
       <p>{dictionary.common.AppDesc}</p>
       <p>{url}</p>
       <p>{url2}</p>
+
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-sm">11</div>
+          <div className="col-sm">11</div>
+          <div className="col-sm">11</div>
+        </div>
+        <div className="row">
+          <div className="col-sm">11</div>
+          <div className="col-sm">11</div>
+          <div className="col-sm">11</div>
+        </div>
+      </div>
     </div>
   );
 }

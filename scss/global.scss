@@ -1,0 +1,11 @@
+@charset 'utf-8';
+// https://sass-guidelin.es/ko
+
+// Configuration
+@import './utils/_variables';
+
+// bootstrap
+@import '../node_modules/bootstrap/scss/bootstrap';
+
+// layout
+@import './layout/_admin';

@@ -1,8 +1,13 @@
+import '@/scss/global.scss';
+import InstallBootstrap from '@/components/helpers/InstallBootstrap';
 import { getDictionary } from '@/utils/get-dictionary';
 import { LanguageProvider } from '@/components/context/LanguageContext';
 import { LocaleType, I18N_CONFIG } from '@/constants/i18n';
 import { Metadata } from 'next';
 import { LanguageSwitcher } from '@/components/locale/LanguageSwitcher';
+import { config } from '@fortawesome/fontawesome-svg-core';
+import '@fortawesome/fontawesome-svg-core/styles.css';
+config.autoAddCss = false;
 
 export async function generateMetadata({
   params,
@@ -34,19 +39,17 @@ export default async function RootLayout({
   const dictionary = await getDictionary(language);
 
   return (
-    <html lang={language}>
-      <body>
-        <LanguageProvider
-          initialLocale={language}
-          initialDictionary={dictionary}
-        >
+    <LanguageProvider initialLocale={language} initialDictionary={dictionary}>
+      <html lang={language}>
+        <body>
+          <InstallBootstrap />
           <header>
             <LanguageSwitcher />
           </header>
           {children}
-        </LanguageProvider>
-      </body>
-    </html>
+        </body>
+      </html>
+    </LanguageProvider>
   );
 }
 

@@ -23,10 +23,22 @@
   },
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.5.9",
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-brands-svg-icons": "^6.7.2",
+    "@fortawesome/free-regular-svg-icons": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "@prisma/client": "^6.1.0",
+    "bootstrap": "^5.3.3",
+    "classnames": "^2.5.1",
+    "immer": "^10.1.1",
     "next": "15.0.3",
-    "react": "19.0.0-rc-66855b96-20241106",
-    "react-dom": "19.0.0-rc-66855b96-20241106"
+    "next-themes": "^0.4.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sass": "^1.85.1",
+    "sonner": "^2.0.1",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@types/negotiator": "^0.6.3",
@@ -40,6 +52,7 @@
     "negotiator": "^1.0.0",
     "prettier": "^3.4.2",
     "prisma": "^6.1.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "typescript-plugin-css-modules": "^5.1.0"
   }
 }
