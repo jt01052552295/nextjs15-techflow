@@ -4,7 +4,7 @@ import { LocaleType } from '@/types/locales';
 
 export const ckLocale = async () => {
   const cookieStore = await cookies();
-  const localeCookie = cookieStore.get('ck_locale');
+  const localeCookie = cookieStore.get('NEXT_LOCALE');
   const ck_locale = localeCookie?.value || 'ko'; // 기본 로케일 설정
 
   return ck_locale as LocaleType;

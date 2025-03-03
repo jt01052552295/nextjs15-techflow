@@ -4,11 +4,8 @@ import { I18N_CONFIG } from '@/constants/i18n';
 import type { LocaleType } from '@/constants/i18n';
 
 // 사전 데이터의 타입 정의
-export type Dictionary = {
-  columns: Record<string, string>;
-  common: Record<string, string>;
-  routes: Record<string, string>;
-};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Dictionary = Record<string, any>;
 
 type GetDictionaryFunction = (locale: LocaleType) => Promise<Dictionary>;
 
@@ -47,7 +44,7 @@ export const getDictionary: GetDictionaryFunction = unstable_cache(
   },
   ['dictionary'],
   {
-    revalidate: 3600,
+    revalidate: process.env.NODE_ENV === 'development' ? false : 3600,
     tags: ['dictionary'],
   },
 );

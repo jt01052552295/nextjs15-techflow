@@ -176,42 +176,42 @@
   },
   "auth": {
     "login": {
-      "snsPrompt": "간편 회원가입/로그인",
-      "loginButton": "로그인",
-      "remember": "계정기억하기",
-      "forgotAccount": "계정을 잊으셨나요?",
-      "forgotPassword": "비밀번호를 잊으셨나요?",
-      "register": "회원가입",
-      "loginWithGithub": "깃허브로 로그인",
-      "loginWithGoogle": "구글로 로그인",
-      "loginWithKakao": "카카오로 로그인",
-      "loginWithNaver": "네이버로 로그인"
+      "snsPrompt": "Easy Sign up/Sign in",
+      "loginButton": "Login",
+      "remember": "Remember Email",
+      "forgotAccount": "Forgot Account?",
+      "forgotPassword": "Forgot Password?",
+      "register": "Sign Up",
+      "loginWithGithub": "Login with Github",
+      "loginWithGoogle": "Login with Google",
+      "loginWithKakao": "Login with Kakao",
+      "loginWithNaver": "Login with Naver"
     },
     "register": {
-      "sendButton": "전송",
-      "sendButtonLoading": "전송중...",
-      "verifyCode": "인증코드",
-      "verifyButton": "인증",
-      "verifyButtonLoading": "인증중...",
-      "resendButton": "재전송",
-      "timeIsUp": "시간이 만료되었습니다.",
-      "codeSent": "전송되었습니다.",
-      "registerButton": "가입",
-      "modify": "변경하기",
-      "findAccount": "계정찾기",
-      "changedPassword": "비밀번호변경",
-      "changedProfile": "프로필변경",
-      "withDrawLabel": "탈퇴",
-      "withDrawMessage": "탈퇴정책에 동의합니다."
+      "sendButton": "Send",
+      "sendButtonLoading": "Sending...",
+      "verifyCode": "Verification Code",
+      "verifyButton": "Verify",
+      "verifyButtonLoading": "Verifying...",
+      "resendButton": "Resend",
+      "timeIsUp": "Time has expired",
+      "codeSent": "Code has been sent",
+      "registerButton": "Register",
+      "modify": "Modify",
+      "findAccount": "Find Account",
+      "changedPassword": "Change Password",
+      "changedProfile": "Change Profile",
+      "withDrawLabel": "Withdraw",
+      "withDrawMessage": "I agree to the withdrawal policy"
     }
   },
   "email": {
     "verification": {
-      "subject": "[{AppName}] 인증코드를 확인하세요",
-      "greeting": "사용자님,",
-      "message": "귀하의 인증 코드는:",
-      "instructions": "등록을 완료하려면 이 코드를 인증칸에 입력하십시오.",
-      "footer": "이 이메일을 요청하지 않은 경우 무시하십시오."
+      "subject": "[{AppName}] Check your verification code",
+      "greeting": "Dear User,",
+      "message": "Your verification code is:",
+      "instructions": "Enter this code in the verification field to complete registration.",
+      "footer": "If you did not request this email, please ignore it."
     }
   }
 }

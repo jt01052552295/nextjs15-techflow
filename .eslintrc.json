@@ -18,7 +18,8 @@
         "endOfLine": "auto"
       }
     ],
-    "react/jsx-props-no-spreading": "off", // 필요시 추가
-    "react/react-in-jsx-scope": "off" // 필요시 추가
+    "react/jsx-props-no-spreading": "off",
+    "react/react-in-jsx-scope": "off",
+    "@typescript-eslint/no-explicit-any": "off"
   }
 }

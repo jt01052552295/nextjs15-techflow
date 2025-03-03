@@ -4,7 +4,7 @@ import { getDictionary } from '@/utils/get-dictionary';
 import { LanguageProvider } from '@/components/context/LanguageContext';
 import { LocaleType, I18N_CONFIG } from '@/constants/i18n';
 import { Metadata } from 'next';
-import { LanguageSwitcher } from '@/components/locale/LanguageSwitcher';
+import { Toaster } from 'sonner';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 config.autoAddCss = false;
@@ -16,10 +16,22 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { language } = await params;
   const dictionary = await getDictionary(language);
+  const AppName =
+    process.env.NEXT_PUBLIC_MODE === 'development'
+      ? dictionary.common.AppName + '::DEV'
+      : dictionary.common.AppName;
 
   return {
-    title: dictionary.common.siteTitle,
-    description: dictionary.common.siteDescription,
+    title: {
+      template: `%s | ${AppName}`,
+      default: AppName, // a default is required when creating a template
+    },
+    description: dictionary.common.AppDesc,
+    keywords: ['Next.js', 'React', 'JavaScript'],
+    robots: {
+      index: false,
+      follow: false,
+    },
     alternates: {
       languages: Object.fromEntries(
         I18N_CONFIG.locales.map((locale) => [locale, `/${locale}`]),
@@ -37,16 +49,22 @@ export default async function RootLayout({
 }) {
   const { language } = await params;
   const dictionary = await getDictionary(language);
+  // console.log('Dictionary being passed to provider:', dictionary.common.auth);
 
   return (
     <LanguageProvider initialLocale={language} initialDictionary={dictionary}>
       <html lang={language}>
         <body>
           <InstallBootstrap />
-          <header>
-            <LanguageSwitcher />
-          </header>
           {children}
+          <Toaster
+            closeButton
+            richColors
+            position="top-center"
+            expand={false}
+            visibleToasts={1}
+            duration={3000}
+          />
         </body>
       </html>
     </LanguageProvider>

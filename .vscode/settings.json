@@ -1,11 +1,16 @@
 {
-    "liveSassCompile.settings.formats": [],
-    "liveSassCompile.settings.includeItems": [],
-    "liveSassCompile.settings.excludeList": ["/scss/**"],
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "eslint.validate": ["javascript", "typescript", "javascriptreact", "typescriptreact"],
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": "explicit"
-    }
+  "liveSassCompile.settings.formats": [],
+  "liveSassCompile.settings.includeItems": [],
+  "liveSassCompile.settings.excludeList": ["/scss/**"],
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "javascriptreact",
+    "typescriptreact"
+  ],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  }
 }

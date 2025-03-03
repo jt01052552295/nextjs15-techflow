@@ -1,0 +1,33 @@
+.register-page {
+  align-items: center;
+  background-color: $gray-500;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  justify-content: center;
+}
+
+.register-box {
+  width: 360px;
+
+  .card {
+    margin-bottom: 0;
+  }
+}
+
+.register-logo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.9rem;
+
+  a {
+    color: $gray-700;
+  }
+}
+
+.register-box-msg {
+  margin: 0;
+  padding: 0 20px 20px;
+  text-align: center;
+}
