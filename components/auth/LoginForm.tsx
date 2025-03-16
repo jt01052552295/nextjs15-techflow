@@ -15,6 +15,7 @@ import useFormUtils from '@/hooks/useFormUtils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { LanguageSwitcher } from '@/components/locale/LanguageSwitcher';
+import SocialButton from './SocialButton';
 
 const LoginForm = () => {
   const { dictionary, locale } = useLanguage();
@@ -42,7 +43,7 @@ const LoginForm = () => {
     resolver: zodResolver(loginSchema(dictionary.common.form)),
     defaultValues: {
       email: '',
-      password: '',
+      password: 'a1111!',
       rememberEmail: false,
     },
     mode: 'onChange',
@@ -62,7 +63,16 @@ const LoginForm = () => {
         if (response.status == 'error') {
           toast.error(response.message);
         }
-        // toast.success(`로그인성공`);
+        toast.success(response.message);
+
+        if (response.expiresAt) {
+          localStorage.setItem('session_expires_at', response.expiresAt);
+        }
+
+        setTimeout(() => {
+          const url = getRouteUrl('main.index', locale);
+          window.location.href = url;
+        }, 500);
       } catch (error) {
         console.error(error);
         toast.error(dictionary.common.unknown_error);
@@ -205,7 +215,9 @@ const LoginForm = () => {
                 )}
               </div>
             </form>
-
+            <div className="mt-3">
+              <SocialButton />
+            </div>
             <div className="mt-3 text-end">
               <Link
                 href={getRouteUrl('auth.account', locale)}

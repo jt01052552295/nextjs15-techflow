@@ -2,6 +2,7 @@ import '@/scss/global.scss';
 import InstallBootstrap from '@/components/helpers/InstallBootstrap';
 import { getDictionary } from '@/utils/get-dictionary';
 import { LanguageProvider } from '@/components/context/LanguageContext';
+import { AuthProvider } from '@/components/context/AuthContext';
 import { LocaleType, I18N_CONFIG } from '@/constants/i18n';
 import { Metadata } from 'next';
 import { Toaster } from 'sonner';
@@ -53,20 +54,22 @@ export default async function RootLayout({
 
   return (
     <LanguageProvider initialLocale={language} initialDictionary={dictionary}>
-      <html lang={language}>
-        <body>
-          <InstallBootstrap />
-          {children}
-          <Toaster
-            closeButton
-            richColors
-            position="top-center"
-            expand={false}
-            visibleToasts={1}
-            duration={3000}
-          />
-        </body>
-      </html>
+      <AuthProvider>
+        <html lang={language}>
+          <body>
+            <InstallBootstrap />
+            {children}
+            <Toaster
+              closeButton
+              richColors
+              position="top-center"
+              expand={false}
+              visibleToasts={1}
+              duration={3000}
+            />
+          </body>
+        </html>
+      </AuthProvider>
     </LanguageProvider>
   );
 }

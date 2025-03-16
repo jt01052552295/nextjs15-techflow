@@ -5,6 +5,7 @@ export const routesData = {
   auth: {
     login: '/auth/login',
     register: '/auth/register',
+    social: '/auth/social',
     account: '/auth/account',
     password: '/auth/password',
     error: '/auth/error',

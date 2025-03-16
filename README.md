@@ -21,6 +21,8 @@ npm i zod react-hook-form @hookform/resolvers
 npm i react-countdown react-textarea-autosize
 npm i react-quill
 npm i bcryptjs --save-dev @types/bcryptjs
+npm i jsonwebtoken --save-dev @types/jsonwebtoken
+
 npm i uuid --save-dev @types/uuid
 npm i nodemailer --save-dev @types/nodemailer
 npm i dayjs
