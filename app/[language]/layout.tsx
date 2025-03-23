@@ -8,6 +8,7 @@ import { Metadata } from 'next';
 import { Toaster } from 'sonner';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
+import { ThemeProvider } from '@/components/context/ThemeProvider';
 config.autoAddCss = false;
 
 export async function generateMetadata({
@@ -55,18 +56,24 @@ export default async function RootLayout({
   return (
     <LanguageProvider initialLocale={language} initialDictionary={dictionary}>
       <AuthProvider>
-        <html lang={language}>
+        <html lang={language} suppressHydrationWarning>
           <body>
-            <InstallBootstrap />
-            {children}
-            <Toaster
-              closeButton
-              richColors
-              position="top-center"
-              expand={false}
-              visibleToasts={1}
-              duration={3000}
-            />
+            <ThemeProvider
+              enableSystem={false}
+              attribute="data-bs-theme"
+              disableTransitionOnChange
+            >
+              <InstallBootstrap />
+              {children}
+              <Toaster
+                closeButton
+                richColors
+                position="top-center"
+                expand={false}
+                visibleToasts={1}
+                duration={3000}
+              />
+            </ThemeProvider>
           </body>
         </html>
       </AuthProvider>

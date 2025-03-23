@@ -2,8 +2,9 @@ import { getDictionary } from '@/utils/get-dictionary';
 import type { LocaleType } from '@/constants/i18n';
 import { getRouteMetadata } from '@/utils/routes';
 import { Metadata } from 'next';
-import Main from '@/components/main/Main';
 import { getRouteUrl } from '@/utils/routes';
+import PageHeader from '@/components/common/PageHeader';
+import Breadcrumb from '@/components/common/Breadcrumb';
 
 type Props = {
   params: { language: LocaleType };
@@ -30,40 +31,38 @@ export default async function Page({ params }: Props) {
   const { language } = await params;
   const dictionary = await getDictionary(language);
   const metadata = getRouteMetadata('main.index', dictionary, language);
+  const url = getRouteUrl('main.index', language);
 
-  const url = getRouteUrl('user.show', language, { id: '1' });
+  const breadcrumbPaths = [
+    {
+      name: dictionary.common?.home || 'Home',
+      url: '/',
+    },
+    {
+      name: metadata.name,
+      url: getRouteUrl('main.index', language),
+    },
+    // {
+    //   name: dictionary.menu?.members || '회원 관리',
+    //   url: '#',
+    // },
+  ];
 
-  const url2 = getRouteUrl('company.edit', language, {
-    id: '123',
-    section: 'profile',
-  });
+  // const url = getRouteUrl('user.show', language, { id: '1' });
+
+  // const url2 = getRouteUrl('company.edit', language, {
+  //   id: '123',
+  //   section: 'profile',
+  // });
 
   // console.log(dictionary);
   // console.log(routes.main.index);
 
   return (
-    <div>
-      <header>
-        <h1>{metadata.name}</h1>
-        {metadata.desc && <p className="page-description">{metadata.desc}</p>}
-      </header>
-      <Main />
-      <h1>{dictionary.common.AppName}</h1>
-      <p>{dictionary.common.AppDesc}</p>
-      <p>{url}</p>
-      <p>{url2}</p>
-
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-sm">11</div>
-          <div className="col-sm">11</div>
-          <div className="col-sm">11</div>
-        </div>
-        <div className="row">
-          <div className="col-sm">11</div>
-          <div className="col-sm">11</div>
-          <div className="col-sm">11</div>
-        </div>
+    <div className="container-fluid">
+      <div className="row flex-column-reverse flex-md-row align-items-md-center mb-3">
+        <PageHeader meta={metadata} />
+        <Breadcrumb paths={breadcrumbPaths} />
       </div>
     </div>
   );

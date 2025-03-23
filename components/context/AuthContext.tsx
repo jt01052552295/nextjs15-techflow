@@ -8,8 +8,7 @@ import {
   ReactNode,
 } from 'react';
 import { useRouter } from 'next/navigation';
-import { getRouteUrl } from '@/utils/routes';
-import { useLanguage } from './LanguageContext';
+
 import { logoutAndRedirectAction } from '@/actions/auth/logout';
 
 // 사용자 타입 정의
@@ -49,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const { locale } = useLanguage();
+  //const { locale } = useLanguage();
 
   // 사용자 정보 가져오기
   const fetchUser = async () => {

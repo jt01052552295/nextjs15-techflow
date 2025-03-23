@@ -1,7 +1,9 @@
 // $primary: #900;
 // $enable-shadows: true;
 // $prefix: "mo-";
-$breadcrumb-divider: quote('>');
+$breadcrumb-divider-color: #6c757d;
+$breadcrumb-divider: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8'><path d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='#{$breadcrumb-divider-color}'/></svg>");
+
 $zindex-levels: (
   n1: -1,
   0: 0,

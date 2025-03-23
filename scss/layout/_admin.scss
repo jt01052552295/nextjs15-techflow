@@ -7,3 +7,307 @@ dd {
   padding: 0;
   list-style: none;
 }
+
+.wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+}
+
+.footer {
+  width: 100vw;
+  padding: 1rem;
+}
+
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100%;
+  max-width: 260px;
+  min-width: 260px;
+  transition: transform 0.3s ease;
+  z-index: 1030;
+
+  &.collapsed {
+    transform: translateX(-100%);
+  }
+
+  &.expanded {
+    transform: translateX(0);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); // 추가: 모바일에서 그림자 효과
+  }
+
+  @include media-breakpoint-up(md) {
+    // 태블릿/데스크톱에서는 사이드바가 메인 콘텐츠를 밀어내는 방식
+    &.expanded {
+      box-shadow: none; // 데스크톱에서는 그림자 효과 제거
+    }
+  }
+
+  // @include media-breakpoint-up(sm) {  }
+  // @include media-breakpoint-up(md) {  }
+  // @include media-breakpoint-up(lg) {  }
+  // @include media-breakpoint-up(xl) {  }
+  // @include media-breakpoint-up(xxl) {  }
+  // @include media-breakpoint-up(md) {
+  //   transform: translateX(-100%); // 기본적으로 숨김 처리
+  //   &.expanded {
+  //     transform: translateX(0); // 클래스가 적용될 때 보이기
+  //   }
+  // }
+  // @include media-breakpoint-down(md) {
+  //   background-color: blue;
+  // }
+  // @include media-breakpoint-up(lg) {
+  //   background-color: red;
+  // }
+
+  .accordion-body {
+    padding: 0;
+  }
+
+  .list-group-bottom > .list-group-item {
+    border: 0;
+  }
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.sidebar-logo {
+  padding: 1.15rem 1.5rem;
+}
+
+.nav-link {
+  padding: $accordion-button-padding-y $accordion-button-padding-x;
+}
+
+.nav-link.active {
+  color: $white;
+  background-color: $primary;
+}
+
+.list-group-item {
+  padding: $list-group-item-padding-y $accordion-button-padding-x + 0.5;
+}
+
+.navbar {
+  width: 100vw;
+  padding: 0.75rem;
+  @include media-breakpoint-up(md) {
+    width: auto;
+  }
+
+  .short-menu .dropdown-menu {
+    min-width: 20rem;
+  }
+}
+
+.sidebar-overlay {
+  display: none;
+
+  .sidebar.expanded ~ & {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1020;
+  }
+
+  @include media-breakpoint-up(md) {
+    display: none !important; // 태블릿/데스크톱에서는 오버레이 사용 안 함
+  }
+}
+
+// Navigation 스타일 시작
+.navigation {
+  width: 100%;
+
+  .main-menu {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    .greeting {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .menu-item {
+      position: relative;
+
+      &.active {
+        > .menu-link,
+        > .menu-toggle {
+          background-color: rgba($primary, 0.1);
+          color: $primary;
+
+          .menu-icon {
+            color: $primary;
+          }
+        }
+      }
+    }
+
+    .menu-toggle,
+    .menu-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+
+      .menu-icon {
+        width: 20px;
+        margin-right: 10px;
+        color: rgba(0, 0, 0, 0.6);
+      }
+
+      .menu-title {
+        flex: 1;
+      }
+
+      .toggle-icon {
+        transition: transform 0.3s ease;
+
+        &.rotated {
+          transform: rotate(180deg);
+        }
+      }
+    }
+
+    .sub-menu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      background-color: rgba(0, 0, 0, 0.02);
+
+      &.open {
+        max-height: 500px; // 충분히 큰 값으로 설정
+      }
+
+      .sub-menu-item {
+        &.active {
+          .sub-menu-link {
+            color: $primary;
+            background-color: rgba($primary, 0.05);
+
+            .sub-menu-icon {
+              color: $primary;
+            }
+          }
+        }
+      }
+
+      .sub-menu-link {
+        display: flex;
+        align-items: center;
+        padding: 0.6rem 1rem 0.6rem 3rem;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .sub-menu-icon {
+          width: 12px;
+          margin-right: 8px;
+          color: rgba(0, 0, 0, 0.5);
+        }
+
+        .menu-description {
+          display: block;
+          margin-top: 0.25rem;
+          font-size: 0.75rem;
+          color: rgba(0, 0, 0, 0.5);
+        }
+      }
+    }
+  }
+}
+// Navigation 스타일 끝
+
+.main {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow: hidden;
+  width: 100%;
+  max-width: 100vw;
+
+  transition: margin-left 0.3s ease;
+  margin-left: 0;
+  @include media-breakpoint-up(md) {
+    &.sidebar-collapsed {
+      margin-left: 0;
+    }
+
+    &.sidebar-expanded {
+      margin-left: 260px; // 사이드바 너비와 일치
+    }
+  }
+}
+
+.content {
+  flex: 1;
+  max-width: 100vw;
+  padding: 1.5rem 0.5rem;
+
+  @include media-breakpoint-up(md) {
+    width: auto;
+  }
+  @include media-breakpoint-up(lg) {
+    padding: 0 3rem 1.5rem;
+  }
+}
+
+.rdrDefinedRangesWrapper {
+  display: none;
+}
+
+.table-fixed {
+  min-width: 640px;
+}
+
+.content-display {
+  // 전체 컨테이너 스타일
+  overflow: hidden;
+
+  // 이미지 스타일
+  img {
+    max-width: 100%;
+    height: auto; // 이미지 비율 유지
+    display: block; // 이미지가 인라인 요소로 취급되지 않도록 함
+    margin: 0 auto; // 이미지를 가운데 정렬
+  }
+
+  // 추가적인 스타일
+  p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+}
+
+.dashboard-card-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: var(--bs-primary);
+  color: var(--bs-white);
+}

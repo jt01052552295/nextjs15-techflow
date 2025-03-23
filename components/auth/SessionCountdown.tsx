@@ -67,7 +67,7 @@ const SessionCountdown: React.FC<SessionCountdownProps> = ({
       setTimeLeft({ days, hours, minutes, seconds });
 
       // 남은 시간이 3일 이하면 연장 버튼 표시
-      setShowExtendButton(days <= 30);
+      setShowExtendButton(days <= 3);
     };
 
     calculateTimeLeft();

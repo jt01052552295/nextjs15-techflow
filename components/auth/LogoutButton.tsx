@@ -11,7 +11,7 @@ import { getRouteUrl } from '@/utils/routes';
 
 type LogoutButtonProps = {
   className?: string;
-  variant?: 'button' | 'link' | 'dropdown';
+  variant?: 'button' | 'link' | 'dropdown' | 'sidebar';
   showIcon?: boolean;
 };
 
@@ -64,6 +64,19 @@ const LogoutButton = ({
     return (
       <button
         className={`dropdown-item ${className}`}
+        onClick={handleLogout}
+        disabled={isPending}
+      >
+        {showIcon && <FontAwesomeIcon icon={faSignOutAlt} className="me-2" />}
+        {isPending
+          ? dictionary.common.loading
+          : dictionary.common.auth.logout.button}
+      </button>
+    );
+  } else if (variant === 'sidebar') {
+    return (
+      <button
+        className={`list-group-item list-group-item-action ${className}`}
         onClick={handleLogout}
         disabled={isPending}
       >
