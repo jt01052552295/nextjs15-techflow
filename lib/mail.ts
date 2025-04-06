@@ -36,13 +36,13 @@ export const sendVerificationEmail = async (
   code: string,
   messages: Record<string, any>,
 ): Promise<boolean> => {
-  const subject = formatMessage(messages.email.verification.subject, {
+  const subject = formatMessage(messages.common.email.verification.subject, {
     AppName: messages.AppName,
   });
-  const greeting = messages.email.verification.greeting;
-  const message = messages.email.verification.message;
-  const instructions = messages.email.verification.instructions;
-  const footer = messages.email.verification.footer;
+  const greeting = messages.common.email.verification.greeting;
+  const message = messages.common.email.verification.message;
+  const instructions = messages.common.email.verification.instructions;
+  const footer = messages.common.email.verification.footer;
 
   const html = loadTemplate('verification', {
     code,

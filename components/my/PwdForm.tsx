@@ -72,7 +72,7 @@ const PwdForm = () => {
   const formAction: SubmitHandler<PasswordType> = (data) => {
     startTransition(async () => {
       try {
-        const response = await resetPasswordAction(data, locale);
+        const response = await resetPasswordAction(data);
         if (response.status == 'success') {
           toast.success(response.message);
           reset();
