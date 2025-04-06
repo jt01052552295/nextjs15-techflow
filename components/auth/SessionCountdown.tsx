@@ -68,6 +68,7 @@ const SessionCountdown: React.FC<SessionCountdownProps> = ({
 
       // 남은 시간이 3일 이하면 연장 버튼 표시
       setShowExtendButton(days <= 3);
+      // setShowExtendButton(days > 3);
     };
 
     calculateTimeLeft();
@@ -114,9 +115,6 @@ const SessionCountdown: React.FC<SessionCountdownProps> = ({
   return (
     <div className="session-countdown">
       <div className="d-flex align-items-center">
-        <small className="text-muted me-2">
-          {dictionary.common.auth.session.expiresIn}:
-        </small>
         <span className="badge bg-info">
           {timeLeft.days > 0 &&
             `${timeLeft.days}${dictionary.common.auth.session.days} `}
@@ -125,9 +123,9 @@ const SessionCountdown: React.FC<SessionCountdownProps> = ({
           {timeLeft.seconds.toString().padStart(2, '0')}
         </span>
 
-        {showExtendButton && (
+        {showExtendButton ? (
           <button
-            className="btn btn-sm btn-outline-primary ms-2"
+            className="btn badge bg-info ms-2 "
             onClick={extendSession}
             disabled={isExtending}
           >
@@ -135,6 +133,10 @@ const SessionCountdown: React.FC<SessionCountdownProps> = ({
               ? dictionary.common.loading
               : dictionary.common.auth.session.extend}
           </button>
+        ) : (
+          <small className="text-muted ms-2">
+            {dictionary.common.auth.session.expiresIn}
+          </small>
         )}
       </div>
     </div>

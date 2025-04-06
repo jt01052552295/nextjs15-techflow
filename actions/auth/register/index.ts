@@ -99,9 +99,9 @@ export const authRegisterAction = async (
     const token = sign(
       {
         userId: result.user.id,
-        email: result.user.email,
-        name: result.user.name,
-        role: result.user.role,
+        // email: result.user.email,
+        // name: result.user.name,
+        // role: result.user.role,
       },
       jwtSecret,
       { expiresIn: '30d' },

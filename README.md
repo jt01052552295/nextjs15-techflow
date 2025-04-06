@@ -40,6 +40,7 @@ npm i --save-dev @types/ua-parser-js
 npm install chartjs-plugin-datalabels --save
 
 npm install mathjs
+npm install node-fetch @types/node-fetch
 
 ```
 

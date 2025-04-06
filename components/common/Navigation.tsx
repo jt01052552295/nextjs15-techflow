@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import cx from 'classnames';
 import { getRouteMetadata, getRouteUrl } from '@/utils/routes';
-import { formatMessage } from '@/lib/util';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faHome,
@@ -19,13 +18,11 @@ import {
   faChartSimple,
   faAngleDown,
 } from '@fortawesome/free-solid-svg-icons';
-import { useAuth } from '@/components/context/AuthContext';
 
 const Navigation = () => {
   const mount = useMount();
   const pathname = usePathname();
   const { dictionary, locale } = useLanguage();
-  const { user } = useAuth();
 
   const menuStructure = [
     {
@@ -117,14 +114,6 @@ const Navigation = () => {
   return (
     <nav className="navigation" data-attr={`${locale}`}>
       <ul className="main-menu">
-        {user && (
-          <li className="greeting">
-            {formatMessage(dictionary.common.greeting, {
-              name: user?.name || '-',
-            })}
-          </li>
-        )}
-
         {menuStructure.map((menu) => {
           const isMenuOpen = openMenus.includes(menu.id);
           const hasSubMenus = menu.subMenus.length > 0;

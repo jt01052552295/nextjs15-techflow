@@ -4,7 +4,6 @@ import { useLanguage } from '@/components/context/LanguageContext';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/context/AuthContext';
 import { getRouteUrl } from '@/utils/routes';
-import SessionCountdown from '@/components/auth/SessionCountdown';
 import cx from 'classnames';
 import Footer from '../common/Footer';
 import { useCollapseStore } from '@/store/sidebar';
@@ -50,7 +49,6 @@ const Main = ({ children }: Props) => {
         <SidebarToggle />
         <ThemeSwitch />
         <LanguageSwitcher />
-        <SessionCountdown />
         <ShortMenu />
         <ShortProfile />
       </nav>

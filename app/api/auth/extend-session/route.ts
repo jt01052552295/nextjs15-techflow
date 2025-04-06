@@ -20,9 +20,9 @@ export async function POST(request: NextRequest) {
     const jwtSecret = process.env.JWT_SECRET || '';
     const decoded = verify(authToken, jwtSecret) as {
       userId: string;
-      email: string;
-      name: string;
-      role: string;
+      // email: string;
+      // name: string;
+      // role: string;
     };
 
     // 세션 찾기
@@ -51,9 +51,9 @@ export async function POST(request: NextRequest) {
     const newToken = sign(
       {
         userId: decoded.userId,
-        email: decoded.email,
-        name: decoded.name,
-        role: decoded.role,
+        // email: decoded.email,
+        // name: decoded.name,
+        // role: decoded.role,
       },
       jwtSecret,
       { expiresIn: '30d' },

@@ -12,9 +12,10 @@ type BreadcrumbPath = {
 
 type BreadcrumbProps = {
   paths: BreadcrumbPath[]; // 경로 배열
+  dictionary: any;
 };
 
-const Breadcrumb = ({ paths }: BreadcrumbProps) => {
+const Breadcrumb = ({ paths, dictionary }: BreadcrumbProps) => {
   const mount = useMount();
   const displayPaths = paths.slice(0, 3);
 
@@ -24,6 +25,16 @@ const Breadcrumb = ({ paths }: BreadcrumbProps) => {
     <div className="col-md-6">
       <nav className="d-md-flex justify-content-md-end" aria-label="breadcrumb">
         <ol className="breadcrumb m-0">
+          <li className={`breadcrumb-item`}>
+            <Link
+              href={'/'}
+              className="link-secondary link-underline link-underline-opacity-0"
+            >
+              <FontAwesomeIcon icon={faHouse} className="me-1" />
+              {dictionary.common?.home || 'Home'}
+            </Link>
+          </li>
+
           {displayPaths.map((path, index) => {
             const isLast = index === displayPaths.length - 1;
 
@@ -40,9 +51,6 @@ const Breadcrumb = ({ paths }: BreadcrumbProps) => {
                     href={path.url}
                     className="link-secondary link-underline link-underline-opacity-0"
                   >
-                    {index === 0 && (
-                      <FontAwesomeIcon icon={faHouse} className="me-1" />
-                    )}
                     {path.name}
                   </Link>
                 )}

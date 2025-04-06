@@ -73,9 +73,9 @@ export const authLoginAction = async (
     const token = sign(
       {
         userId: existingUser.id,
-        email: existingUser.email,
-        name: existingUser.name,
-        role: existingUser.role,
+        // email: existingUser.email,
+        // name: existingUser.name,
+        // role: existingUser.role,
       },
       jwtSecret,
       { expiresIn: '30d' },

@@ -170,3 +170,56 @@ export function calculateChangeRate(
 
   return { powerDifference, kepcoDifference };
 }
+
+// 파일 확장자 추출 함수
+export const getFileExtension = (filename: string): string => {
+  return filename
+    .slice(((filename.lastIndexOf('.') - 1) >>> 0) + 2)
+    .toLowerCase();
+};
+
+// 허용된 파일 타입 목록을 사람이 읽기 쉬운 형식으로 변환
+export const getAcceptableFileTypes = (accept: string): string => {
+  const types = accept.split(',').map((type) => type.trim());
+  const extensions = types.map((type) => {
+    if (type === 'image/*') return 'images';
+    if (type === 'application/pdf') return 'PDF';
+    if (type.startsWith('.')) return type.substring(1).toUpperCase();
+    return type;
+  });
+
+  return extensions.join(', ');
+};
+
+// 파일 타입 검증 함수 개선
+export const isValidFileType = (file: File, accept: string): boolean => {
+  const acceptTypes = accept.split(',').map((type) => type.trim());
+
+  // 파일 확장자 확인
+  const fileExt = getFileExtension(file.name);
+  const acceptableExts = acceptTypes
+    .filter((type) => type.startsWith('.'))
+    .map((type) => type.substring(1).toLowerCase());
+
+  // MIME 타입 확인
+  const acceptableMimeTypes = acceptTypes.filter(
+    (type) => !type.startsWith('.'),
+  );
+
+  // 확장자 체크
+  if (acceptableExts.includes(fileExt)) {
+    return true;
+  }
+
+  // MIME 타입 체크
+  return acceptableMimeTypes.some((type) => {
+    if (type === '*' || type === '*/*') return true;
+
+    if (type.endsWith('/*')) {
+      const mainType = type.split('/')[0];
+      return file.type.startsWith(`${mainType}/`);
+    }
+
+    return file.type === type;
+  });
+};

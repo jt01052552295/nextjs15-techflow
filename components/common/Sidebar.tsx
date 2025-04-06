@@ -9,6 +9,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { useCollapseStore } from '@/store/sidebar';
 
+import UserProfileWidget from '@/components/common/UserProfileWidget';
+
 const Sidebar = () => {
   const { dictionary, locale } = useLanguage();
   const { collapse, setCollapse } = useCollapseStore();
@@ -51,7 +53,7 @@ const Sidebar = () => {
             </Link>
           </h1>
         </div>
-
+        <UserProfileWidget collapse={collapse} />
         <Navigation />
 
         <div className="list-group list-group-flush mt-auto list-group-bottom">

@@ -42,7 +42,7 @@ const nextConfig = {
       },
       {
         protocol: 'http',
-        hostname: 'static.winetrip.co.kr',
+        hostname: 'static.mymedia.work',
       },
     ],
   },

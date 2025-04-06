@@ -35,10 +35,6 @@ export default async function Page({ params }: Props) {
 
   const breadcrumbPaths = [
     {
-      name: dictionary.common?.home || 'Home',
-      url: '/',
-    },
-    {
       name: metadata.name,
       url: getRouteUrl('main.index', language),
     },
@@ -62,7 +58,7 @@ export default async function Page({ params }: Props) {
     <div className="container-fluid">
       <div className="row flex-column-reverse flex-md-row align-items-md-center mb-3">
         <PageHeader meta={metadata} />
-        <Breadcrumb paths={breadcrumbPaths} />
+        <Breadcrumb paths={breadcrumbPaths} dictionary={dictionary} />
       </div>
     </div>
   );

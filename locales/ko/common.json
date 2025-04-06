@@ -103,12 +103,14 @@
   "carbon": "탄소",
   "footer": "Copyright &copy; 2025 <strong>Footer</strong> All rights reserved.",
   "upload": {
+    "uploading": "업로드중...",
     "upload_btn": "파일선택",
     "preview": "미리보기",
     "no_file": "업로드할 파일이 없습니다.",
     "max_count": "{max}개 이하로만 업로드 가능합니다.",
     "max_size": "업로드 용량 총 {max}MB 이하로만 업로드 가능합니다.",
-    "info_message": "(최대: {count}개, 총 용량: {size}MB 이하)"
+    "info_message": "(최대: {count}개, 총 용량: {size}MB 이하)",
+    "wrong_file": "{extension} : 지원하지 않는 파일 형식입니다."
   },
   "api": {
     "fail1": "API Error : 연결실패 했습니다.",
@@ -166,7 +168,8 @@
   },
   "userRole": {
     "admin": "관리자",
-    "extra": "엑스트라",
+    "extra": "외부자",
+    "company": "기업",
     "user": "회원"
   },
   "gender": {
@@ -236,7 +239,7 @@
       "githubOauthError": "깃허브 로그인 처리 중 오류가 발생했습니다"
     },
     "session": {
-      "expiresIn": "세션 만료",
+      "expiresIn": "남았습니다.",
       "days": "일",
       "extend": "연장하기",
       "extended": "세션이 성공적으로 연장되었습니다"

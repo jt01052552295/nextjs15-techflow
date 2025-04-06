@@ -53,8 +53,8 @@ model User {
   isUse      Boolean  @default(true) @map("is_use")
   isVisible  Boolean  @default(true) @map("is_visible")
   isSignout  Boolean  @default(false) @map("is_signout")
-  profile    UserProfile[]
   accounts   Account[]
+  profile    UserProfile[]
   sessions   Session[]
   company    Company? 
   setting    Setting?
@@ -73,13 +73,16 @@ model User {
 model UserProfile {
   idx    Int    @id @default(autoincrement())
   uid    String @unique @default(uuid())
-  userId String @unique @map("user_id")
+  userId String
   name   String
   url    String @db.VarChar(255)
-  user   User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId], map: "userId_index")
   @@map("ec_user_profile")
 }
+
+
 
 model Company {
   idx       Int       @id @default(autoincrement())
