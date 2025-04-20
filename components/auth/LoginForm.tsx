@@ -18,7 +18,7 @@ import { LanguageSwitcher } from '@/components/locale/LanguageSwitcher';
 import SocialButton from './SocialButton';
 
 const LoginForm = () => {
-  const { dictionary, locale } = useLanguage();
+  const { dictionary, locale, t } = useLanguage();
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -112,11 +112,13 @@ const LoginForm = () => {
     }
   }, [errors.email, watchedEmail]);
 
+  const welcomeMessage = t('common.AppName', {});
+
   return (
     <div className={styles['register-page']}>
       <div className={styles['register-box']}>
         <div className={styles['register-logo']}>
-          <h1 className="fs-5 m-0">{dictionary.common.AppName}</h1>
+          <h1 className="fs-5 m-0">{welcomeMessage}</h1>
           <LanguageSwitcher />
         </div>
 
