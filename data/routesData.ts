@@ -14,6 +14,7 @@ export const routesData = {
     profile: '/my/profile',
     pwd: '/my/pwd',
     settings: '/my/settings',
+    withdraw: '/my/withdraw',
   },
   todo1: {
     index: '/todo1',

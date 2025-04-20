@@ -1,10 +1,16 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faGear, faLock } from '@fortawesome/free-solid-svg-icons';
+import {
+  faUser,
+  faGear,
+  faLock,
+  faRightFromBracket,
+} from '@fortawesome/free-solid-svg-icons';
 import { getRouteUrl } from '@/utils/routes';
 import Link from 'next/link';
 import { useLanguage } from '@/components/context/LanguageContext';
 import LogoutButton from '../auth/LogoutButton';
+import { formatMessage } from '@/lib/util';
 
 const ShortProfile = () => {
   const { dictionary, locale } = useLanguage();
@@ -51,6 +57,16 @@ const ShortProfile = () => {
               &nbsp;{dictionary.routes.my.settings.name}
             </Link>
           </li>
+          <li>
+            <Link
+              className="dropdown-item"
+              href={getRouteUrl('my.withdraw', locale)}
+            >
+              <FontAwesomeIcon icon={faRightFromBracket} />
+              &nbsp;Signout
+            </Link>
+          </li>
+
           <li>
             <hr className="dropdown-divider" />
           </li>

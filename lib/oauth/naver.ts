@@ -43,6 +43,26 @@ export async function getNaverToken(code: string, state: string) {
   return await response.json();
 }
 
+// 액세스 토큰 갱신
+export async function refreshNaverToken(refreshToken: string) {
+  const params = new URLSearchParams({
+    grant_type: 'refresh_token',
+    client_id: NAVER_CLIENT_ID,
+    client_secret: NAVER_CLIENT_SECRET,
+    refresh_token: refreshToken,
+  });
+
+  const response = await fetch(NAVER_TOKEN_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: params.toString(),
+  });
+
+  return await response.json();
+}
+
 // 네이버 프로필 정보 가져오기
 export async function getNaverProfile(accessToken: string) {
   const response = await fetch(NAVER_PROFILE_URL, {
@@ -52,6 +72,51 @@ export async function getNaverProfile(accessToken: string) {
   });
 
   return await response.json();
+}
+
+// 액세스 토큰 삭제
+export async function deleteNaverToken(accessToken: string) {
+  try {
+    const params = new URLSearchParams({
+      grant_type: 'delete',
+      client_id: NAVER_CLIENT_ID,
+      client_secret: NAVER_CLIENT_SECRET,
+      access_token: accessToken,
+      service_provider: 'NAVER',
+    });
+
+    const response = await fetch(NAVER_TOKEN_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    });
+
+    const result = await response.json();
+
+    if (result.error) {
+      throw new Error(
+        `Naver revoke error: ${result.error_description || result.error}`,
+      );
+    }
+
+    return {
+      success: true,
+      message: 'Successfully revoked Naver connection',
+      data: result,
+    };
+  } catch (error) {
+    console.error('Failed to revoke Naver connection:', error);
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : 'Unknown error occurred while revoking Naver connection',
+      error,
+    };
+  }
 }
 
 // 네이버 사용자 정보 타입
@@ -65,4 +130,22 @@ export interface NaverUser {
   gender?: string;
   birthday?: string;
   mobile?: string;
+}
+// 네이버 토큰 응답 타입
+export interface NaverTokenResponse {
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+  expires_in: number;
+  error?: string;
+  error_description?: string;
+}
+
+// 네이버 프로필 응답 타입
+export interface NaverProfileResponse {
+  resultcode: string;
+  message: string;
+  response: NaverUser;
+  error?: string;
+  error_description?: string;
 }

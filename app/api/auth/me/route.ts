@@ -44,6 +44,7 @@ export async function GET(request: NextRequest) {
       phone: user.phone,
       isUse: user.isUse,
       isVisible: user.isVisible,
+      isSignout: user.isSignout,
       role: user.role,
       createdAt: user.createdAt,
       profile: user.profile || [],
