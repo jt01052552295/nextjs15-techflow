@@ -6,9 +6,8 @@ import prisma from '@/lib/prisma';
 import { withdrawSchema, WithdrawType } from '@/actions/auth/withdraw/schema';
 import { getUserByEmail, getUserById } from '@/actions/user/info';
 import { User } from '@prisma/client';
-import { getDictionary } from '@/utils/get-dictionary';
+import { __ts, getDictionary } from '@/utils/get-dictionary';
 import { ckLocale } from '@/lib/cookie';
-import { formatMessage } from '@/lib/util';
 import { logoutAction } from '../logout';
 import { deleteNaverToken } from '@/lib/oauth/naver';
 
@@ -26,6 +25,7 @@ export const autWithdrawAction = async (
 ): Promise<ReturnType> => {
   const language = await ckLocale();
   const dictionary = await getDictionary(language);
+  const missingFields = await __ts('common.form.missingFields', {}, language);
 
   const validatedFields = withdrawSchema(dictionary.common.form).safeParse(
     data,
@@ -33,28 +33,35 @@ export const autWithdrawAction = async (
   if (!validatedFields.success) {
     return {
       status: 'error',
-      message: dictionary.common.form.missingFields,
+      message: missingFields,
     };
   }
 
-  const { id, email, nick, name, role, phone, isSignout } =
-    validatedFields.data;
+  const { id, email, isSignout } = validatedFields.data;
 
   const existingUserById = await getUserById(id);
   if (!existingUserById) {
+    const notExistId = await __ts(
+      'common.form.notExist',
+      { column: id },
+      language,
+    );
     return {
       status: 'error',
-      message: formatMessage(dictionary.common.form.notExist, { column: id }),
+      message: notExistId,
     };
   }
 
   const existingUser = await getUserByEmail(email);
   if (!existingUser) {
+    const notExistEmail = await __ts(
+      'common.form.notExist',
+      { column: email },
+      language,
+    );
     return {
       status: 'error',
-      message: formatMessage(dictionary.common.form.notExist, {
-        column: email,
-      }),
+      message: notExistEmail,
     };
   }
 
@@ -107,11 +114,20 @@ export const autWithdrawAction = async (
       }
     }
 
+    const withDrawLabel = await __ts(
+      'common.auth.register.withDrawLabel',
+      {},
+      language,
+    );
+    const resultComplete = await __ts(
+      'common.form.resultComplete',
+      { result: withDrawLabel },
+      language,
+    );
+
     return {
       status: 'success',
-      message: formatMessage(dictionary.common.form.resultComplete, {
-        result: dictionary.common.auth.register.withDrawLabel,
-      }),
+      message: resultComplete,
       data: result.user,
     };
   } catch (error) {

@@ -1,14 +1,12 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/prisma';
 import { profileSchema, ProfileType } from '@/actions/auth/profile/schema';
 import { getUserByEmail, getUserById } from '@/actions/user/info';
 import { User } from '@prisma/client';
-import { getDictionary } from '@/utils/get-dictionary';
+import { __ts, getDictionary } from '@/utils/get-dictionary';
 import { ckLocale } from '@/lib/cookie';
-import { formatMessage } from '@/lib/util';
 
 type ReturnType = {
   status: string;
@@ -24,12 +22,13 @@ export const authProfileAction = async (
 ): Promise<ReturnType> => {
   const language = await ckLocale();
   const dictionary = await getDictionary(language);
+  const missingFields = await __ts('common.form.missingFields', {}, language);
 
   const validatedFields = profileSchema(dictionary.common.form).safeParse(data);
   if (!validatedFields.success) {
     return {
       status: 'error',
-      message: dictionary.common.form.missingFields,
+      message: missingFields,
     };
   }
 
@@ -38,19 +37,28 @@ export const authProfileAction = async (
 
   const existingUserById = await getUserById(id);
   if (!existingUserById) {
+    const notExistId = await __ts(
+      'common.form.notExist',
+      { column: id },
+      language,
+    );
+
     return {
       status: 'error',
-      message: formatMessage(dictionary.common.form.notExist, { column: id }),
+      message: notExistId,
     };
   }
 
   const existingUser = await getUserByEmail(email);
   if (!existingUser) {
+    const notExistEmail = await __ts(
+      'common.form.notExist',
+      { column: email },
+      language,
+    );
     return {
       status: 'error',
-      message: formatMessage(dictionary.common.form.notExist, {
-        column: email,
-      }),
+      message: notExistEmail,
     };
   }
 
@@ -71,11 +79,20 @@ export const authProfileAction = async (
       return { user };
     });
 
+    const changedProfile = await __ts(
+      'common.auth.register.changedProfile',
+      {},
+      language,
+    );
+    const resultComplete = await __ts(
+      'common.form.resultComplete',
+      { result: changedProfile },
+      language,
+    );
+
     return {
       status: 'success',
-      message: formatMessage(dictionary.common.form.resultComplete, {
-        result: dictionary.common.auth.register.changedProfile,
-      }),
+      message: resultComplete,
       data: result.user,
     };
   } catch (error) {

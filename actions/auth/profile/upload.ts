@@ -1,17 +1,10 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/prisma';
-import { getUserByEmail, getUserById } from '@/actions/user/info';
-import { User } from '@prisma/client';
-import { getDictionary } from '@/utils/get-dictionary';
+import { getUserById } from '@/actions/user/info';
+import { __ts, getDictionary } from '@/utils/get-dictionary';
 import { ckLocale } from '@/lib/cookie';
-import { formatMessage } from '@/lib/util';
-import path, { join } from 'path';
-import fs from 'fs';
-import { stat, mkdir, writeFile, unlink, readdir, rmdir } from 'fs/promises';
-import { IUserProfile, IUserProfilePart } from '@/types/user';
 import https from 'https';
 import fetch from 'node-fetch';
 type ReturnType = {
@@ -33,14 +26,14 @@ interface UploadResponseData {
 
 export const uploadAction = async (data: FormData): Promise<ReturnType> => {
   const language = await ckLocale();
-  const dictionary = await getDictionary(language);
+  const missingFields = await __ts('common.form.missingFields', {}, language);
 
   const serialized = Object.fromEntries(data);
 
   if (!serialized.uid) {
     return {
       status: 'error',
-      message: dictionary.common.form.missingFields,
+      message: missingFields,
     };
   }
 
@@ -48,25 +41,39 @@ export const uploadAction = async (data: FormData): Promise<ReturnType> => {
 
   const existingUserById = await getUserById(id);
   if (!existingUserById) {
+    const notExistId = await __ts(
+      'common.form.notExist',
+      { column: id },
+      language,
+    );
+
     return {
       status: 'error',
-      message: formatMessage(dictionary.common.form.notExist, { column: id }),
+      message: notExistId,
     };
   }
 
   const files = data.getAll('file[]') as File[];
 
   if (files.length === 0) {
+    const no_file = await __ts('common.upload.no_file', {}, language);
+
     return {
       status: 'error',
-      message: dictionary.common.upload.no_file,
+      message: no_file,
     };
   }
 
   if (files.length > 4) {
+    const max_count = await __ts(
+      'common.upload.max_count',
+      { max: 4 },
+      language,
+    );
+
     return {
       status: 'error',
-      message: dictionary.common.upload.max_count.replace('{max}', '4'),
+      message: max_count,
     };
   }
 
@@ -74,9 +81,15 @@ export const uploadAction = async (data: FormData): Promise<ReturnType> => {
   const fileSizeMB = parseFloat((fileSizeSum / (1024 * 1024)).toFixed(2));
 
   if (fileSizeMB > 20.0) {
+    const max_size = await __ts(
+      'common.upload.max_size',
+      { max: '20MB' },
+      language,
+    );
+
     return {
       status: 'error',
-      message: dictionary.common.upload.max_size.replace('{max}', '20MB'),
+      message: max_size,
     };
   }
   try {
@@ -133,8 +146,8 @@ export const uploadAction = async (data: FormData): Promise<ReturnType> => {
         );
         responseData.profileEntries = profileEntries;
       }
-
-      return { status: 'success', message: 'upload ok!', data: responseData };
+      const upload_success = await __ts('common.upload_success', {}, language);
+      return { status: 'success', message: upload_success, data: responseData };
 
       // return { idx: 0, uid, todoId, name: fileName, url: fileUrl }
       //   responseData.files.forEach((fileInfo: any) => {
@@ -148,11 +161,12 @@ export const uploadAction = async (data: FormData): Promise<ReturnType> => {
       //     });
       //   });
     } else {
+      const upload_error = await __ts('common.upload_error', {}, language);
       const errorText = await uploadResponse.text();
       console.error(
         `Upload failed with status: ${uploadResponse.status}, message: ${errorText}`,
       );
-      throw new Error(dictionary.common.upload_error);
+      throw new Error(upload_error);
     }
   } catch (error) {
     console.error('업로드 에러:', error);
@@ -168,7 +182,7 @@ export const deleteFileAction = async (
   profileId: string,
 ): Promise<ReturnType> => {
   const language = await ckLocale();
-  const dictionary = await getDictionary(language);
+  const notExist = await __ts('common.form.notExist', {}, language);
 
   try {
     // 프로필 정보 조회
@@ -180,7 +194,7 @@ export const deleteFileAction = async (
     if (!profile) {
       return {
         status: 'error',
-        message: dictionary.common.form.notExist || 'Profile not found',
+        message: notExist,
       };
     }
 
@@ -192,17 +206,18 @@ export const deleteFileAction = async (
     // 업데이트된 경로 재검증
     // revalidatePath(`/admin/user/${profile.userId}`);
     // revalidatePath('/admin/user');
+    const delete_success = await __ts('common.delete_success', {}, language);
 
     return {
       status: 'success',
-      message:
-        dictionary.common.delete_success || 'Profile deleted successfully',
+      message: delete_success,
     };
   } catch (error) {
+    const delete_error = await __ts('common.delete_error', {}, language);
     console.error('프로필 삭제 에러:', error);
     return {
       status: 'error',
-      message: dictionary.common.delete_error || 'Failed to delete profile',
+      message: delete_error,
     };
   }
 };

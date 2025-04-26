@@ -1,4 +1,6 @@
 // 네이버 OAuth 설정 및 유틸리티 함수
+import { __ts } from '@/utils/get-dictionary';
+import { ckLocale } from '@/lib/cookie';
 
 // 네이버 API 설정
 export const NAVER_CLIENT_ID = process.env.NAVER_CLIENT_ID || '';
@@ -76,6 +78,7 @@ export async function getNaverProfile(accessToken: string) {
 
 // 액세스 토큰 삭제
 export async function deleteNaverToken(accessToken: string) {
+  const language = await ckLocale();
   try {
     const params = new URLSearchParams({
       grant_type: 'delete',
@@ -96,24 +99,33 @@ export async function deleteNaverToken(accessToken: string) {
     const result = await response.json();
 
     if (result.error) {
-      throw new Error(
-        `Naver revoke error: ${result.error_description || result.error}`,
+      const errorMessage = await __ts(
+        'oauth.naver.error.revokeTokenDetail',
+        { desc: result.error_description || result.error },
+        language,
       );
+
+      throw new Error(errorMessage);
     }
+
+    const successMessage = await __ts(
+      'oauth.naver.success.revokeToken',
+      {},
+      language,
+    );
 
     return {
       success: true,
-      message: 'Successfully revoked Naver connection',
+      message: successMessage,
       data: result,
     };
   } catch (error) {
+    const unknown = await __ts('oauth.naver.error.unknown', {}, language);
+
     console.error('Failed to revoke Naver connection:', error);
     return {
       success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : 'Unknown error occurred while revoking Naver connection',
+      message: error instanceof Error ? error.message : unknown,
       error,
     };
   }

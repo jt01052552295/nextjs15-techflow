@@ -1,6 +1,5 @@
 'use server';
 import prisma from '@/lib/prisma';
-import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/ko';
@@ -8,28 +7,28 @@ import { makeRandString, maskingEmail, maskingName } from '@/lib/util';
 import { sendVerificationEmail } from '@/lib/mail';
 import { getUserByEmail, getUserByPhone } from '@/actions/user/info';
 import { VerificationPurpose } from '@prisma/client';
-import { getDictionary } from '@/utils/get-dictionary';
+import { __ts } from '@/utils/get-dictionary';
 import { ckLocale } from '@/lib/cookie';
-import { formatMessage } from '@/lib/util';
 
 export const generateVerificationToken = async (
   email: string,
   purpose: VerificationPurpose,
 ) => {
   const language = await ckLocale();
-  const dictionary = await getDictionary(language);
 
-  const token = uuidv4();
   const code = makeRandString(6, 'numeric');
   const expires = dayjs().add(5, 'minute').toDate();
 
   const existingUser = await getUserByEmail(email);
   if (existingUser) {
+    const alreadyUseEmail = await __ts(
+      'common.form.alreadyUse',
+      { column: email },
+      language,
+    );
     return {
       success: false,
-      message: formatMessage(dictionary.common.form.alreadyUse, {
-        column: email,
-      }),
+      message: alreadyUseEmail,
     };
   }
 
@@ -43,16 +42,26 @@ export const generateVerificationToken = async (
     },
   });
 
-  const emailSent = await sendVerificationEmail(email, code, dictionary.common);
+  const emailSent = await sendVerificationEmail(email, code);
   if (emailSent) {
+    const codeSentSuccessfully = await __ts(
+      'common.verification.codeSentSuccessfully',
+      {},
+      language,
+    );
     return {
       success: true,
-      message: dictionary.common.form.verification.codeSentSuccessfully,
+      message: codeSentSuccessfully,
     };
   } else {
+    const FailedVerificationEmail = await __ts(
+      'common.form.FailedVerificationEmail',
+      {},
+      language,
+    );
     return {
       success: false,
-      message: dictionary.common.form.FailedVerificationEmail,
+      message: FailedVerificationEmail,
     };
   }
 };
@@ -62,19 +71,20 @@ export const generateVerificationUserToken = async (
   purpose: VerificationPurpose,
 ) => {
   const language = await ckLocale();
-  const dictionary = await getDictionary(language);
 
-  const token = uuidv4();
   const code = makeRandString(6, 'numeric');
   const expires = dayjs().add(5, 'minute').toDate();
 
   const existingUser = await getUserByEmail(email);
   if (!existingUser) {
+    const notExistEmail = await __ts(
+      'common.form.notExist',
+      { column: email },
+      language,
+    );
     return {
       success: false,
-      message: formatMessage(dictionary.common.form.notExist, {
-        column: email,
-      }),
+      message: notExistEmail,
     };
   }
 
@@ -88,16 +98,26 @@ export const generateVerificationUserToken = async (
     },
   });
 
-  const emailSent = await sendVerificationEmail(email, code, dictionary);
+  const emailSent = await sendVerificationEmail(email, code);
   if (emailSent) {
+    const codeSentSuccessfully = await __ts(
+      'common.verification.codeSentSuccessfully',
+      {},
+      language,
+    );
     return {
       success: true,
-      message: dictionary.common.form.verification.codeSentSuccessfully,
+      message: codeSentSuccessfully,
     };
   } else {
+    const FailedEmail = await __ts(
+      'common.form.verification.FailedEmail',
+      {},
+      language,
+    );
     return {
       success: false,
-      message: dictionary.common.form.verification.FailedEmail,
+      message: FailedEmail,
     };
   }
 };
@@ -108,7 +128,6 @@ export const verifyEmailToken = async (
   purpose: VerificationPurpose,
 ) => {
   const language = await ckLocale();
-  const dictionary = await getDictionary(language);
 
   try {
     const verification = await prisma.verification.findFirst({
@@ -123,29 +142,50 @@ export const verifyEmailToken = async (
     });
 
     if (!verification) {
+      const invalidCode = await __ts(
+        'common.form.verification.invalidCode',
+        {},
+        language,
+      );
       return {
         success: false,
-        message: dictionary.common.form.verification.invalidCode,
+        message: invalidCode,
       };
     }
 
     const isExpired = dayjs().isAfter(dayjs(verification.expiresAt));
     if (isExpired) {
+      const expiredCode = await __ts(
+        'common.form.verification.expiredCode',
+        {},
+        language,
+      );
       return {
         success: false,
-        message: dictionary.common.form.verification.expiredCode,
+        message: expiredCode,
       };
     }
 
+    const verificationCode = await __ts(
+      'common.form.verification.verificationCode',
+      {},
+      language,
+    );
+
     return {
       success: true,
-      message: dictionary.common.form.verification.verificationCode,
+      message: verificationCode,
     };
   } catch (error) {
+    const errorVerificationCode = await __ts(
+      'common.form.verification.errorVerificationCode',
+      {},
+      language,
+    );
     console.error('Error verifying code:', error);
     return {
       success: false,
-      message: dictionary.common.form.verification.errorVerificationCode,
+      message: errorVerificationCode,
     };
   }
 };
@@ -155,19 +195,20 @@ export const generateVerificationPhoneToken = async (
   purpose: VerificationPurpose,
 ) => {
   const language = await ckLocale();
-  const dictionary = await getDictionary(language);
 
-  const token = uuidv4();
   const code = makeRandString(6, 'numeric');
   const expires = dayjs().add(5, 'minute').toDate();
 
   const existingUser = await getUserByPhone(phone);
   if (existingUser) {
+    const alreadyUsePhone = await __ts(
+      'common.form.alreadyUse',
+      { column: phone },
+      language,
+    );
     return {
       success: false,
-      message: formatMessage(dictionary.common.form.alreadyUse, {
-        column: phone,
-      }),
+      message: alreadyUsePhone,
     };
   }
 
@@ -181,9 +222,15 @@ export const generateVerificationPhoneToken = async (
     },
   });
 
+  const codeSentSuccessfully = await __ts(
+    'common.form.verification.codeSentSuccessfully',
+    {},
+    language,
+  );
+
   return {
     success: true,
-    message: dictionary.common.form.verification.codeSentSuccessfully,
+    message: codeSentSuccessfully,
   };
 
   // const emailSent = await sendVerificationEmail(phone, code);
@@ -199,19 +246,20 @@ export const generateVerificationUserPhoneToken = async (
   purpose: VerificationPurpose,
 ) => {
   const language = await ckLocale();
-  const dictionary = await getDictionary(language);
 
-  const token = uuidv4();
   const code = makeRandString(6, 'numeric');
   const expires = dayjs().add(5, 'minute').toDate();
 
   const existingUser = await getUserByPhone(phone);
   if (!existingUser) {
+    const notExistPhone = await __ts(
+      'common.form.notExist',
+      { column: phone },
+      language,
+    );
     return {
       success: false,
-      message: formatMessage(dictionary.common.form.notExist, {
-        column: phone,
-      }),
+      message: notExistPhone,
     };
   }
 
@@ -232,9 +280,15 @@ export const generateVerificationUserPhoneToken = async (
     },
   });
 
+  const codeSentSuccessfully = await __ts(
+    'common.form.verification.codeSentSuccessfully',
+    {},
+    language,
+  );
+
   return {
     success: true,
-    message: dictionary.common.form.verification.codeSentSuccessfully,
+    message: codeSentSuccessfully,
     user: user,
   };
 
@@ -252,7 +306,6 @@ export const verifyPhoneToken = async (
   purpose: VerificationPurpose,
 ) => {
   const language = await ckLocale();
-  const dictionary = await getDictionary(language);
 
   try {
     const verification = await prisma.verification.findFirst({
@@ -267,29 +320,52 @@ export const verifyPhoneToken = async (
     });
 
     if (!verification) {
+      const invalidCode = await __ts(
+        'common.form.verification.invalidCode',
+        {},
+        language,
+      );
+
       return {
         success: false,
-        message: dictionary.common.form.verification.invalidCode,
+        message: invalidCode,
       };
     }
 
     const isExpired = dayjs().isAfter(dayjs(verification.expiresAt));
     if (isExpired) {
+      const expiredCode = await __ts(
+        'common.form.verification.expiredCode',
+        {},
+        language,
+      );
       return {
         success: false,
-        message: dictionary.common.form.verification.expiredCode,
+        message: expiredCode,
       };
     }
 
+    const verificationCode = await __ts(
+      'common.form.verification.verificationCode',
+      {},
+      language,
+    );
+
     return {
       success: true,
-      message: dictionary.common.form.verification.verificationCode,
+      message: verificationCode,
     };
   } catch (error) {
+    const errorVerificationCode = await __ts(
+      'common.form.verification.errorVerificationCode',
+      {},
+      language,
+    );
+
     console.error('Error verifying code:', error);
     return {
       success: false,
-      message: dictionary.common.form.verification.errorVerificationCode,
+      message: errorVerificationCode,
     };
   }
 };

@@ -2,11 +2,8 @@
 
 import { cookies } from 'next/headers';
 import { verify } from 'jsonwebtoken';
-import prisma from '@/lib/prisma';
-import { User } from '@prisma/client';
-import { getDictionary } from '@/utils/get-dictionary';
+import { __ts } from '@/utils/get-dictionary';
 import { ckLocale } from '@/lib/cookie';
-import { formatMessage } from '@/lib/util';
 
 type ReturnType = {
   status: string;
@@ -17,15 +14,15 @@ type ReturnType = {
 export const getOauthDataAction = async (): Promise<ReturnType> => {
   try {
     const language = await ckLocale();
-    const dictionary = await getDictionary(language);
-
     const cookieStore = await cookies();
     const oauthToken = cookieStore.get('oauth_data')?.value;
+
+    const noOauth = await __ts('common.auth.error.noOauth', {}, language);
 
     if (!oauthToken) {
       return {
         status: 'error',
-        message: 'OAuth 데이터를 찾을 수 없습니다.',
+        message: noOauth,
       };
     }
 

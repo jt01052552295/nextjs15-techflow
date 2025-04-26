@@ -1,9 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
-import { getDictionary } from '@/utils/get-dictionary';
+import { __ts } from '@/utils/get-dictionary';
 import type { LocaleType } from '@/constants/i18n';
 import { getRouteUrl } from '@/utils/routes';
-import { useParams, useSearchParams } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faExclamationTriangle,
@@ -18,24 +17,42 @@ type Props = {
 export default async function Page({ params, searchParams }: Props) {
   const { language } = await params;
   const { code, msg } = await searchParams;
-  const dictionary = await getDictionary(language);
+
+  const title = await __ts('common.auth.error.title', {}, language);
+  const invalidRequest = await __ts(
+    'common.auth.error.invalidRequest',
+    {},
+    language,
+  );
+  const unauthorized = await __ts(
+    'common.auth.error.unauthorized',
+    {},
+    language,
+  );
+  const conflict = await __ts('common.auth.error.conflict', {}, language);
+  const serverError = await __ts('common.auth.error.serverError', {}, language);
+  const errorCodeTxt = await __ts('common.auth.error.errorCode', {}, language);
+  const backToLogin = await __ts('common.auth.error.backToLogin', {}, language);
+
+  const defaultMessage = await __ts(
+    'common.auth.error.defaultMessage',
+    {},
+    language,
+  );
 
   const errorCode = code || '500';
-  const errorMessage = msg || '알 수 없는 오류가 발생했습니다.';
-
-  console.log(dictionary.common.auth);
+  const errorMessage = msg || defaultMessage;
 
   // 에러 코드에 따른 제목 설정
-  let errorTitle = dictionary.common.auth.error.title || '오류가 발생했습니다';
+  let errorTitle = title;
   if (errorCode === '400') {
-    errorTitle =
-      dictionary.common.auth.error.invalidRequest || '유효하지 않은 요청';
+    errorTitle = invalidRequest;
   } else if (errorCode === '401') {
-    errorTitle = dictionary.common.auth.error.unauthorized || '인증 오류';
+    errorTitle = unauthorized;
   } else if (errorCode === '409') {
-    errorTitle = dictionary.common.auth.error.conflict || '계정 충돌';
+    errorTitle = conflict;
   } else if (errorCode === '500') {
-    errorTitle = dictionary.common.auth.error.serverError || '서버 오류';
+    errorTitle = serverError;
   }
 
   return (
@@ -58,7 +75,7 @@ export default async function Page({ params, searchParams }: Props) {
             <div className="card-text mb-4">
               <p>{decodeURIComponent(errorMessage)}</p>
               <div className="text-muted small">
-                {dictionary.common.auth.error.errorCode}:{errorCode}
+                {errorCodeTxt}:{errorCode}
               </div>
             </div>
 
@@ -68,8 +85,7 @@ export default async function Page({ params, searchParams }: Props) {
                 className="btn btn-primary"
               >
                 <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
-                {dictionary.common.auth.error.backToLogin ||
-                  '로그인 페이지로 돌아가기'}
+                {backToLogin}
               </Link>
             </div>
           </div>

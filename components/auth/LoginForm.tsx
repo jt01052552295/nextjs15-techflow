@@ -112,7 +112,7 @@ const LoginForm = () => {
     }
   }, [errors.email, watchedEmail]);
 
-  const welcomeMessage = t('common.AppName', {});
+  const welcomeMessage = t('common.AppDesc');
 
   return (
     <div className={styles['register-page']}>

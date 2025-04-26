@@ -1,9 +1,8 @@
 import sendEmail from './send-email';
 import fs from 'fs';
 import path from 'path';
-import { formatMessage } from '@/lib/util';
-
-const domain = process.env.NEXT_PUBLIC_APP_URL;
+import { __ts } from '@/utils/get-dictionary';
+import { ckLocale } from '@/lib/cookie';
 
 const loadTemplate = (
   templateName: string,
@@ -34,15 +33,30 @@ const loadTemplate = (
 export const sendVerificationEmail = async (
   email: string,
   code: string,
-  messages: Record<string, any>,
 ): Promise<boolean> => {
-  const subject = formatMessage(messages.common.email.verification.subject, {
-    AppName: messages.AppName,
-  });
-  const greeting = messages.common.email.verification.greeting;
-  const message = messages.common.email.verification.message;
-  const instructions = messages.common.email.verification.instructions;
-  const footer = messages.common.email.verification.footer;
+  const language = await ckLocale();
+
+  const AppName = await __ts('common.AppName', {}, language);
+
+  const subject = await __ts(
+    'common.email.verification.subject',
+    { AppName: AppName },
+    language,
+  );
+
+  const greeting = await __ts(
+    'common.email.verification.greeting',
+    {},
+    language,
+  );
+  const message = await __ts('common.email.verification.message', {}, language);
+
+  const instructions = await __ts(
+    'common.email.verification.instructions',
+    {},
+    language,
+  );
+  const footer = await __ts('common.email.verification.footer', {}, language);
 
   const html = loadTemplate('verification', {
     code,
