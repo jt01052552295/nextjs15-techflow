@@ -1,6 +1,4 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { cookies } from 'next/headers';
 
 import { useSearchParams } from 'next/navigation';
 // import { signInWithGitHub, signInWithNaver } from '@/actions/auth';
@@ -9,10 +7,14 @@ import { getRouteUrl } from '@/utils/routes';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment, faN } from '@fortawesome/free-solid-svg-icons';
-import { faGithub, faGoogle } from '@fortawesome/free-brands-svg-icons';
+import {
+  faFacebook,
+  faGithub,
+  faGoogle,
+} from '@fortawesome/free-brands-svg-icons';
 
 const SocialButton = () => {
-  const { dictionary, locale } = useLanguage();
+  const { t } = useLanguage();
 
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') as string;
@@ -32,7 +34,7 @@ const SocialButton = () => {
   return (
     <div className="row text-center mb-3">
       <p>- OR -</p>
-      <p className="text-start">{dictionary.common.auth.login.snsPrompt}</p>
+      <p className="text-start">{t('common.auth.login.snsPrompt')}</p>
       <div className="d-grid gap-2">
         <button
           type="button"
@@ -40,7 +42,7 @@ const SocialButton = () => {
           onClick={() => onOauth('github')}
         >
           <FontAwesomeIcon icon={faGithub} />
-          &nbsp; {dictionary.common.auth.login.loginWithGithub}
+          &nbsp; {t('common.auth.login.loginWithGithub')}
         </button>
         <button
           type="button"
@@ -48,7 +50,7 @@ const SocialButton = () => {
           onClick={() => onOauth('google')}
         >
           <FontAwesomeIcon icon={faGoogle} />
-          &nbsp; {dictionary.common.auth.login.loginWithGoogle}
+          &nbsp; {t('common.auth.login.loginWithGoogle')}
         </button>
         <button
           type="button"
@@ -56,7 +58,7 @@ const SocialButton = () => {
           onClick={() => onOauth('kakao')}
         >
           <FontAwesomeIcon icon={faComment} />
-          &nbsp; {dictionary.common.auth.login.loginWithKakao}
+          &nbsp; {t('common.auth.login.loginWithKakao')}
         </button>
         <button
           type="button"
@@ -65,7 +67,16 @@ const SocialButton = () => {
           onClick={() => onOauth('naver')}
         >
           <FontAwesomeIcon icon={faN} />
-          &nbsp; {dictionary.common.auth.login.loginWithNaver}
+          &nbsp; {t('common.auth.login.loginWithNaver')}
+        </button>
+        <button
+          type="button"
+          className="btn btn-primary"
+          disabled={false}
+          onClick={() => onOauth('facebook')}
+        >
+          <FontAwesomeIcon icon={faFacebook} />
+          &nbsp; {t('common.auth.login.loginWithFacebook')}
         </button>
       </div>
     </div>

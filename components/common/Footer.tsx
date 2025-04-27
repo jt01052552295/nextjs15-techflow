@@ -2,7 +2,7 @@
 import { useLanguage } from '@/components/context/LanguageContext';
 
 const Footer = () => {
-  const { dictionary } = useLanguage();
+  const { t } = useLanguage();
   return (
     <footer className="footer">
       <div className="container-fluid">
@@ -10,7 +10,7 @@ const Footer = () => {
           <div className="col-12 text-start">
             <p
               className="mb-0"
-              dangerouslySetInnerHTML={{ __html: dictionary.common.footer }}
+              dangerouslySetInnerHTML={{ __html: t('common.footer') }}
             ></p>
           </div>
         </div>

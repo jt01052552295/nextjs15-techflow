@@ -200,7 +200,8 @@
       "loginWithGithub": "깃허브로 로그인",
       "loginWithGoogle": "구글로 로그인",
       "loginWithKakao": "카카오로 로그인",
-      "loginWithNaver": "네이버로 로그인"
+      "loginWithNaver": "네이버로 로그인",
+      "loginWithFacebook": "페이스북으로 로그인"
     },
     "logout": {
       "button": "로그아웃",

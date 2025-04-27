@@ -29,7 +29,7 @@ import useFormUtils from '@/hooks/useFormUtils';
 import { useAuth } from '../context/AuthContext';
 
 const PwdForm = () => {
-  const { dictionary, locale } = useLanguage();
+  const { dictionary, t } = useLanguage();
   const router = useRouter();
 
   const { user } = useAuth();
@@ -83,7 +83,7 @@ const PwdForm = () => {
         // toast.success(`로그인성공`);
       } catch (error) {
         console.error(error);
-        toast.error(dictionary.common.unknown_error);
+        toast.error(t('common.unknown_error'));
       }
     });
   };
@@ -100,14 +100,14 @@ const PwdForm = () => {
         <input type="hidden" {...register('email')} />
         <div className="card">
           <div className="card-header">
-            <h5 className="card-title m-0">{dictionary.common.basic_info}</h5>
+            <h5 className="card-title m-0">{t('common.basic_info')}</h5>
           </div>
           <div className="card-body">
             <div className="row">
               <div className="col-md-12 col-lg-6">
                 <div className="mb-3">
                   <label className="form-label">
-                    {dictionary.columns.user.password}
+                    {t('columns.user.password')}
                   </label>
                   <div className="input-group has-validation">
                     <input
@@ -137,14 +137,14 @@ const PwdForm = () => {
                     )}
                     {!errors.password && (
                       <div className="valid-feedback">
-                        {dictionary.common.form.valid}
+                        {t('common.form.valid')}
                       </div>
                     )}
                   </div>
                 </div>
                 <div className="mb-3">
                   <label className="form-label">
-                    {dictionary.columns.user.passwordRe}
+                    {t('columns.user.passwordRe')}
                   </label>
                   <div className="input-group has-validation">
                     <input
@@ -174,7 +174,7 @@ const PwdForm = () => {
                     )}
                     {!errors.re_password && (
                       <div className="valid-feedback">
-                        {dictionary.common.form.valid}
+                        {t('common.form.valid')}
                       </div>
                     )}
                   </div>
@@ -193,7 +193,7 @@ const PwdForm = () => {
                 >
                   <FontAwesomeIcon icon={faFloppyDisk} />
                   &nbsp;
-                  {isPending ? dictionary.loading : dictionary.common.save}
+                  {isPending ? t('common.loading') : t('common.save')}
                 </button>
               </div>
               <div className="col-auto">
@@ -205,7 +205,7 @@ const PwdForm = () => {
                 >
                   <FontAwesomeIcon icon={faRotateRight} />
                   &nbsp;
-                  {isPending ? dictionary.loading : dictionary.common.cancel}
+                  {isPending ? t('common.loading') : t('common.cancel')}
                 </button>
               </div>
             </div>

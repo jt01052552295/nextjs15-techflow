@@ -4,6 +4,7 @@ import Link from 'next/link';
 import useMount from '@/hooks/useMount';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHouse } from '@fortawesome/free-solid-svg-icons';
+import { useLanguage } from '@/components/context/LanguageContext';
 
 type BreadcrumbPath = {
   name: string;
@@ -12,11 +13,11 @@ type BreadcrumbPath = {
 
 type BreadcrumbProps = {
   paths: BreadcrumbPath[]; // 경로 배열
-  dictionary: any;
 };
 
-const Breadcrumb = ({ paths, dictionary }: BreadcrumbProps) => {
+const Breadcrumb = ({ paths }: BreadcrumbProps) => {
   const mount = useMount();
+  const { t } = useLanguage();
   const displayPaths = paths.slice(0, 3);
 
   if (!mount) return null;
@@ -31,7 +32,7 @@ const Breadcrumb = ({ paths, dictionary }: BreadcrumbProps) => {
               className="link-secondary link-underline link-underline-opacity-0"
             >
               <FontAwesomeIcon icon={faHouse} className="me-1" />
-              {dictionary.common?.home || 'Home'}
+              {t('common.home', {}) || 'Home'}
             </Link>
           </li>
 

@@ -20,12 +20,7 @@ import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import Image from 'next/image';
 import { IUserProfile } from '@/types/user';
-import {
-  formatMessage,
-  getFileExtension,
-  getAcceptableFileTypes,
-  isValidFileType,
-} from '@/lib/util';
+import { getFileExtension, isValidFileType } from '@/lib/util';
 import { uploadAction, deleteFileAction } from '@/actions/auth/profile/upload';
 
 export interface FileUploadPreviewRef {
@@ -70,7 +65,7 @@ const FileUploadPreview = forwardRef<
     },
     ref,
   ) => {
-    const { dictionary } = useLanguage();
+    const { t } = useLanguage();
     const { user, updateUserProfiles } = useAuth();
     const [files, setFiles] = useState<FilePreview[]>([]);
     const [isUploading, setIsUploading] = useState(false);
@@ -126,11 +121,10 @@ const FileUploadPreview = forwardRef<
 
         // 최대 파일 수 제한 확인
         if (files.length + selectedFiles.length > maxFiles) {
-          throw Error(
-            formatMessage(dictionary.common.upload.max_count, {
-              max: maxFiles.toString(),
-            }),
-          );
+          const msg = t('common.upload.max_count', {
+            max: maxFiles.toString(),
+          });
+          throw Error(msg);
         }
 
         //  파일 크기 계산
@@ -140,11 +134,11 @@ const FileUploadPreview = forwardRef<
           totalSize += file.size;
         });
         if (totalSize > maxSizeBytes) {
-          throw Error(
-            formatMessage(dictionary.common.upload.max_size, {
-              max: maxSize.toString(),
-            }),
-          );
+          const msg = t('common.upload.max_size', {
+            max: maxSize.toString(),
+          });
+
+          throw Error(msg);
         }
 
         setIsUploading(true);
@@ -156,11 +150,10 @@ const FileUploadPreview = forwardRef<
         Array.from(selectedFiles).forEach((file) => {
           if (!isValidFileType(file, accept)) {
             const fileExt = getFileExtension(file.name);
-            throw Error(
-              formatMessage(dictionary.common.upload.wrong_file, {
-                extension: fileExt.toUpperCase(),
-              }),
-            );
+            const msg = t('common.upload.wrong_file', {
+              extension: fileExt.toUpperCase(),
+            });
+            throw Error(msg);
           }
           frm.append(`file[]`, file);
 
@@ -214,9 +207,9 @@ const FileUploadPreview = forwardRef<
           }));
           updateUserProfiles(newProfiles);
 
-          toast.success(
-            dictionary.common.upload.success || 'Upload successful',
-          );
+          const msg = t('common.upload.success');
+
+          toast.success(msg || 'Upload successful');
         } else {
           throw Error(response.message || 'Upload failed');
         }
@@ -310,8 +303,8 @@ const FileUploadPreview = forwardRef<
               <FontAwesomeIcon icon={faUpload} />
             )}{' '}
             {isUploading
-              ? dictionary.common.upload.uploading || 'Uploading...'
-              : dictionary.common.upload.upload_btn}
+              ? t('common.upload.uploading') || 'Uploading...'
+              : t('common.upload.upload_btn')}
           </button>
           <input
             type="file"
@@ -328,7 +321,7 @@ const FileUploadPreview = forwardRef<
           {files.length > 0 && (
             <small className="text-muted ms-2">
               {files.length}/{maxFiles}{' '}
-              {dictionary.common.upload.files_count || 'files'}
+              {t('common.upload.files_count') || 'files'}
             </small>
           )}
         </div>

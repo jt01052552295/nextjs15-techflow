@@ -12,7 +12,7 @@ interface SessionCountdownProps {
 const SessionCountdown: React.FC<SessionCountdownProps> = ({
   initialExpiresAt,
 }) => {
-  const { dictionary } = useLanguage();
+  const { t } = useLanguage();
   const { refreshUser } = useAuth();
   const [expiresAt, setExpiresAt] = useState<Date | null>(
     initialExpiresAt ? new Date(initialExpiresAt) : null,
@@ -94,17 +94,17 @@ const SessionCountdown: React.FC<SessionCountdownProps> = ({
 
       if (response.ok) {
         setExpiresAt(new Date(data.expiresAt));
-        toast.success(dictionary.common.auth.session.extended);
+        toast.success(t('common.auth.session.extended'));
         refreshUser(); // 사용자 정보 새로고침
 
         // 쿠키 업데이트
         document.cookie = `session_expires=${encodeURIComponent(data.expiresAt)}; path=/; max-age=${30 * 24 * 60 * 60}`;
       } else {
-        toast.error(data.error || dictionary.common.unknown_error);
+        toast.error(data.error || t('common.unknown_error'));
       }
     } catch (error) {
       console.error('세션 연장 오류:', error);
-      toast.error(dictionary.common.unknown_error);
+      toast.error(t('common.unknown_error'));
     } finally {
       setIsExtending(false);
     }
@@ -117,7 +117,7 @@ const SessionCountdown: React.FC<SessionCountdownProps> = ({
       <div className="d-flex align-items-center">
         <span className="badge bg-info">
           {timeLeft.days > 0 &&
-            `${timeLeft.days}${dictionary.common.auth.session.days} `}
+            `${timeLeft.days}${t('common.auth.session.days')} `}
           {timeLeft.hours.toString().padStart(2, '0')}:
           {timeLeft.minutes.toString().padStart(2, '0')}:
           {timeLeft.seconds.toString().padStart(2, '0')}
@@ -130,12 +130,12 @@ const SessionCountdown: React.FC<SessionCountdownProps> = ({
             disabled={isExtending}
           >
             {isExtending
-              ? dictionary.common.loading
-              : dictionary.common.auth.session.extend}
+              ? t('common.loading')
+              : t('common.auth.session.extend')}
           </button>
         ) : (
           <small className="text-muted ms-2">
-            {dictionary.common.auth.session.expiresIn}
+            {t('common.auth.session.expiresIn')}
           </small>
         )}
       </div>

@@ -10,10 +10,9 @@ import { getRouteUrl } from '@/utils/routes';
 import Link from 'next/link';
 import { useLanguage } from '@/components/context/LanguageContext';
 import LogoutButton from '../auth/LogoutButton';
-import { formatMessage } from '@/lib/util';
 
 const ShortProfile = () => {
-  const { dictionary, locale } = useLanguage();
+  const { locale, t } = useLanguage();
 
   return (
     <div className="ms-3">
@@ -28,7 +27,7 @@ const ShortProfile = () => {
         </button>
         <ul className="dropdown-menu dropdown-menu-end">
           <li>
-            <h6 className="dropdown-header">{dictionary.common.information}</h6>
+            <h6 className="dropdown-header">{t('common.information')}</h6>
           </li>
           <li>
             <Link
@@ -36,7 +35,7 @@ const ShortProfile = () => {
               href={getRouteUrl('my.profile', locale)}
             >
               <FontAwesomeIcon icon={faUser} />
-              &nbsp;{dictionary.routes.my.profile.name}
+              &nbsp;{t('routes.my.profile.name')}
             </Link>
           </li>
           <li>
@@ -45,7 +44,7 @@ const ShortProfile = () => {
               href={getRouteUrl('my.pwd', locale)}
             >
               <FontAwesomeIcon icon={faLock} />
-              &nbsp;{dictionary.routes.my.pwd.name}
+              &nbsp;{t('routes.my.pwd.name')}
             </Link>
           </li>
           <li>
@@ -54,7 +53,7 @@ const ShortProfile = () => {
               href={getRouteUrl('my.settings', locale)}
             >
               <FontAwesomeIcon icon={faGear} />
-              &nbsp;{dictionary.routes.my.settings.name}
+              &nbsp;{t('routes.my.settings.name')}
             </Link>
           </li>
           <li>
@@ -63,7 +62,7 @@ const ShortProfile = () => {
               href={getRouteUrl('my.withdraw', locale)}
             >
               <FontAwesomeIcon icon={faRightFromBracket} />
-              &nbsp;Signout
+              &nbsp;{t('common.auth.register.withDrawLabel')}
             </Link>
           </li>
 

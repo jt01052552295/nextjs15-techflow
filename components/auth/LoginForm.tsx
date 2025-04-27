@@ -75,7 +75,7 @@ const LoginForm = () => {
         }, 500);
       } catch (error) {
         console.error(error);
-        toast.error(dictionary.common.unknown_error);
+        toast.error(t('common.unknown_error'));
       }
     });
   };
@@ -112,13 +112,11 @@ const LoginForm = () => {
     }
   }, [errors.email, watchedEmail]);
 
-  const welcomeMessage = t('common.AppDesc');
-
   return (
     <div className={styles['register-page']}>
       <div className={styles['register-box']}>
         <div className={styles['register-logo']}>
-          <h1 className="fs-5 m-0">{welcomeMessage}</h1>
+          <h1 className="fs-5 m-0">{t('common.AppName')}</h1>
           <LanguageSwitcher />
         </div>
 
@@ -127,7 +125,7 @@ const LoginForm = () => {
             <form onSubmit={handleSubmit(formAction)} noValidate>
               <div className="mb-3">
                 <label className="form-label" htmlFor="email">
-                  {dictionary.columns.user.email}
+                  {t('columns.user.email')}
                 </label>
                 <input
                   type="email"
@@ -144,14 +142,12 @@ const LoginForm = () => {
                   </div>
                 )}
                 {!errors.email && (
-                  <div className="valid-feedback">
-                    {dictionary.common.form.valid}
-                  </div>
+                  <div className="valid-feedback">{t('common.form.valid')}</div>
                 )}
               </div>
               <div className="mb-3">
                 <label className="form-label" htmlFor="password">
-                  {dictionary.columns.user.password}
+                  {t('columns.user.password')}
                 </label>
                 <div className="input-group has-validation">
                   <input
@@ -181,7 +177,7 @@ const LoginForm = () => {
                   )}
                   {!errors.password && (
                     <div className="valid-feedback">
-                      {dictionary.common.form.valid}
+                      {t('common.form.valid')}
                     </div>
                   )}
                 </div>
@@ -197,7 +193,7 @@ const LoginForm = () => {
                   })}
                 />
                 <label className="form-check-label" htmlFor="rememberEmail">
-                  {dictionary.common.auth.login.remember}
+                  {t('common.auth.login.remember')}
                 </label>
               </div>
               <div className="d-grid">
@@ -207,8 +203,8 @@ const LoginForm = () => {
                   disabled={isPending || !isValid}
                 >
                   {isPending
-                    ? dictionary.common.loading
-                    : dictionary.common.auth.login.loginButton}
+                    ? t('common.loading')
+                    : t('common.auth.login.loginButton')}
                 </button>
                 {errorMessage && (
                   <div className="alert alert-danger mt-2 p-2" role="alert">
@@ -225,7 +221,7 @@ const LoginForm = () => {
                 href={getRouteUrl('auth.account', locale)}
                 className="text-muted"
               >
-                {dictionary.common.auth.login.forgotAccount}
+                {t('common.auth.login.forgotAccount')}
               </Link>
             </div>
             <div className="mt-1 text-end">
@@ -233,7 +229,7 @@ const LoginForm = () => {
                 href={getRouteUrl('auth.password', locale)}
                 className="text-muted"
               >
-                {dictionary.common.auth.login.forgotPassword}
+                {t('common.auth.login.forgotPassword')}
               </Link>
             </div>
             <div className="mt-1 text-end">
@@ -241,7 +237,7 @@ const LoginForm = () => {
                 href={getRouteUrl('auth.register', locale)}
                 className="text-muted"
               >
-                {dictionary.common.auth.login.register}
+                {t('common.auth.login.register')}
               </Link>
             </div>
           </div>

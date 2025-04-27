@@ -1,5 +1,5 @@
 'use client';
-import { UserRole } from '@prisma/client';
+
 import {
   createContext,
   useContext,

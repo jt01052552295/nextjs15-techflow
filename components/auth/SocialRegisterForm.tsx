@@ -17,12 +17,8 @@ import { toast } from 'sonner';
 import useFormUtils from '@/hooks/useFormUtils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
-import { formatMessage } from '@/lib/util';
-import { VerificationPurpose } from '@prisma/client';
 import Countdown, { CountdownRendererFn } from 'react-countdown';
 import {
-  generateVerificationToken,
-  verifyEmailToken,
   generateVerificationPhoneToken,
   verifyPhoneToken,
 } from '@/actions/auth/register/token';
@@ -39,7 +35,7 @@ import { oauthSocialRegisterAction } from '@/actions/auth/register/social';
 
 const SocialRegisterForm = () => {
   const router = useRouter();
-  const { dictionary, locale } = useLanguage();
+  const { dictionary, locale, t } = useLanguage();
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | undefined>('');
   const [step, setStep] = useState<number>(1);
@@ -174,7 +170,7 @@ const SocialRegisterForm = () => {
         // toast.success(`로그인성공`);
       } catch (error) {
         console.error(error);
-        toast.error(dictionary.common.unknown_error);
+        toast.error(t('common.unknown_error'));
       }
     });
   };
@@ -246,13 +242,13 @@ const SocialRegisterForm = () => {
     <div className={styles['register-page']}>
       <div className={styles['register-box']}>
         <div className={styles['register-logo']}>
-          <h1 className="fs-5 m-0">{dictionary.common.auth.login.register}</h1>
+          <h1 className="fs-5 m-0">{t('common.auth.login.register')}</h1>
           <div className="text-center">
             <Link
               href={getRouteUrl('auth.login', locale)}
               className="text-muted"
             >
-              {dictionary.common.auth.login.loginButton}
+              {t('common.auth.login.loginButton')}
             </Link>
           </div>
         </div>
@@ -267,7 +263,7 @@ const SocialRegisterForm = () => {
                   {!phoneSent && (
                     <div className="mb-3">
                       <label className="form-label">
-                        {dictionary.columns.user.phone}
+                        {t('columns.user.phone')}
                       </label>
                       <div className="input-group has-validation">
                         <input
@@ -285,8 +281,8 @@ const SocialRegisterForm = () => {
                           onClick={showVerificationPhone}
                         >
                           {isPhoneSentLoading
-                            ? dictionary.common.auth.register.sendButtonLoading
-                            : dictionary.common.auth.register.sendButton}
+                            ? t('common.auth.register.sendButtonLoading')
+                            : t('common.auth.register.sendButton')}
                         </button>
                         {errors.hp?.message && (
                           <div className="invalid-feedback">
@@ -295,7 +291,7 @@ const SocialRegisterForm = () => {
                         )}
                         {!errors.hp && (
                           <div className="valid-feedback">
-                            {dictionary.common.form.valid}
+                            {t('common.form.valid')}
                           </div>
                         )}
                       </div>
@@ -304,7 +300,7 @@ const SocialRegisterForm = () => {
                   {phoneSent && (
                     <div className="mb-3">
                       <label className="form-label">
-                        {dictionary.common.auth.register.verifyCode}
+                        {t('common.auth.register.verifyCode')}
                       </label>
                       <div className="input-group has-validation">
                         <input
@@ -323,9 +319,8 @@ const SocialRegisterForm = () => {
                           disabled={isPhoneTimerExpired || phoneCodeSent}
                         >
                           {isPhoneSentLoading
-                            ? dictionary.common.auth.register
-                                .verifyButtonLoading
-                            : dictionary.common.auth.register.verifyButton}
+                            ? t('common.auth.register.verifyButtonLoading')
+                            : t('common.auth.register.verifyButton')}
                         </button>
                         {errors.hpCode?.message && (
                           <div className="invalid-feedback">
@@ -334,7 +329,7 @@ const SocialRegisterForm = () => {
                         )}
                         {!errors.hpCode && (
                           <div className="valid-feedback">
-                            {dictionary.common.form.valid}
+                            {t('common.form.valid')}
                           </div>
                         )}
                       </div>
@@ -352,14 +347,14 @@ const SocialRegisterForm = () => {
                         {isPhoneTimerExpired && !phoneCodeSent && (
                           <div className="d-flex justify-content-between align-items-center mt-3">
                             <p className="m-0">
-                              {dictionary.common.auth.register.timeIsUp}
+                              {t('common.auth.register.timeIsUp')}
                             </p>
                             <button
                               type="button"
                               className="btn btn-outline-secondary btn-sm"
                               onClick={reVerificationPhone}
                             >
-                              {dictionary.common.auth.register.resendButton}
+                              {t('common.auth.register.resendButton')}
                             </button>
                           </div>
                         )}
@@ -369,7 +364,7 @@ const SocialRegisterForm = () => {
                             className="alert alert-success mt-2 p-2"
                             role="alert"
                           >
-                            {dictionary.common.auth.register.codeSent}
+                            {t('common.auth.register.codeSent')}
                           </div>
                         )}
                       </div>
@@ -383,7 +378,7 @@ const SocialRegisterForm = () => {
                   {hasPhoneFromOAuth && (
                     <div className="mb-3">
                       <label className="form-label">
-                        {dictionary.columns.user.phone}
+                        {t('columns.user.phone')}
                       </label>
                       <input type="hidden" {...register('hp')} />
                       <input type="hidden" {...register('hpCode')} />
@@ -394,13 +389,13 @@ const SocialRegisterForm = () => {
                         readOnly
                       />
                       <small className="text-success">
-                        {dictionary.common.auth.register.phoneVerified}
+                        {t('common.auth.register.phoneVerified')}
                       </small>
                     </div>
                   )}
                   <div className="mb-2">
                     <label className="form-label" htmlFor="name">
-                      {dictionary.columns.user.name}
+                      {t('columns.user.name')}
                     </label>
 
                     <input
@@ -419,7 +414,7 @@ const SocialRegisterForm = () => {
                     )}
                     {!errors.name && (
                       <div className="valid-feedback">
-                        {dictionary.common.form.valid}
+                        {t('common.form.valid')}
                       </div>
                     )}
                   </div>
@@ -432,7 +427,7 @@ const SocialRegisterForm = () => {
                       {...register('privacy')}
                     />
                     <label className="form-check-label" htmlFor="privacy">
-                      {dictionary.columns.user.privacyLabel}
+                      {t('columns.user.privacyLabel')}
                     </label>
                     {errors.privacy?.message && (
                       <div className="invalid-feedback">
@@ -448,8 +443,8 @@ const SocialRegisterForm = () => {
                       disabled={isPending || !isValid}
                     >
                       {isPending
-                        ? dictionary.common.loading
-                        : dictionary.common.auth.register.registerButton}
+                        ? t('common.loading')
+                        : t('common.auth.register.registerButton')}
                     </button>
                     {errorMessage && (
                       <div className="alert alert-danger mt-2 p-2" role="alert">
@@ -463,8 +458,8 @@ const SocialRegisterForm = () => {
               {step === 3 && (
                 <div className="text-center">
                   <p>
-                    {formatMessage(dictionary.common.form.resultComplete, {
-                      result: dictionary.common.auth.register.registerButton,
+                    {t('common.form.resultComplete', {
+                      result: t('common.auth.register.registerButton'),
                     })}
                   </p>
                   <button

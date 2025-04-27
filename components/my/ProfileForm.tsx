@@ -23,12 +23,10 @@ import { UserRole } from '@prisma/client';
 import { toast } from 'sonner';
 import useFormUtils from '@/hooks/useFormUtils';
 import { useAuth } from '../context/AuthContext';
-import { formatMessage } from '@/lib/util';
 import FileUploadPreview, { FileUploadPreviewRef } from './FileUploadPreview';
-import { IUserProfile } from '@/types/user';
 
 const ProfileForm = () => {
-  const { dictionary, locale } = useLanguage();
+  const { dictionary, locale, t } = useLanguage();
   const router = useRouter();
 
   const { user, refreshUser, userProfiles, updateUserProfiles } = useAuth();
@@ -90,7 +88,7 @@ const ProfileForm = () => {
         // toast.success(`로그인성공`);
       } catch (error) {
         console.error(error);
-        toast.error(dictionary.common.unknown_error);
+        toast.error(t('common.unknown_error'));
       }
     });
   };
@@ -111,15 +109,13 @@ const ProfileForm = () => {
         <input type="hidden" {...register('email')} />
         <div className="card">
           <div className="card-header">
-            <h5 className="card-title m-0">{dictionary.common.basic_info}</h5>
+            <h5 className="card-title m-0">{t('common.basic_info')}</h5>
           </div>
           <div className="card-body">
             <div className="row">
               <div className="col-md-12 col-lg-6">
                 <div className="mb-3">
-                  <label className="form-label">
-                    {dictionary.columns.user.name}
-                  </label>
+                  <label className="form-label">{t('columns.user.name')}</label>
                   <div className="input-group has-validation">
                     <input
                       type="text"
@@ -137,15 +133,13 @@ const ProfileForm = () => {
                     )}
                     {!errors.name && (
                       <div className="valid-feedback">
-                        {dictionary.common.form.valid}
+                        {t('common.form.valid')}
                       </div>
                     )}
                   </div>
                 </div>
                 <div className="mb-3">
-                  <label className="form-label">
-                    {dictionary.columns.user.nick}
-                  </label>
+                  <label className="form-label">{t('columns.user.nick')}</label>
                   <div className="input-group has-validation">
                     <input
                       type="text"
@@ -163,7 +157,7 @@ const ProfileForm = () => {
                     )}
                     {!errors.nick && (
                       <div className="valid-feedback">
-                        {dictionary.common.form.valid}
+                        {t('common.form.valid')}
                       </div>
                     )}
                   </div>
@@ -171,7 +165,7 @@ const ProfileForm = () => {
 
                 <div className="mb-3">
                   <label className="form-label">
-                    {dictionary.columns.user.phone}
+                    {t('columns.user.phone')}
                   </label>
                   <div className="input-group has-validation">
                     <input
@@ -190,15 +184,13 @@ const ProfileForm = () => {
                     )}
                     {!errors.phone && (
                       <div className="valid-feedback">
-                        {dictionary.common.form.valid}
+                        {t('common.form.valid')}
                       </div>
                     )}
                   </div>
                 </div>
                 <div className="mb-3 ">
-                  <label className="form-label">
-                    {dictionary.columns.user.role}
-                  </label>
+                  <label className="form-label">{t('columns.user.role')}</label>
 
                   <select
                     className={`form-select ${getInputClass('role')}`}
@@ -208,18 +200,18 @@ const ProfileForm = () => {
                       onBlur: () => handleInputChange('role'),
                     })}
                   >
-                    <option value="">{dictionary.common.choose}</option>
+                    <option value="">{t('common.choose')}</option>
                     <option value={UserRole.ADMIN}>
-                      {dictionary.common.userRole.admin}
+                      {t('common.userRole.admin')}
                     </option>
                     <option value={UserRole.EXTRA}>
-                      {dictionary.common.userRole.extra}
+                      {t('common.userRole.extra')}
                     </option>
                     <option value={UserRole.COMPANY}>
-                      {dictionary.common.userRole.company}
+                      {t('common.userRole.company')}
                     </option>
                     <option value={UserRole.USER}>
-                      {dictionary.common.userRole.user}
+                      {t('common.userRole.user')}
                     </option>
                   </select>
                   {errors.role?.message && (
@@ -229,7 +221,7 @@ const ProfileForm = () => {
                   )}
                   {!errors.role && (
                     <div className="valid-feedback">
-                      {dictionary.common.form.valid}
+                      {t('common.form.valid')}
                     </div>
                   )}
                 </div>
@@ -237,7 +229,7 @@ const ProfileForm = () => {
               <div className="col-md-12 col-lg-6">
                 <div className="mb-3">
                   <label className="form-label" htmlFor="isUse">
-                    {dictionary.columns.user.isUse}
+                    {t('columns.user.isUse')}
                   </label>
                   <div className="input-group ">
                     <div className="form-check form-switch">
@@ -249,14 +241,14 @@ const ProfileForm = () => {
                         {...register('isUse')}
                       />
                       <label className="form-check-label" htmlFor={`isUse`}>
-                        {dictionary.common.usage}
+                        {t('common.usage')}
                       </label>
                     </div>
                   </div>
                 </div>
                 <div className="mb-3">
                   <label className="form-label" htmlFor="isVisible">
-                    {dictionary.columns.user.isVisible}
+                    {t('columns.user.isVisible')}
                   </label>
                   <div className="input-group">
                     <div className="form-check form-switch">
@@ -268,7 +260,7 @@ const ProfileForm = () => {
                         {...register('isVisible')}
                       />
                       <label className="form-check-label" htmlFor={`isVisible`}>
-                        {dictionary.common.visible}
+                        {t('common.visible')}
                       </label>
                     </div>
                   </div>
@@ -277,7 +269,7 @@ const ProfileForm = () => {
                   <label className="form-label" htmlFor="profile">
                     {dictionary.columns.user.profile}
                     <small className="text-muted ms-1">
-                      {formatMessage(dictionary.common.upload.info_message, {
+                      {t('common.upload.info_message', {
                         count: '4',
                         size: '20',
                       })}
@@ -307,7 +299,7 @@ const ProfileForm = () => {
                 >
                   <FontAwesomeIcon icon={faFloppyDisk} />
                   &nbsp;
-                  {isPending ? dictionary.loading : dictionary.common.save}
+                  {isPending ? t('common.loading') : t('common.save')}
                 </button>
               </div>
               <div className="col-auto">
@@ -319,7 +311,7 @@ const ProfileForm = () => {
                 >
                   <FontAwesomeIcon icon={faRotateRight} />
                   &nbsp;
-                  {isPending ? dictionary.loading : dictionary.common.cancel}
+                  {isPending ? t('common.loading') : t('common.cancel')}
                 </button>
               </div>
             </div>

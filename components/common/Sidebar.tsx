@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useLanguage } from '@/components/context/LanguageContext';
 import Link from 'next/link';
 import cx from 'classnames';
@@ -12,7 +12,7 @@ import { useCollapseStore } from '@/store/sidebar';
 import UserProfileWidget from '@/components/common/UserProfileWidget';
 
 const Sidebar = () => {
-  const { dictionary, locale } = useLanguage();
+  const { t } = useLanguage();
   const { collapse, setCollapse } = useCollapseStore();
 
   useEffect(() => {
@@ -49,7 +49,7 @@ const Sidebar = () => {
         <div className="sidebar-logo">
           <h1 className="fs-5 m-0 text-center">
             <Link href="/" className="link-body-emphasis text-decoration-none">
-              {dictionary.common.AppName}
+              {t('common.AppName')}
             </Link>
           </h1>
         </div>
@@ -63,7 +63,7 @@ const Sidebar = () => {
             aria-current="true"
           >
             <FontAwesomeIcon icon={faGear} />
-            &nbsp;{dictionary.common.settings}
+            &nbsp;{t('common.settings')}
           </Link>
           <LogoutButton variant="sidebar" />
         </div>

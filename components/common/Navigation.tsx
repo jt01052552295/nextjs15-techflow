@@ -22,7 +22,7 @@ import {
 const Navigation = () => {
   const mount = useMount();
   const pathname = usePathname();
-  const { dictionary, locale } = useLanguage();
+  const { dictionary, locale, t } = useLanguage();
 
   const menuStructure = [
     {

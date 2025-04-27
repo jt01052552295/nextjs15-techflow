@@ -12,21 +12,17 @@ import {
 import { useRouter } from 'next/navigation';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import Link from 'next/link';
 import { useLanguage } from '@/components/context/LanguageContext';
-import { getRouteUrl } from '@/utils/routes';
 import { withdrawSchema, WithdrawType } from '@/actions/auth/withdraw/schema';
 import { autWithdrawAction } from '@/actions/auth/withdraw';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFloppyDisk, faRotateRight } from '@fortawesome/free-solid-svg-icons';
-import { UserRole } from '@prisma/client';
 import { toast } from 'sonner';
 import useFormUtils from '@/hooks/useFormUtils';
 import { useAuth } from '../context/AuthContext';
-import { formatMessage } from '@/lib/util';
 
 const WithdrawForm = () => {
-  const { dictionary, locale } = useLanguage();
+  const { dictionary, locale, t } = useLanguage();
   const router = useRouter();
 
   const { user, refreshUser, userProfiles, updateUserProfiles } = useAuth();
@@ -81,7 +77,7 @@ const WithdrawForm = () => {
         // toast.success(`로그인성공`);
       } catch (error) {
         console.error(error);
-        toast.error(dictionary.common.unknown_error);
+        toast.error(t('common.unknown_error'));
       }
     });
   };
@@ -98,15 +94,13 @@ const WithdrawForm = () => {
         <input type="hidden" {...register('email')} />
         <div className="card">
           <div className="card-header">
-            <h5 className="card-title m-0">{dictionary.common.basic_info}</h5>
+            <h5 className="card-title m-0">{t('common.basic_info')}</h5>
           </div>
           <div className="card-body">
             <div className="row">
               <div className="col-md-12 col-lg-6">
                 <div className="mb-3">
-                  <label className="form-label">
-                    {dictionary.columns.user.name}
-                  </label>
+                  <label className="form-label">{t('columns.user.name')}</label>
                   <div className="input-group has-validation">
                     <input
                       type="text"
@@ -124,15 +118,13 @@ const WithdrawForm = () => {
                     )}
                     {!errors.name && (
                       <div className="valid-feedback">
-                        {dictionary.common.form.valid}
+                        {t('common.form.valid')}
                       </div>
                     )}
                   </div>
                 </div>
                 <div className="mb-3">
-                  <label className="form-label">
-                    {dictionary.columns.user.nick}
-                  </label>
+                  <label className="form-label">{t('columns.user.nick')}</label>
                   <div className="input-group has-validation">
                     <input
                       type="text"
@@ -150,7 +142,7 @@ const WithdrawForm = () => {
                     )}
                     {!errors.nick && (
                       <div className="valid-feedback">
-                        {dictionary.common.form.valid}
+                        {t('common.form.valid')}
                       </div>
                     )}
                   </div>
@@ -158,7 +150,7 @@ const WithdrawForm = () => {
 
                 <div className="mb-3">
                   <label className="form-label">
-                    {dictionary.columns.user.phone}
+                    {t('columns.user.phone')}
                   </label>
                   <div className="input-group has-validation">
                     <input
@@ -177,7 +169,7 @@ const WithdrawForm = () => {
                     )}
                     {!errors.phone && (
                       <div className="valid-feedback">
-                        {dictionary.common.form.valid}
+                        {t('common.form.valid')}
                       </div>
                     )}
                   </div>
@@ -186,7 +178,7 @@ const WithdrawForm = () => {
               <div className="col-md-12 col-lg-6">
                 <div className="mb-3">
                   <label className="form-label" htmlFor="isSignout">
-                    {dictionary.columns.user.isSignout}
+                    {t('columns.user.isSignout')}
                   </label>
                   <div className="input-group ">
                     <div className="form-check form-switch">
@@ -198,7 +190,7 @@ const WithdrawForm = () => {
                         {...register('isSignout')}
                       />
                       <label className="form-check-label" htmlFor={`isSignout`}>
-                        {dictionary.common.usage}
+                        {t('common.usage')}
                       </label>
                     </div>
                   </div>
@@ -216,7 +208,7 @@ const WithdrawForm = () => {
                 >
                   <FontAwesomeIcon icon={faFloppyDisk} />
                   &nbsp;
-                  {isPending ? dictionary.loading : dictionary.common.save}
+                  {isPending ? t('common.loading') : t('common.save')}
                 </button>
               </div>
               <div className="col-auto">
@@ -228,7 +220,7 @@ const WithdrawForm = () => {
                 >
                   <FontAwesomeIcon icon={faRotateRight} />
                   &nbsp;
-                  {isPending ? dictionary.loading : dictionary.common.cancel}
+                  {isPending ? t('common.loading') : t('common.cancel')}
                 </button>
               </div>
             </div>

@@ -22,7 +22,7 @@ const LogoutButton = ({
 }: LogoutButtonProps) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-  const { dictionary, locale } = useLanguage();
+  const { dictionary, locale, t } = useLanguage();
 
   const handleLogout = () => {
     startTransition(async () => {
@@ -38,7 +38,7 @@ const LogoutButton = ({
         }
       } catch (error) {
         console.error('로그아웃 오류:', error);
-        toast.error(dictionary.common.auth.logout.fail);
+        toast.error(t('common.auth.logout.fail'));
       }
     });
   };
@@ -55,9 +55,7 @@ const LogoutButton = ({
         }}
       >
         {showIcon && <FontAwesomeIcon icon={faSignOutAlt} className="me-2" />}
-        {isPending
-          ? dictionary.common.loading
-          : dictionary.common.auth.logout.button}
+        {isPending ? t('common.loading') : t('common.auth.logout.button')}
       </a>
     );
   } else if (variant === 'dropdown') {
@@ -68,9 +66,7 @@ const LogoutButton = ({
         disabled={isPending}
       >
         {showIcon && <FontAwesomeIcon icon={faSignOutAlt} className="me-2" />}
-        {isPending
-          ? dictionary.common.loading
-          : dictionary.common.auth.logout.button}
+        {isPending ? t('common.loading') : t('common.auth.logout.button')}
       </button>
     );
   } else if (variant === 'sidebar') {
@@ -81,9 +77,7 @@ const LogoutButton = ({
         disabled={isPending}
       >
         {showIcon && <FontAwesomeIcon icon={faSignOutAlt} className="me-2" />}
-        {isPending
-          ? dictionary.common.loading
-          : dictionary.common.auth.logout.button}
+        {isPending ? t('common.loading') : t('common.auth.logout.button')}
       </button>
     );
   }
@@ -96,9 +90,7 @@ const LogoutButton = ({
       disabled={isPending}
     >
       {showIcon && <FontAwesomeIcon icon={faSignOutAlt} className="me-2" />}
-      {isPending
-        ? dictionary.common.loading
-        : dictionary.common.auth.logout.button}
+      {isPending ? t('common.loading') : t('common.auth.logout.button')}
     </button>
   );
 };
