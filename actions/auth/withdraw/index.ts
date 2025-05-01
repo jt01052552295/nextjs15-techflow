@@ -12,6 +12,7 @@ import { logoutAction } from '../logout';
 import { deleteNaverToken } from '@/lib/oauth/naver';
 import { deleteKakaoToken } from '@/lib/oauth/kakao';
 import { deleteGoogleToken } from '@/lib/oauth/google';
+import { deleteGithubToken } from '@/lib/oauth/github';
 
 type ReturnType = {
   status: string;
@@ -144,6 +145,27 @@ export const autWithdrawAction = async (
           }
         } catch (naverError) {
           console.error('구글 토큰 삭제 중 예외 발생:', naverError);
+        }
+      } else if (
+        existingAccount?.provider === 'github' &&
+        existingAccount.access_token
+      ) {
+        try {
+          const githubTokenResult = await deleteGithubToken(
+            existingAccount.access_token,
+          );
+
+          console.log(githubTokenResult);
+
+          if (githubTokenResult.success) {
+            await prisma.account.delete({
+              where: { idx: existingAccount.idx },
+            });
+          } else {
+            console.error('github 토큰 삭제 실패:', githubTokenResult.message);
+          }
+        } catch (naverError) {
+          console.error('github 토큰 삭제 중 예외 발생:', naverError);
         }
       }
 

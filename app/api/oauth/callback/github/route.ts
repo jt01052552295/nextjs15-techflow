@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getGoogleToken, getGoogleProfile } from '@/lib/oauth/google';
+import {
+  getGithubToken,
+  getGithubProfile,
+  getGithubEmails,
+} from '@/lib/oauth/github';
 import { cookies } from 'next/headers';
 import prisma from '@/lib/prisma';
 import { sign } from 'jsonwebtoken';
@@ -15,10 +19,10 @@ export async function GET(request: NextRequest) {
     const state = searchParams.get('state');
 
     const language = await ckLocale();
-    const provider = await __ts('common.oauth.provider.google', {}, language);
+    const provider = await __ts('common.oauth.provider.github', {}, language);
 
     const cookieStore = await cookies();
-    const savedState = cookieStore.get('google_oauth_state')?.value;
+    const savedState = cookieStore.get('github_oauth_state')?.value;
 
     if (!code || !state || state !== savedState) {
       const invalidRequest = await __ts(
@@ -36,7 +40,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 액세스 토큰 요청
-    const tokenResponse = await getGoogleToken(code);
+    const tokenResponse = await getGithubToken(code);
     if (!tokenResponse.access_token) {
       const accessTokenFail = await __ts(
         'common.oauth.error.accessTokenFail',
@@ -49,9 +53,9 @@ export async function GET(request: NextRequest) {
     }
 
     // 프로필 정보 요청
-    const profileResponse = await getGoogleProfile(tokenResponse.access_token);
+    const profileResponse = await getGithubProfile(tokenResponse.access_token);
     console.log(`profileResponse`, profileResponse);
-    if (!profileResponse.sub) {
+    if (!profileResponse.id) {
       const userInfoFail = await __ts(
         'common.oauth.error.userInfoFail',
         { provider: provider },
@@ -62,7 +66,30 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(redirectUrl);
     }
 
-    const { sub, name, email, picture } = profileResponse;
+    // 이메일이 null인 경우 별도로 이메일 정보 요청
+    let userEmail = profileResponse.email;
+    if (!userEmail) {
+      try {
+        const emailsResponse = await getGithubEmails(
+          tokenResponse.access_token,
+        );
+        console.log('GitHub emails:', emailsResponse);
+
+        // 주 이메일(primary) 또는 첫 번째 이메일 사용
+        const primaryEmail = emailsResponse.find((email: any) => email.primary);
+        if (primaryEmail && primaryEmail.verified) {
+          userEmail = primaryEmail.email;
+        } else if (emailsResponse.length > 0 && emailsResponse[0].verified) {
+          userEmail = emailsResponse[0].email;
+        }
+
+        console.log('Selected email:', userEmail);
+      } catch (emailError) {
+        console.error('GitHub 이메일 정보 가져오기 실패:', emailError);
+      }
+    }
+
+    const { id, name } = profileResponse;
     // console.log(kakaoUser);
 
     // 새 사용자인 경우 추가 정보 입력 페이지로 리다이렉트
@@ -71,9 +98,9 @@ export async function GET(request: NextRequest) {
     const expires_in = Number(tokenResponse.expires_in);
 
     // 1. 이메일로 가입된 사용자 확인 (일반 계정 또는 다른 소셜 계정)
-    if (email) {
+    if (userEmail) {
       const existingUserByEmail = await prisma.user.findUnique({
-        where: { email: email },
+        where: { email: userEmail },
         include: {
           accounts: true,
         },
@@ -87,7 +114,7 @@ export async function GET(request: NextRequest) {
 
         const existingAccounts = existingUserByEmail.accounts || [];
         const existingSocialAccount = existingAccounts.find(
-          (account) => account.provider !== 'google',
+          (account) => account.provider !== 'github',
         );
 
         if (existingSocialAccount) {
@@ -114,8 +141,8 @@ export async function GET(request: NextRequest) {
     // 2. 소셜 계정으로 가입된 사용자 확인
     const existingAccount = await prisma.account.findFirst({
       where: {
-        provider: 'google',
-        providerAccountId: sub,
+        provider: 'github',
+        providerAccountId: id.toString(),
       },
       include: {
         user: true,
@@ -140,7 +167,7 @@ export async function GET(request: NextRequest) {
       });
 
       // 기존 OAuth 상태 쿠키 삭제
-      cookieStore.delete('google_oauth_state');
+      cookieStore.delete('github_oauth_state');
 
       const expiresAt = await createAuthSession(existingUser, {
         expiryDays: 30,
@@ -156,12 +183,12 @@ export async function GET(request: NextRequest) {
 
     // 4. 신규 사용자인 경우 회원가입 페이지로 리다이렉트
     const oauthData = {
-      provider: 'google',
-      providerAccountId: sub,
-      email: email,
+      provider: 'github',
+      providerAccountId: id.toString(),
+      email: userEmail,
       name: name || '',
-      nickname: name || '',
-      profileImage: picture || null,
+      nickname: name || profileResponse.login || '',
+      profileImage: profileResponse.avatar_url || null,
       phone: '09052552295',
       accessToken: tokenResponse.access_token,
       refreshToken: tokenResponse.refresh_token || null,
@@ -196,9 +223,9 @@ export async function GET(request: NextRequest) {
     // const redirectUrl = process.env.NEXT_PUBLIC_APP_URL + mainUrl;
     // return NextResponse.redirect(`${redirectUrl}`);
   } catch (error) {
-    console.error('구글 로그인 콜백 처리 오류:', error);
+    console.error('github 로그인 콜백 처리 오류:', error);
     const language = await ckLocale();
-    const provider = await __ts('common.oauth.provider.google', {}, language);
+    const provider = await __ts('common.oauth.provider.github', {}, language);
     const errorUrl = getRouteUrl('auth.error', language);
     const callbackError = await __ts(
       'common.oauth.error.callbackError',
