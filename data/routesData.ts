@@ -10,6 +10,10 @@ export const routesData = {
     password: '/auth/password',
     error: '/auth/error',
   },
+  policy: {
+    privacy: '/auth/policy/privacy',
+    terms: '/auth/policy/terms',
+  },
   my: {
     profile: '/my/profile',
     pwd: '/my/pwd',

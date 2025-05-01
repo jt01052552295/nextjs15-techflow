@@ -2,18 +2,23 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verify, sign } from 'jsonwebtoken';
 import prisma from '@/lib/prisma';
+import { ckLocale } from '@/lib/cookie';
+import { __ts } from '@/utils/get-dictionary';
 
 export async function POST(request: NextRequest) {
+  const language = await ckLocale();
   try {
     const cookieStore = await cookies();
     const sessionToken = cookieStore.get('session_token')?.value;
     const authToken = cookieStore.get('auth_token')?.value;
 
     if (!sessionToken || !authToken) {
-      return NextResponse.json(
-        { error: '인증되지 않은 요청입니다.' },
-        { status: 401 },
+      const invalidRequest = await __ts(
+        'common.auth.error.invalidRequest',
+        {},
+        language,
       );
+      return NextResponse.json({ error: invalidRequest }, { status: 401 });
     }
 
     // JWT 토큰 검증
@@ -31,10 +36,12 @@ export async function POST(request: NextRequest) {
     });
 
     if (!session) {
-      return NextResponse.json(
-        { error: '세션을 찾을 수 없습니다.' },
-        { status: 404 },
+      const sessionNotFound = await __ts(
+        'common.auth.error.sessionNotFound',
+        {},
+        language,
       );
+      return NextResponse.json({ error: sessionNotFound }, { status: 404 });
     }
 
     // 새로운 만료 시간 설정 (30일 연장)
@@ -67,16 +74,24 @@ export async function POST(request: NextRequest) {
       path: '/',
     });
 
+    const sessionExtended = await __ts(
+      'common.auth.session.extended',
+      {},
+      language,
+    );
+
     return NextResponse.json({
       success: true,
-      message: '세션이 성공적으로 연장되었습니다.',
+      message: sessionExtended,
       expiresAt: expiresAt.toISOString(),
     });
   } catch (error) {
     console.error('세션 연장 오류:', error);
-    return NextResponse.json(
-      { error: '세션 연장 중 오류가 발생했습니다.' },
-      { status: 500 },
+    const sessionExtendError = await __ts(
+      'common.auth.error.sessionExtendError',
+      {},
+      language,
     );
+    return NextResponse.json({ error: sessionExtendError }, { status: 500 });
   }
 }

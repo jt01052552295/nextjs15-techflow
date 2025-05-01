@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getNaverToken, getNaverProfile } from '@/lib/oauth/naver';
+import { getGoogleToken, getGoogleProfile } from '@/lib/oauth/google';
 import { cookies } from 'next/headers';
 import prisma from '@/lib/prisma';
 import { sign } from 'jsonwebtoken';
@@ -15,10 +15,10 @@ export async function GET(request: NextRequest) {
     const state = searchParams.get('state');
 
     const language = await ckLocale();
-    const provider = await __ts('common.oauth.provider.naver', {}, language);
+    const provider = await __ts('common.oauth.provider.google', {}, language);
 
     const cookieStore = await cookies();
-    const savedState = cookieStore.get('naver_oauth_state')?.value;
+    const savedState = cookieStore.get('google_oauth_state')?.value;
 
     if (!code || !state || state !== savedState) {
       const invalidRequest = await __ts(
@@ -35,8 +35,8 @@ export async function GET(request: NextRequest) {
       // );
     }
 
-    // 네이버 액세스 토큰 요청
-    const tokenResponse = await getNaverToken(code, state);
+    // 액세스 토큰 요청
+    const tokenResponse = await getGoogleToken(code);
     if (!tokenResponse.access_token) {
       const accessTokenFail = await __ts(
         'common.oauth.error.accessTokenFail',
@@ -48,9 +48,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(redirectUrl);
     }
 
-    // 네이버 프로필 정보 요청
-    const profileResponse = await getNaverProfile(tokenResponse.access_token);
-    if (profileResponse.resultcode !== '00' || !profileResponse.response) {
+    // 프로필 정보 요청
+    const profileResponse = await getGoogleProfile(tokenResponse.access_token);
+    console.log(`profileResponse`, profileResponse);
+    if (!profileResponse.sub) {
       const userInfoFail = await __ts(
         'common.oauth.error.userInfoFail',
         { provider: provider },
@@ -61,8 +62,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(redirectUrl);
     }
 
-    const naverUser = profileResponse.response;
-    // console.log(naverUser);
+    const { sub, name, email, picture } = profileResponse;
+    // console.log(kakaoUser);
 
     // 새 사용자인 경우 추가 정보 입력 페이지로 리다이렉트
     // 네이버 사용자 정보를 암호화하여 쿠키에 저장
@@ -70,9 +71,9 @@ export async function GET(request: NextRequest) {
     const expires_in = Number(tokenResponse.expires_in);
 
     // 1. 이메일로 가입된 사용자 확인 (일반 계정 또는 다른 소셜 계정)
-    if (naverUser.email) {
+    if (email) {
       const existingUserByEmail = await prisma.user.findUnique({
-        where: { email: naverUser.email },
+        where: { email: email },
         include: {
           accounts: true,
         },
@@ -86,7 +87,7 @@ export async function GET(request: NextRequest) {
 
         const existingAccounts = existingUserByEmail.accounts || [];
         const existingSocialAccount = existingAccounts.find(
-          (account) => account.provider !== 'naver',
+          (account) => account.provider !== 'google',
         );
 
         if (existingSocialAccount) {
@@ -113,8 +114,8 @@ export async function GET(request: NextRequest) {
     // 2. 소셜 계정으로 가입된 사용자 확인
     const existingAccount = await prisma.account.findFirst({
       where: {
-        provider: 'naver',
-        providerAccountId: naverUser.id,
+        provider: 'google',
+        providerAccountId: sub,
       },
       include: {
         user: true,
@@ -139,7 +140,7 @@ export async function GET(request: NextRequest) {
       });
 
       // 기존 OAuth 상태 쿠키 삭제
-      cookieStore.delete('naver_oauth_state');
+      cookieStore.delete('kakao_oauth_state');
 
       const expiresAt = await createAuthSession(existingUser, {
         expiryDays: 30,
@@ -155,13 +156,13 @@ export async function GET(request: NextRequest) {
 
     // 4. 신규 사용자인 경우 회원가입 페이지로 리다이렉트
     const oauthData = {
-      provider: 'naver',
-      providerAccountId: naverUser.id,
-      email: naverUser.email,
-      name: naverUser.name,
-      nickname: naverUser.name,
-      profileImage: naverUser.profile_image || null,
-      phone: naverUser.mobile?.replace(/[^0-9]/g, '') || '09052552295',
+      provider: 'google',
+      providerAccountId: sub,
+      email: email,
+      name: name || '',
+      nickname: name || '',
+      profileImage: picture || null,
+      phone: '09052552295',
       accessToken: tokenResponse.access_token,
       refreshToken: tokenResponse.refresh_token || null,
       expiresAt: tokenResponse.expires_in,
@@ -195,9 +196,9 @@ export async function GET(request: NextRequest) {
     // const redirectUrl = process.env.NEXT_PUBLIC_APP_URL + mainUrl;
     // return NextResponse.redirect(`${redirectUrl}`);
   } catch (error) {
-    console.error('네이버 로그인 콜백 처리 오류:', error);
+    console.error('구글 로그인 콜백 처리 오류:', error);
     const language = await ckLocale();
-    const provider = await __ts('common.oauth.provider.naver', {}, language);
+    const provider = await __ts('common.oauth.provider.google', {}, language);
     const errorUrl = getRouteUrl('auth.error', language);
     const callbackError = await __ts(
       'common.oauth.error.callbackError',

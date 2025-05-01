@@ -10,6 +10,8 @@ import { __ts, getDictionary } from '@/utils/get-dictionary';
 import { ckLocale } from '@/lib/cookie';
 import { logoutAction } from '../logout';
 import { deleteNaverToken } from '@/lib/oauth/naver';
+import { deleteKakaoToken } from '@/lib/oauth/kakao';
+import { deleteGoogleToken } from '@/lib/oauth/google';
 
 type ReturnType = {
   status: string;
@@ -102,6 +104,46 @@ export const autWithdrawAction = async (
           }
         } catch (naverError) {
           console.error('네이버 토큰 삭제 중 예외 발생:', naverError);
+        }
+      } else if (
+        existingAccount?.provider === 'kakao' &&
+        existingAccount.access_token
+      ) {
+        try {
+          const kakaoTokenResult = await deleteKakaoToken(
+            existingAccount.access_token,
+          );
+
+          if (kakaoTokenResult.success) {
+            await prisma.account.delete({
+              where: { idx: existingAccount.idx },
+            });
+          } else {
+            console.error('카카오오 토큰 삭제 실패:', kakaoTokenResult.message);
+          }
+        } catch (naverError) {
+          console.error('카카오 토큰 삭제 중 예외 발생:', naverError);
+        }
+      } else if (
+        existingAccount?.provider === 'google' &&
+        existingAccount.access_token
+      ) {
+        try {
+          const googleTokenResult = await deleteGoogleToken(
+            existingAccount.access_token,
+          );
+
+          console.log(googleTokenResult);
+
+          if (googleTokenResult.success) {
+            await prisma.account.delete({
+              where: { idx: existingAccount.idx },
+            });
+          } else {
+            console.error('구글 토큰 삭제 실패:', googleTokenResult.message);
+          }
+        } catch (naverError) {
+          console.error('구글 토큰 삭제 중 예외 발생:', naverError);
         }
       }
 

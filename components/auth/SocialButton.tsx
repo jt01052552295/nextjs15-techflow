@@ -22,6 +22,14 @@ const SocialButton = () => {
   const onOauth = async (provider: string) => {
     if (provider == 'naver') {
       window.location.href = '/api/oauth/request/naver';
+    } else if (provider == 'kakao') {
+      window.location.href = '/api/oauth/request/kakao';
+    } else if (provider == 'github') {
+      window.location.href = '/api/oauth/request/github';
+    } else if (provider == 'google') {
+      window.location.href = '/api/oauth/request/google';
+    } else if (provider == 'facebook') {
+      window.location.href = '/api/oauth/request/facebook';
     } else {
       console.log(provider);
     }

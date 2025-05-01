@@ -268,5 +268,88 @@
       "instructions": "Enter this code to complete registration",
       "footer": "Ignore if you didn't request this email"
     }
+  },
+  "policy": {
+    "privacy": {
+      "title": "Privacy Policy",
+      "section1": {
+        "title": "1. Purpose of Collection and Use of Personal Information",
+        "content": "TechFlow processes personal information for the following purposes. The personal information being processed will not be used for any purpose other than the following, and if the purpose of use changes, necessary measures will be taken, such as obtaining separate consent in accordance with Article 18 of the Personal Information Protection Act."
+      },
+      "section2": {
+        "title": "2. Personal Information Items Collected",
+        "content": "TechFlow collects the following personal information for membership registration, consultation, and service applications:",
+        "items": [
+          "Required: Email address, password, name, mobile phone number",
+          "Optional: Profile image, address",
+          "Automatically collected: IP address, cookies, visit date/time, service usage records, device information"
+        ]
+      },
+      "section3": {
+        "title": "3. Retention and Use Period of Personal Information",
+        "content": "In principle, TechFlow destroys personal information without delay after the purpose of collecting and using personal information has been achieved. However, if it is necessary to preserve information in accordance with the provisions of relevant laws and regulations, the company will retain member information for a certain period as specified by relevant laws and regulations."
+      },
+      "section4": {
+        "title": "4. Provision of Personal Information to Third Parties",
+        "content": "TechFlow processes personal information of data subjects only within the scope specified in Article 1 (Purpose of Processing Personal Information) and provides personal information to third parties only in cases falling under Articles 17 and 18 of the Personal Information Protection Act, such as with the consent of the data subject or special provisions of the law."
+      },
+      "section5": {
+        "title": "5. Rights, Obligations, and Methods of Exercise for Data Subjects",
+        "content": "Users, as data subjects, can exercise the following rights. The data subject may exercise the following personal information protection-related rights against TechFlow at any time: (Request to view personal information, request for correction if there are errors, request for deletion, request to stop processing)"
+      },
+      "section6": {
+        "title": "6. Personal Information Protection Officer",
+        "content": "TechFlow has designated a personal information protection officer as follows to take overall responsibility for the processing of personal information and to handle complaints and remedy damages related to the processing of personal information. Personal Information Protection Officer: Hong Gil-dong (Contact: privacy@techflow.work)"
+      },
+      "lastUpdated": "Last Updated",
+      "lastUpdatedDate": "May 1, 2025"
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "section1": {
+        "title": "1. General Provisions",
+        "content": "These Terms of Service (hereinafter referred to as 'Terms') establish the rights, obligations, and responsibilities between TechFlow (hereinafter referred to as 'Company') and its users regarding the use of services provided by the Company."
+      },
+      "section2": {
+        "title": "2. Definition of Terms",
+        "content": "The definitions of terms used in these Terms are as follows:",
+        "items": [
+          "'Service' refers to all services provided by the Company through its website, mobile applications, and other platforms.",
+          "'User' refers to any individual who accesses the Service and uses it in accordance with these Terms.",
+          "'Account' refers to the combination of username and password required for using the Service.",
+          "'Content' refers to all information created, uploaded, shared, or stored by users while using the Service."
+        ]
+      },
+      "section3": {
+        "title": "3. Amendment of Terms",
+        "content": "The Company may amend these Terms if necessary. When amending the Terms, the Company will notify users of the amended Terms, the date of enforcement, and the reasons for amendment through the website or individual notifications at least 7 days prior to the enforcement date. However, for amendments that impose significant disadvantages on users, the Company will provide notification at least 30 days prior to enforcement."
+      },
+      "section4": {
+        "title": "4. Service Usage Agreement",
+        "content": "The Service usage agreement is established when a user agrees to these Terms and the Company approves the user's registration. The Company may refuse registration in the following cases: when false information is provided during registration, when registration is attempted by a person who has lost their user qualification due to the Company's actions, or when registration is technically impossible."
+      },
+      "section5": {
+        "title": "5. User Responsibilities",
+        "content": "Users shall not engage in the following activities when using the Service: illegal activities or activities that violate public order and morals, activities that infringe on the intellectual property rights of the Company or third parties, activities that impede the operation of the Service, distribution of false information, or any other activities that the Company reasonably determines to be inappropriate."
+      },
+      "section6": {
+        "title": "6. Service Availability and Changes",
+        "content": "The Company strives to provide the Service 24 hours a day, 365 days a year, but may temporarily suspend the Service for maintenance, inspection, replacement, or failure of information and communication facilities such as computers. The Company may change all or part of the Service if there are reasonable grounds such as technical necessity or operational policy changes."
+      },
+      "section7": {
+        "title": "7. Termination and Restriction of Service",
+        "content": "Users may request termination of the Service usage agreement at any time. The Company may restrict or terminate the Service usage agreement if a user violates these Terms or causes harm to other users or the Service operation."
+      },
+      "section8": {
+        "title": "8. Intellectual Property Rights",
+        "content": "All intellectual property rights related to the Service belong to the Company or the rightful owner. Users may not use information obtained through the Service for commercial purposes or provide it to third parties without the Company's prior consent."
+      },
+      "section9": {
+        "title": "9. Governing Law and Dispute Resolution",
+        "content": "These Terms shall be governed by and construed in accordance with the laws of the Republic of Korea. Any disputes arising in connection with the Service shall be resolved through mutual consultation between the Company and the user, and if the dispute is not resolved through consultation, it may be referred to the competent court in accordance with the relevant laws."
+      },
+      "lastUpdated": "Last Updated",
+      "lastUpdatedDate": "May 1, 2025"
+    }
   }
 }

@@ -112,12 +112,15 @@ export const oauthSocialRegisterAction = async (
 
       // 2. 소셜 로그인 정보가 있는 경우 Account 테이블에 저장
       if (data.provider && data.providerAccountId) {
+        const providerAccountIdStr = data.providerAccountId
+          ? String(data.providerAccountId)
+          : '';
         await tx.account.create({
           data: {
             userId: user.id,
             type: 'oauth',
             provider: data.provider,
-            providerAccountId: data.providerAccountId,
+            providerAccountId: providerAccountIdStr,
             access_token: data.accessToken || null,
             refresh_token: data.refreshToken || null,
             expires_at: expiresAtValue,

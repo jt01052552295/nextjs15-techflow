@@ -33,7 +33,7 @@ const RegisterForm = () => {
   const { dictionary, locale, t } = useLanguage();
   const router = useRouter();
 
-  const [step, setStep] = useState<number>(1);
+  const [step, setStep] = useState<number>(3);
   const [emailSent, setEmailSent] = useState<boolean>(false);
   const [isEmailSentLoading, setIsEmailSentLoading] = useState<boolean>(false);
   const [emailCodeSent, setEmailCodeSent] = useState<boolean>(false);
@@ -243,42 +243,84 @@ const RegisterForm = () => {
               {step === 1 && (
                 <div>
                   {!emailSent && (
-                    <div className="mb-3">
-                      <label className="form-label">
-                        {t('columns.user.email')}
-                      </label>
-
-                      <div className="input-group has-validation">
-                        <input
-                          type="email"
-                          className={`form-control ${getInputClass('email')}`}
-                          {...register('email', {
-                            onChange: () => handleInputChange('email'),
-                            onBlur: () => handleInputChange('email'),
-                          })}
-                          readOnly={isPending}
-                        />
-                        <button
-                          type="button"
-                          className="btn btn-outline-secondary"
-                          onClick={showVerificationEmail}
-                        >
-                          {isEmailSentLoading
-                            ? t('common.auth.register.sendButtonLoading')
-                            : t('common.auth.register.sendButton')}
-                        </button>
-                        {errors.email?.message && (
-                          <div className="invalid-feedback">
-                            {errors.email?.message}
+                    <>
+                      <div className="mb-3">
+                        <div className="form-check">
+                          <input
+                            type="checkbox"
+                            id="termsAgreement"
+                            className={`form-check-input ${errors.privacy ? 'is-invalid' : ''}`}
+                            {...register('privacy')}
+                          />
+                          <label
+                            className="form-check-label"
+                            htmlFor="termsAgreement"
+                          >
+                            {t('common.form.privacy')}
+                          </label>
+                          <div className="mt-2 small">
+                            <Link
+                              href={`?modal=terms`}
+                              className="me-2 text-decoration-none"
+                              scroll={false} // 스크롤 방지
+                              prefetch={true} // 미리 가져오기
+                            >
+                              {t('common.policy.terms.title')}
+                            </Link>
+                            <span className="mx-1">|</span>
+                            <Link
+                              href={`?modal=privacy`}
+                              className="ms-2 text-decoration-none"
+                              scroll={false} // 스크롤 방지
+                              prefetch={true} // 미리 가져오기
+                            >
+                              {t('common.policy.privacy.title')}
+                            </Link>
                           </div>
-                        )}
-                        {!errors.email && (
-                          <div className="valid-feedback">
-                            {t('common.form.valid')}
-                          </div>
-                        )}
+                          {errors.privacy && (
+                            <div className="invalid-feedback">
+                              {errors.privacy.message}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                      <div className="mb-3">
+                        <label className="form-label">
+                          {t('columns.user.email')}
+                        </label>
+
+                        <div className="input-group has-validation">
+                          <input
+                            type="email"
+                            className={`form-control ${getInputClass('email')}`}
+                            {...register('email', {
+                              onChange: () => handleInputChange('email'),
+                              onBlur: () => handleInputChange('email'),
+                            })}
+                            readOnly={isPending}
+                          />
+                          <button
+                            type="button"
+                            className="btn btn-outline-secondary"
+                            onClick={showVerificationEmail}
+                          >
+                            {isEmailSentLoading
+                              ? t('common.auth.register.sendButtonLoading')
+                              : t('common.auth.register.sendButton')}
+                          </button>
+                          {errors.email?.message && (
+                            <div className="invalid-feedback">
+                              {errors.email?.message}
+                            </div>
+                          )}
+                          {!errors.email && (
+                            <div className="valid-feedback">
+                              {t('common.form.valid')}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </>
                   )}
                   {emailSent && (
                     <div className="mb-3">
@@ -579,8 +621,27 @@ const RegisterForm = () => {
                       {...register('privacy')}
                     />
                     <label className="form-check-label" htmlFor="privacy">
-                      {t('columns.user.privacyLabel')}
+                      {t('common.form.privacy')}
                     </label>
+                    <div className="mt-2 small">
+                      <Link
+                        href={`?modal=terms`}
+                        className="me-2 text-decoration-none"
+                        scroll={false} // 스크롤 방지
+                        prefetch={true} // 미리 가져오기
+                      >
+                        {t('common.policy.terms.title')}
+                      </Link>
+                      <span className="mx-1">|</span>
+                      <Link
+                        href={`?modal=privacy`}
+                        className="ms-2 text-decoration-none"
+                        scroll={false} // 스크롤 방지
+                        prefetch={true} // 미리 가져오기
+                      >
+                        {t('common.policy.privacy.title')}
+                      </Link>
+                    </div>
                     {errors.privacy?.message && (
                       <div className="invalid-feedback">
                         {errors.privacy?.message}

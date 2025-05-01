@@ -22,8 +22,19 @@
       "name": "계정가입",
       "desc": ""
     },
+
     "error": {
       "name": "에러",
+      "desc": ""
+    }
+  },
+  "policy": {
+    "privacy": {
+      "name": "개인정보처리방침",
+      "desc": ""
+    },
+    "terms": {
+      "name": "이용약관",
       "desc": ""
     }
   },

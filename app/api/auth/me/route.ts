@@ -2,17 +2,23 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verify } from 'jsonwebtoken';
 import prisma from '@/lib/prisma';
+import { ckLocale } from '@/lib/cookie';
+import { __ts } from '@/utils/get-dictionary';
 
 export async function GET(request: NextRequest) {
+  const language = await ckLocale();
   try {
     const cookieStore = await cookies();
     const authToken = cookieStore.get('auth_token')?.value;
 
     if (!authToken) {
-      return NextResponse.json(
-        { error: '인증되지 않은 요청입니다.' },
-        { status: 401 },
+      const invalidRequest = await __ts(
+        'common.auth.error.invalidRequest',
+        {},
+        language,
       );
+
+      return NextResponse.json({ error: invalidRequest }, { status: 401 });
     }
 
     // JWT 토큰 검증
@@ -30,10 +36,12 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: '사용자를 찾을 수 없습니다.' },
-        { status: 404 },
+      const userNotFound = await __ts(
+        'common.auth.error.userNotFound',
+        {},
+        language,
       );
+      return NextResponse.json({ error: userNotFound }, { status: 404 });
     }
 
     const userWithProfiles = {
@@ -54,9 +62,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ user: userWithProfiles });
   } catch (error) {
     console.error('사용자 정보 조회 오류:', error);
-    return NextResponse.json(
-      { error: '사용자 정보를 가져오는 중 오류가 발생했습니다.' },
-      { status: 500 },
+    const userInfoError = await __ts(
+      'common.auth.error.userInfoError',
+      {},
+      language,
     );
+    return NextResponse.json({ error: userInfoError }, { status: 500 });
   }
 }

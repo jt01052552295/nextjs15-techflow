@@ -98,10 +98,12 @@ export async function deleteNaverToken(accessToken: string) {
 
     const result = await response.json();
 
+    const provider = await __ts('common.oauth.provider.naver', {}, language);
+
     if (result.error) {
       const errorMessage = await __ts(
-        'oauth.naver.error.revokeTokenDetail',
-        { desc: result.error_description || result.error },
+        'common.oauth.error.revokeTokenDetail',
+        { provider: provider, desc: result.error_description || result.error },
         language,
       );
 
@@ -109,8 +111,8 @@ export async function deleteNaverToken(accessToken: string) {
     }
 
     const successMessage = await __ts(
-      'oauth.naver.success.revokeToken',
-      {},
+      'common.oauth.success.revokeToken',
+      { provider: provider },
       language,
     );
 
@@ -120,7 +122,12 @@ export async function deleteNaverToken(accessToken: string) {
       data: result,
     };
   } catch (error) {
-    const unknown = await __ts('oauth.naver.error.unknown', {}, language);
+    const provider = await __ts('common.oauth.provider.naver', {}, language);
+    const unknown = await __ts(
+      'common.oauth.error.unknown',
+      { provider: provider },
+      language,
+    );
 
     console.error('Failed to revoke Naver connection:', error);
     return {
