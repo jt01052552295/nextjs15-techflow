@@ -13,6 +13,7 @@ import { deleteNaverToken } from '@/lib/oauth/naver';
 import { deleteKakaoToken } from '@/lib/oauth/kakao';
 import { deleteGoogleToken } from '@/lib/oauth/google';
 import { deleteGithubToken } from '@/lib/oauth/github';
+import { revokeFacebookConnection } from '@/lib/oauth/facebook';
 
 type ReturnType = {
   status: string;
@@ -166,6 +167,31 @@ export const autWithdrawAction = async (
           }
         } catch (naverError) {
           console.error('github 토큰 삭제 중 예외 발생:', naverError);
+        }
+      } else if (
+        existingAccount?.provider === 'facebook' &&
+        existingAccount.access_token
+      ) {
+        try {
+          const facebookTokenResult = await revokeFacebookConnection(
+            existingAccount.access_token,
+            existingAccount.providerAccountId,
+          );
+
+          console.log(facebookTokenResult);
+
+          if (facebookTokenResult.success) {
+            await prisma.account.delete({
+              where: { idx: existingAccount.idx },
+            });
+          } else {
+            console.error(
+              'facebook 토큰 삭제 실패:',
+              facebookTokenResult.message,
+            );
+          }
+        } catch (naverError) {
+          console.error('facebook 토큰 삭제 중 예외 발생:', naverError);
         }
       }
 

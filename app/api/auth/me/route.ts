@@ -32,6 +32,13 @@ export async function GET(request: NextRequest) {
       where: { id: decoded.userId },
       include: {
         profile: true,
+        accounts: {
+          select: {
+            provider: true,
+            providerAccountId: true,
+            createdAt: true,
+          },
+        },
       },
     });
 
@@ -56,6 +63,7 @@ export async function GET(request: NextRequest) {
       role: user.role,
       createdAt: user.createdAt,
       profile: user.profile || [],
+      accounts: user.accounts || [],
     };
 
     // 캐시 방지 헤더 추가

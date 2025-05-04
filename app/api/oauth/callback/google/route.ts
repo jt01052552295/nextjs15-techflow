@@ -6,7 +6,7 @@ import { sign } from 'jsonwebtoken';
 import { getRouteUrl } from '@/utils/routes';
 import { ckLocale } from '@/lib/cookie';
 import { __ts } from '@/utils/get-dictionary';
-import { createAuthSession } from '@/lib/auth-utils';
+import { createAuthSession, getAuthSession } from '@/lib/auth-utils';
 
 export async function GET(request: NextRequest) {
   try {
@@ -34,6 +34,17 @@ export async function GET(request: NextRequest) {
       //   { status: 400 },
       // );
     }
+
+    // state 디코딩하여 mode 정보 추출
+    let mode = 'login';
+    try {
+      const decodedState = Buffer.from(state, 'base64').toString();
+      const stateData = JSON.parse(decodedState);
+      mode = stateData.mode || 'login';
+    } catch (e) {
+      console.error('Failed to parse state:', e);
+    }
+    console.log('mode', mode);
 
     // 액세스 토큰 요청
     const tokenResponse = await getGoogleToken(code);
@@ -63,55 +74,74 @@ export async function GET(request: NextRequest) {
     }
 
     const { sub, name, email, picture } = profileResponse;
-    // console.log(kakaoUser);
-
-    // 새 사용자인 경우 추가 정보 입력 페이지로 리다이렉트
-    // 네이버 사용자 정보를 암호화하여 쿠키에 저장
-
     const expires_in = Number(tokenResponse.expires_in);
 
-    // 1. 이메일로 가입된 사용자 확인 (일반 계정 또는 다른 소셜 계정)
-    if (email) {
-      const existingUserByEmail = await prisma.user.findUnique({
-        where: { email: email },
-        include: {
-          accounts: true,
+    // 연결모드
+    if (mode === 'connect') {
+      const session = await getAuthSession();
+      if (!session) {
+        const accessTokenFail = await __ts(
+          'common.oauth.error.accessTokenFail',
+          {},
+          language,
+        );
+        const errorUrl = getRouteUrl('error.index', language);
+        return NextResponse.redirect(
+          `${process.env.NEXT_PUBLIC_APP_URL}${errorUrl}?code=401&msg=${encodeURIComponent(accessTokenFail)}`,
+        );
+      }
+
+      const currentUser = session;
+
+      // 이메일 주소 확인 (이메일이 같아야 계정 연결 가능)
+      if (email !== currentUser.email) {
+        const emailMismatch = await __ts(
+          'common.oauth.error.emailMismatch',
+          {},
+          language,
+        );
+        const errorUrl = getRouteUrl('error.index', language);
+        return NextResponse.redirect(
+          `${process.env.NEXT_PUBLIC_APP_URL}${errorUrl}?code=403&msg=${encodeURIComponent(emailMismatch)}`,
+        );
+      }
+
+      // 이미 연결된 계정인지 확인
+      const alreadyConnected = await prisma.account.findFirst({
+        where: {
+          provider: 'google',
+          providerAccountId: sub,
         },
+        include: { user: true },
       });
 
-      if (existingUserByEmail) {
-        console.log(
-          '이미 같은 이메일로 가입된 사용자:',
-          existingUserByEmail.email,
+      if (alreadyConnected) {
+        const alreadyConnectMsg = await __ts(
+          'common.oauth.error.alreadyConnect',
+          {},
+          language,
         );
-
-        const existingAccounts = existingUserByEmail.accounts || [];
-        const existingSocialAccount = existingAccounts.find(
-          (account) => account.provider !== 'google',
+        const errorUrl = getRouteUrl('error.index', language);
+        return NextResponse.redirect(
+          `${process.env.NEXT_PUBLIC_APP_URL}${errorUrl}?code=403&msg=${encodeURIComponent(alreadyConnectMsg)}`,
         );
-
-        if (existingSocialAccount) {
-          // 다른 소셜 계정으로 가입된 경우
-          const providerName = await __ts(
-            `common.oauth.provider.${existingSocialAccount.provider}`,
-            {},
-            language,
-          );
-
-          const otherSocialAccountError = await __ts(
-            'common.oauth.error.otherSocialAccount',
-            { provider: providerName },
-            language,
-          );
-          const errorMessage = encodeURIComponent(otherSocialAccountError);
-          const errorUrl = getRouteUrl('auth.error', language);
-          const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL}${errorUrl}?code=409&msg=${errorMessage}`;
-          return NextResponse.redirect(redirectUrl);
-        }
+      } else {
+        // 새 계정 연결 생성
+        await prisma.account.create({
+          data: {
+            provider: 'google',
+            providerAccountId: sub,
+            type: 'oauth',
+            access_token: tokenResponse.access_token,
+            refresh_token: tokenResponse.refresh_token || null,
+            expires_at: expires_in ? parseInt(expires_in.toString(), 10) : null,
+            userId: currentUser.id,
+          },
+        });
       }
     }
 
-    // 2. 소셜 계정으로 가입된 사용자 확인
+    // 소셜 계정으로 로그인
     const existingAccount = await prisma.account.findFirst({
       where: {
         provider: 'google',
@@ -122,36 +152,58 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // 3. 소셜 계정이 있으면 로그인 처리
     if (existingAccount) {
-      const existingUser = existingAccount.user;
-      console.log('기존 소셜 계정으로 가입된 사용자:', existingUser.email);
+      const user = existingAccount.user;
 
-      // 계정 정보 업데이트 (토큰 갱신)
+      if (user.isSignout || !user.isUse) {
+        const msgKey = user.isSignout
+          ? 'common.oauth.error.withdrawnAccount'
+          : 'common.oauth.error.disabledAccount';
+        const msg = await __ts(msgKey, {}, language);
+        const errorUrl = getRouteUrl('auth.error', language);
+        return NextResponse.redirect(
+          `${process.env.NEXT_PUBLIC_APP_URL}${errorUrl}?code=403&msg=${encodeURIComponent(msg)}`,
+        );
+      }
+
       await prisma.account.update({
         where: { idx: existingAccount.idx },
         data: {
           access_token: tokenResponse.access_token,
           refresh_token: tokenResponse.refresh_token || null,
-          expires_at: expires_in ? parseInt(expires_in.toString(), 10) : null,
+          expires_at: expires_in,
           token_type: tokenResponse.token_type || null,
           updatedAt: new Date(),
         },
       });
 
-      // 기존 OAuth 상태 쿠키 삭제
       cookieStore.delete('google_oauth_state');
+      await createAuthSession(user, { expiryDays: 30 });
 
-      const expiresAt = await createAuthSession(existingUser, {
-        expiryDays: 30,
-      });
-      console.log(expiresAt);
-
-      // 메인 페이지로 리다이렉트
       const mainUrl = getRouteUrl('main.index', language);
-      const redirectUrl = process.env.NEXT_PUBLIC_APP_URL + mainUrl;
-      console.log(redirectUrl);
-      return NextResponse.redirect(`${redirectUrl}`);
+      return NextResponse.redirect(
+        `${process.env.NEXT_PUBLIC_APP_URL}${mainUrl}`,
+      );
+    }
+
+    // ❌ account는 없지만 동일 이메일 user가 존재 → 차단
+    if (email) {
+      const userByEmail = await prisma.user.findUnique({
+        where: { email },
+        select: { id: true },
+      });
+
+      if (userByEmail) {
+        const msg = await __ts(
+          'common.oauth.error.accountExists',
+          {},
+          language,
+        );
+        const errorUrl = getRouteUrl('auth.error', language);
+        return NextResponse.redirect(
+          `${process.env.NEXT_PUBLIC_APP_URL}${errorUrl}?code=409&msg=${encodeURIComponent(msg)}`,
+        );
+      }
     }
 
     // 4. 신규 사용자인 경우 회원가입 페이지로 리다이렉트
@@ -162,7 +214,7 @@ export async function GET(request: NextRequest) {
       name: name || '',
       nickname: name || '',
       profileImage: picture || null,
-      phone: '09052552295',
+      phone: '09052552292',
       accessToken: tokenResponse.access_token,
       refreshToken: tokenResponse.refresh_token || null,
       expiresAt: tokenResponse.expires_in,

@@ -5,6 +5,7 @@ import { getRouteMetadata } from '@/utils/routes';
 import { getRouteUrl } from '@/utils/routes';
 import PageHeader from '@/components/common/PageHeader';
 import Breadcrumb from '@/components/common/Breadcrumb';
+import SettingForm from '@/components/my/SettingForm';
 
 type Props = {
   params: { language: LocaleType };
@@ -26,11 +27,10 @@ export default async function Page({ params }: Props) {
     <div className="container-fluid">
       <div className="row flex-column-reverse flex-md-row align-items-md-center mb-3">
         <PageHeader meta={metadata} />
-        <Breadcrumb paths={breadcrumbPaths} dictionary={dictionary} />
+        <Breadcrumb paths={breadcrumbPaths} />
       </div>
-      <div className="row">
-        <div className="col-sm">Settings</div>
-      </div>
+
+      <SettingForm />
     </div>
   );
 }

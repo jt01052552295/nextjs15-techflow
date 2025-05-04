@@ -2,6 +2,9 @@ export const routesData = {
   main: {
     index: '/main',
   },
+  error: {
+    index: '/error',
+  },
   auth: {
     login: '/auth/login',
     register: '/auth/register',

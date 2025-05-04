@@ -1,10 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-// import { signInWithGitHub, signInWithNaver } from '@/actions/auth';
 import { useLanguage } from '@/components/context/LanguageContext';
-import { getRouteUrl } from '@/utils/routes';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment, faN } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -31,13 +28,9 @@ const SocialButton = () => {
     } else if (provider == 'facebook') {
       window.location.href = '/api/oauth/request/facebook';
     } else {
-      console.log(provider);
+      console.log(provider, callbackUrl || '/main');
     }
   };
-
-  // const onOauth = (provider: string) => {
-  //   // oauthSignIn(provider, callbackUrl || '/main')
-  // }
 
   return (
     <div className="row text-center mb-3">

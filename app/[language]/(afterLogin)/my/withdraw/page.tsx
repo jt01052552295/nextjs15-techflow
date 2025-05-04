@@ -26,7 +26,7 @@ export default async function Page({ params }: Props) {
     <div className="container-fluid">
       <div className="row flex-column-reverse flex-md-row align-items-md-center mb-3">
         <PageHeader meta={metadata} />
-        <Breadcrumb paths={breadcrumbPaths} dictionary={dictionary} />
+        <Breadcrumb paths={breadcrumbPaths} />
       </div>
       <WithdrawForm />
     </div>

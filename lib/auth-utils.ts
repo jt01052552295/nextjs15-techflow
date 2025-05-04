@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { sign } from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import prisma from '@/lib/prisma';
+import { verify } from 'jsonwebtoken';
 
 interface SessionOptions {
   expiryDays?: number; // 세션 만료 일수 (기본값: 30일)
@@ -78,4 +79,53 @@ export async function createAuthSession(
   });
 
   return expiresAt;
+}
+
+export async function getAuthSession(): Promise<any | null> {
+  const cookieStore = await cookies();
+
+  const authToken = cookieStore.get('auth_token')?.value;
+
+  if (!authToken) {
+    return null;
+  }
+
+  try {
+    // JWT 토큰 검증
+    const jwtSecret = process.env.JWT_SECRET || '';
+    const decoded = verify(authToken, jwtSecret) as {
+      userId: string;
+    };
+
+    // 사용자 정보 조회
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      include: {
+        profile: true,
+      },
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    const userWithProfiles = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      nick: user.nick,
+      phone: user.phone,
+      isUse: user.isUse,
+      isVisible: user.isVisible,
+      isSignout: user.isSignout,
+      role: user.role,
+      createdAt: user.createdAt,
+      profile: user.profile || [],
+    };
+
+    return userWithProfiles;
+  } catch (error) {
+    console.error('세션 검증 오류:', error);
+    return null;
+  }
 }
