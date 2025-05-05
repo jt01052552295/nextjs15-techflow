@@ -111,3 +111,21 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 ├── next.config.ts
 ├── package.json
 └── tsconfig.json
+
+
+/app
+  /[language]                     # 다국어 처리
+    /(afterLogin)                # 로그인 후 접근 영역
+      /todos                     # 게시판 이름
+        @modal                   # 패러렐라우트(모달 상세)
+          (.)[uid]               # 모달 상세 보기
+            page.tsx
+            default.tsx
+        [uid]
+          edit/
+            page.tsx            # 일반 수정 페이지
+        p/
+          create/
+            page.tsx            # 등록 폼
+        layout.tsx              # 공통 레이아웃 (선택)
+        page.tsx                # 목록 페이지

@@ -132,7 +132,7 @@
       "desc": ""
     }
   },
-  "todo1": {
+  "todos": {
     "index": {
       "name": "Todo",
       "desc": "할일목록"

@@ -32,30 +32,36 @@ const Navigation = () => {
       subMenus: [],
     },
     {
-      id: 'members',
+      id: 'Todos',
       icon: faUser,
-      route: null,
-      subMenus: [
-        { id: 'member-list', route: 'auth.login' }, // 회원 목록
-        { id: 'company-list', route: 'auth.register' }, // 업체 목록
-      ],
+      route: 'todos.index',
+      subMenus: [],
     },
-    {
-      id: 'devices',
-      icon: faServer,
-      route: null,
-      subMenus: [
-        { id: 'device-management', route: 'device.index' }, // 절감장치
-      ],
-    },
-    {
-      id: 'statistics',
-      icon: faChartSimple,
-      route: null,
-      subMenus: [
-        { id: 'power-statistics', route: 'estat.index' }, // 전력통계
-      ],
-    },
+    // {
+    //   id: 'members',
+    //   icon: faUser,
+    //   route: null,
+    //   subMenus: [
+    //     { id: 'member-list', route: 'auth.login' }, // 회원 목록
+    //     { id: 'company-list', route: 'auth.register' }, // 업체 목록
+    //   ],
+    // },
+    // {
+    //   id: 'devices',
+    //   icon: faServer,
+    //   route: null,
+    //   subMenus: [
+    //     { id: 'device-management', route: 'device.index' }, // 절감장치
+    //   ],
+    // },
+    // {
+    //   id: 'statistics',
+    //   icon: faChartSimple,
+    //   route: null,
+    //   subMenus: [
+    //     { id: 'power-statistics', route: 'estat.index' }, // 전력통계
+    //   ],
+    // },
   ];
 
   const [openMenus, setOpenMenus] = useState<string[]>([]);
@@ -177,11 +183,6 @@ const Navigation = () => {
                             className="sub-menu-icon"
                           />
                           {subMenuMetadata.name}
-                          {subMenuMetadata.desc && (
-                            <small className="menu-description">
-                              {subMenuMetadata.desc}
-                            </small>
-                          )}
                         </Link>
                       </li>
                     );

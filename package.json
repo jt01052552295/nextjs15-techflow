@@ -21,7 +21,11 @@
     "lint-and-format": "ESLint && Prettier 동시검사",
     "lint-and-format:fix": "ESLint && Prettier 동시수정"
   },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/todos.ts"
+  },
   "dependencies": {
+    "@faker-js/faker": "^9.7.0",
     "@formatjs/intl-localematcher": "^0.5.9",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
@@ -67,6 +71,7 @@
     "nodemailer": "^6.10.0",
     "prettier": "^3.4.2",
     "prisma": "^6.1.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5.1.0",
     "uuid": "^11.1.0"

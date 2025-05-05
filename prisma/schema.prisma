@@ -298,12 +298,15 @@ model Todos {
   gender       String?        @db.VarChar(255)
   img1         String?        @db.VarChar(255)
   ipAddress    String?        @map("ip_address") @db.VarChar(255)
+  sortOrder    Int           @default(0) @map("sort_order")
   createdAt    DateTime       @default(now()) @map("created_at")
   updatedAt    DateTime       @default(now()) @updatedAt @map("updated_at")
   isUse        Boolean        @default(true) @map("is_use")
   isVisible    Boolean        @default(true) @map("is_visible")
   content      String?        @db.LongText
   content2     String?        @db.LongText
+  password     String?        @db.VarChar(255)
+
   TodosComment TodosComment[]
   TodosFile    TodosFile[]
   TodosOption    TodosOption[]

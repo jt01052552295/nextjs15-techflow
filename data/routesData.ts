@@ -23,11 +23,11 @@ export const routesData = {
     settings: '/my/settings',
     withdraw: '/my/withdraw',
   },
-  todo1: {
-    index: '/todo1',
-    create: '/todo1/p/create',
-    show: '/todo1/{id}',
-    edit: '/todo1/{id}/edit',
+  todos: {
+    index: '/todos',
+    create: '/todos/p/create',
+    show: '/todos/{id}',
+    edit: '/todos/{id}/edit',
   },
   user: {
     index: '/user',
