@@ -18,14 +18,14 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import ScrollToTopButton from '../common/ScrollToTopButton';
 import DeleteConfirmModal from './DeleteConfirmModal';
-import { useRouter } from 'next/navigation';
 import { faSquare } from '@fortawesome/free-regular-svg-icons';
 import { toast } from 'sonner';
 import { listUpdateAction } from '@/actions/todos/list/update';
 import { listSortAction } from '@/actions/todos/list/sort';
+import { useLanguage } from '@/components/context/LanguageContext';
 
 const ListForm = () => {
-  const router = useRouter();
+  const { t } = useLanguage();
   const [items, setItems] = useState<ITodos[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -155,7 +155,7 @@ const ListForm = () => {
 
   const handleMove = async (direction: 'up' | 'down' | 'top' | 'bottom') => {
     if (selectedUids.length !== 1) {
-      toast.warning('정렬은 하나의 항목만 선택해주세요.');
+      toast.warning(t('common.sort_single_only'));
       return;
     }
 
@@ -200,7 +200,7 @@ const ListForm = () => {
                       <FontAwesomeIcon
                         icon={checkAll ? faSquareCheck : faSquare}
                       />{' '}
-                      전체선택
+                      {t('common.select_all')}
                     </label>
                   </div>
 
@@ -216,7 +216,8 @@ const ListForm = () => {
                       }}
                       disabled={selectedUids.length === 0}
                     >
-                      <FontAwesomeIcon icon={faTrash} /> 선택삭제
+                      <FontAwesomeIcon icon={faTrash} />{' '}
+                      {t('common.delete_selected')}
                     </button>
                   </div>
                 </div>
@@ -228,7 +229,10 @@ const ListForm = () => {
                   onClick={() => handleMove('top')}
                   disabled={!isSingleSelected}
                 >
-                  <FontAwesomeIcon icon={faArrowUpWideShort} title="맨 위로" />
+                  <FontAwesomeIcon
+                    icon={faArrowUpWideShort}
+                    title={t('common.move_top')}
+                  />
                 </button>
                 <button
                   type="button"
@@ -236,7 +240,10 @@ const ListForm = () => {
                   onClick={() => handleMove('up')}
                   disabled={!isSingleSelected}
                 >
-                  <FontAwesomeIcon icon={faArrowUp} title="위로 이동" />
+                  <FontAwesomeIcon
+                    icon={faArrowUp}
+                    title={t('common.move_up')}
+                  />
                 </button>
                 <button
                   type="button"
@@ -244,7 +251,10 @@ const ListForm = () => {
                   onClick={() => handleMove('down')}
                   disabled={!isSingleSelected}
                 >
-                  <FontAwesomeIcon icon={faArrowDown} title="아래로 이동" />
+                  <FontAwesomeIcon
+                    icon={faArrowDown}
+                    title={t('common.move_down')}
+                  />
                 </button>
                 <button
                   type="button"
@@ -254,7 +264,7 @@ const ListForm = () => {
                 >
                   <FontAwesomeIcon
                     icon={faArrowDownWideShort}
-                    title="맨 아래로"
+                    title={t('common.move_bottom')}
                   />
                 </button>
               </div>
@@ -268,9 +278,9 @@ const ListForm = () => {
           <thead>
             <tr>
               <th className="text-center">#</th>
-              <th className="text-center">UID</th>
+              <th className="text-center">{t('columns.todos.uid')}</th>
               <th className="text-center">
-                이름
+                {t('columns.todos.name')}
                 <span className="ms-2">
                   <FontAwesomeIcon
                     icon={faCaretUp}
@@ -287,7 +297,7 @@ const ListForm = () => {
                 </span>
               </th>
               <th className="text-center">
-                이메일
+                {t('columns.todos.email')}
                 <span className="ms-2">
                   <FontAwesomeIcon
                     icon={faCaretUp}
@@ -304,7 +314,7 @@ const ListForm = () => {
                 </span>
               </th>
               <th className="text-center">
-                생성일
+                {t('columns.todos.createdAt')}
                 <span className="ms-2">
                   <FontAwesomeIcon
                     icon={faCaretUp}
@@ -321,7 +331,7 @@ const ListForm = () => {
                 </span>
               </th>
               <th className="text-center">
-                수정일
+                {t('columns.todos.updatedAt')}
                 <span className="ms-2">
                   <FontAwesomeIcon
                     icon={faCaretUp}
@@ -353,10 +363,10 @@ const ListForm = () => {
             ))}
           </tbody>
         </table>
-        {loading && <p className="text-center py-3">로딩 중...</p>}
+        {loading && <p className="text-center py-3">{t('common.loading')}</p>}
         <div ref={loader} className="h-10" />
         {!hasMore && (
-          <p className="text-center py-3">모든 항목을 불러왔습니다.</p>
+          <p className="text-center py-3">{t('common.all_items_loaded')}</p>
         )}
       </div>
 

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useLanguage } from '@/components/context/LanguageContext';
 
 type Props = {
   value: string;
@@ -12,6 +13,7 @@ type Props = {
 };
 
 const EditableCell = ({ value, onSave }: Props) => {
+  const { t } = useLanguage();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -71,10 +73,10 @@ const EditableCell = ({ value, onSave }: Props) => {
             className="form-control form-control-sm"
           />
           <button className="btn btn-sm btn-primary" onClick={handleSave}>
-            저장
+            {t('common.save')}
           </button>
           <button className="btn btn-sm btn-secondary" onClick={handleCancel}>
-            취소
+            {t('common.cancel')}
           </button>
         </div>
       ) : (

@@ -187,7 +187,7 @@
     "isVisible": "표시 여부",
     "isMobile": "모바일 사용 여부"
   },
-  "todo": {
+  "todos": {
     "idx": "IDX",
     "uid": "UUID",
     "cid": "CUID",
@@ -196,6 +196,8 @@
     "gender": "성별",
     "img1": "프로필",
     "ipAddress": "IP",
+    "sortOrder": "정렬순서",
+    "password": "비밀번호",
     "createdAt": "생성일",
     "updatedAt": "수정일",
     "isUse": "사용 여부",

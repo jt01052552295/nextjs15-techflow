@@ -80,7 +80,6 @@ const ListRow = ({
           onClick={() => setSelectedTodo(todo)}
         >
           <FontAwesomeIcon icon={faTrash} />
-          &nbsp;삭제
         </button>
       </td>
     </tr>

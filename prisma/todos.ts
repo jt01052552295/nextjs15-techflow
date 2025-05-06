@@ -9,7 +9,7 @@ async function main() {
   const password = '1111';
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 200; i++) {
     todos.push({
       name: faker.lorem.words(3),
       email: faker.internet.email(),
@@ -20,6 +20,7 @@ async function main() {
       content2: faker.lorem.paragraph(),
       createdAt: new Date(),
       password: hashedPassword,
+      sortOrder: i + 1,
     });
   }
 
@@ -27,7 +28,7 @@ async function main() {
     data: todos,
   });
 
-  console.log('100 todos created!');
+  console.log('200 todos created!');
 }
 
 main()
