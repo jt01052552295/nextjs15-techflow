@@ -112,7 +112,7 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 ├── package.json
 └── tsconfig.json
 
-
+test
 /app
   /[language]                     # 다국어 처리
     /(afterLogin)                # 로그인 후 접근 영역
