@@ -31,7 +31,7 @@ export const listAction = async (
     }
 
     const allowedSortFields = [
-      'sort_order',
+      'sortOrder',
       'name',
       'email',
       'createdAt',
@@ -65,6 +65,14 @@ export const listAction = async (
     const items = await prisma.todos.findMany(queryOptions);
     const totalCount = await prisma.todos.count({ where });
     const totalPages = Math.ceil(totalCount / take);
+
+    console.log('[listAction]', {
+      page,
+      skip,
+      take,
+      orderBy,
+      filters,
+    });
 
     return {
       items,

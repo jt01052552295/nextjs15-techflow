@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
-import type { ITodosFilterType } from '@/types/todos';
+import React, { useState, useEffect } from 'react';
+import type { ITodosFilterType, OrderField } from '@/types/todos';
 import { getRouteUrl } from '@/utils/routes';
 import { useLanguage } from '@/components/context/LanguageContext';
-
+import { useSearchParams } from 'next/navigation';
 type Props = {
   onSearch: (filters: ITodosFilterType) => void;
   totalCount?: number;
@@ -12,17 +12,30 @@ type Props = {
 
 const SearchForm = ({ onSearch, totalCount }: Props) => {
   const { locale, t } = useLanguage();
+  const searchParams = useSearchParams();
   const url = getRouteUrl('todos.index', locale);
 
   const [form, setForm] = useState<ITodosFilterType>({
     name: '',
     email: '',
-    orderBy: 'sort_order',
+    orderBy: 'sortOrder',
     order: 'desc',
     dateType: undefined,
     startDate: '',
     endDate: '',
   });
+
+  useEffect(() => {
+    setForm({
+      name: searchParams.get('name') || '',
+      email: searchParams.get('email') || '',
+      orderBy: (searchParams.get('orderBy') as OrderField) || 'sortOrder',
+      order: (searchParams.get('order') as 'asc' | 'desc') || 'desc',
+      dateType: searchParams.get('dateType') || undefined,
+      startDate: searchParams.get('startDate') || '',
+      endDate: searchParams.get('endDate') || '',
+    });
+  }, [searchParams]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -40,27 +53,27 @@ const SearchForm = ({ onSearch, totalCount }: Props) => {
     <>
       <form onSubmit={handleSubmit} className="row g-2 align-items-end mb-3">
         <div className="col-md-2">
-          <label className="form-label">
-            {t('columns.todos.name')} <span className="text-danger">*</span>
-          </label>
+          <label className="form-label">{t('columns.todos.name')}</label>
           <input
             type="text"
             name="name"
             className="form-control"
             value={form.name}
             onChange={handleChange}
-            required
           />
         </div>
 
         <div className="col-md-2">
-          <label className="form-label">{t('columns.todos.email')}</label>
+          <label className="form-label">
+            {t('columns.todos.email')} <span className="text-danger">*</span>
+          </label>
           <input
             type="text"
             name="email"
             className="form-control"
             value={form.email}
             onChange={handleChange}
+            required
           />
         </div>
 

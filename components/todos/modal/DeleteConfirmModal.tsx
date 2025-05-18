@@ -7,21 +7,24 @@ import { toast } from 'sonner';
 import { useLanguage } from '@/components/context/LanguageContext';
 
 type Props = {
-  todo: ITodos | null;
+  row: ITodos | null;
   uids?: string[];
-  onDeleted: () => void;
+  onDeleted: (deletedUids: string[]) => void;
 };
 
-const DeleteConfirmModal = ({ todo, uids, onDeleted }: Props) => {
+const DeleteConfirmModal = ({ row, uids, onDeleted }: Props) => {
   const { t } = useLanguage();
 
   const handleDelete = async () => {
-    const formData = todo ? { uid: todo.uid } : { uids };
+    const deletedUids: string[] = row ? [row.uid] : (uids ?? []);
+    if (deletedUids.length === 0) return;
+
+    const formData = row ? { uid: row.uid } : { uids };
 
     const response = await deleteAction(formData);
     if (response.data && response.status === 'success') {
       toast.success(response.message);
-      onDeleted(); // 상위에서 갱신 처리
+      onDeleted(deletedUids); // 상위에서 갱신 처리
     } else {
       toast.error(response.message);
     }
@@ -46,8 +49,14 @@ const DeleteConfirmModal = ({ todo, uids, onDeleted }: Props) => {
             />
           </div>
           <div className="modal-body">
-            {todo ? (
-              <p>{t('common.confirm_delete_single', { name: todo.name })}</p>
+            {row ? (
+              <p
+                dangerouslySetInnerHTML={{
+                  __html: t('common.confirm_delete_single', {
+                    name: row.name,
+                  }),
+                }}
+              />
             ) : (
               <p>{t('common.confirm_delete_multi', { count: uids?.length })}</p>
             )}
@@ -64,6 +73,7 @@ const DeleteConfirmModal = ({ todo, uids, onDeleted }: Props) => {
               type="button"
               className="btn btn-danger"
               onClick={handleDelete}
+              data-bs-dismiss="modal"
             >
               {t('common.confirm')}
             </button>

@@ -63,7 +63,7 @@ export type IITodosOptionWithoutIDX = Omit<ITodosOption, 'idx'>;
 export type ITodosOptionPart = Partial<ITodosOption>;
 
 export type OrderField =
-  | 'sort_order'
+  | 'sortOrder'
   | 'name'
   | 'email'
   | 'createdAt'
@@ -71,8 +71,8 @@ export type OrderField =
 export type OrderDirection = 'asc' | 'desc';
 
 export type ITodosFilterType = {
-  name: string;
-  email?: string;
+  name?: string;
+  email: string;
   dateType?: string;
   startDate?: string;
   endDate?: string;

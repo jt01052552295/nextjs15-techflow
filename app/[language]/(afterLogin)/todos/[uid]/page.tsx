@@ -5,6 +5,7 @@ import { Metadata } from 'next';
 import { getRouteUrl } from '@/utils/routes';
 import PageHeader from '@/components/common/PageHeader';
 import Breadcrumb from '@/components/common/Breadcrumb';
+import ShowForm from '@/components/todos/ShowForm';
 
 type Props = {
   params: { language: LocaleType };
@@ -50,6 +51,7 @@ export default async function Page({ params }: Props) {
         <PageHeader meta={metadata} />
         <Breadcrumb paths={breadcrumbPaths} />
       </div>
+      <ShowForm />
     </div>
   );
 }
