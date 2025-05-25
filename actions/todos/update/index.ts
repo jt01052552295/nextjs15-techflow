@@ -138,13 +138,14 @@ export const updateAction = async (data: UpdateTodosType) => {
       message: save_success,
       data: rs,
     };
-  } catch (error) {
+  } catch (error: any) {
     // console.error 는 터미널창 확인,
     // return error는 브라우저로 전달
     console.error(error);
     const save_failed = await __ts('common.save_failed', {}, language);
     return {
       status: 'error',
+      error: error.message,
       message: save_failed,
     };
   }

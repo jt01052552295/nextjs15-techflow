@@ -79,7 +79,7 @@ const RegisterForm = () => {
   const formAction: SubmitHandler<RegisterType> = (data) => {
     startTransition(async () => {
       try {
-        const response = await authRegisterAction(data, locale);
+        const response = await authRegisterAction(data);
         if (response.status == 'success') {
           reset();
           setStep(4);

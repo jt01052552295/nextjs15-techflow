@@ -6,9 +6,10 @@ import { getRouteUrl } from '@/utils/routes';
 import PageHeader from '@/components/common/PageHeader';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import ShowForm from '@/components/todos/ShowForm';
+import { showAction } from '@/actions/todos/show';
 
 type Props = {
-  params: { language: LocaleType };
+  params: { language: LocaleType; uid: string };
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -29,10 +30,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function Page({ params }: Props) {
-  const { language } = await params;
+  const { language, uid } = await params;
   const dictionary = await getDictionary(language);
   const metadata = getRouteMetadata('todos.index', dictionary, language);
   const url = getRouteUrl('todos.index', language);
+  const data = await showAction(uid);
+
+  if (!data) {
+    return <p>{dictionary.common.failed_data}</p>;
+  }
+
+  const showProps = {
+    rs: data ?? [],
+  };
 
   const breadcrumbPaths = [
     {
@@ -51,7 +61,7 @@ export default async function Page({ params }: Props) {
         <PageHeader meta={metadata} />
         <Breadcrumb paths={breadcrumbPaths} />
       </div>
-      <ShowForm />
+      <ShowForm {...showProps} />
     </div>
   );
 }

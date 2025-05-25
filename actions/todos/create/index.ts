@@ -129,6 +129,11 @@ export const createAction = async (data: CreateTodosType) => {
       }
 
       const todo = await prisma.todos.create(createData);
+      await prisma.todos.update({
+        where: { idx: todo.idx },
+        data: { sortOrder: todo.idx },
+      });
+
       return todo;
     });
 
