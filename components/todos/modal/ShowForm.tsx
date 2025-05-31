@@ -23,7 +23,7 @@ import {
 
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ITodosPart } from '@/types/todos';
+import { ITodosPart, ITodosOption } from '@/types/todos';
 
 type TypeProps = {
   rs: ITodosPart;
@@ -36,6 +36,8 @@ export default function ShowForm(props: TypeProps) {
   const [isDataFetched, setIsDataFetched] = useState<boolean | undefined>(
     false,
   );
+
+  const [optionData, setOptionData] = useState<ITodosOption[]>([]);
 
   const { register, setValue, getValues } = useForm<UpdateTodosType>({
     mode: 'onChange',
@@ -57,6 +59,10 @@ export default function ShowForm(props: TypeProps) {
       setValue('content2', props.rs.content2);
       setValue('isUse', props.rs.isUse);
       setValue('isVisible', props.rs.isVisible);
+
+      if (props.rs.TodosOption) {
+        setOptionData(props.rs.TodosOption);
+      }
     }
   }, [props.rs, setValue]);
 
@@ -259,10 +265,48 @@ export default function ShowForm(props: TypeProps) {
                       </h5>
                     </div>
                     <div className="card-body">
-                      <div className="row">
-                        <div className="col">
-                          <div className="mb-2">OptionForm</div>
-                        </div>
+                      <div className="row g-4">
+                        {optionData.length > 0 ? (
+                          optionData.map((v, index) => (
+                            <div key={index} className="col-md-6">
+                              <div className="p-4 rounded-4 shadow-sm bg-white border h-100 d-flex flex-column justify-content-center align-items-center text-center">
+                                <div className="mb-3 w-100">
+                                  <h4 className="fw-bold text-dark mb-0">
+                                    #{index + 1}
+                                  </h4>
+                                </div>
+                                <div className="mb-2 w-100">
+                                  <div className="text-secondary small">
+                                    이름
+                                  </div>
+                                  <div className="fs-4 fw-semibold">
+                                    {v.name}
+                                  </div>
+                                </div>
+                                <div className="mb-2 w-100">
+                                  <div className="text-secondary small">
+                                    나이
+                                  </div>
+                                  <div className="fs-4 fw-semibold">
+                                    {v.age}
+                                  </div>
+                                </div>
+                                <div className="w-100">
+                                  <div className="text-secondary small">
+                                    성별
+                                  </div>
+                                  <div className="fs-4 fw-semibold">
+                                    {v.gender}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="col-12 text-center text-muted">
+                            추가 정보가 없습니다.
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

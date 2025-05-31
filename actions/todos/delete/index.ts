@@ -35,6 +35,9 @@ export const deleteAction = async (data: DeleteActionInput) => {
         await tx.todosComment.deleteMany({
           where: { todoId: { in: uids } },
         });
+        await tx.todosOption.deleteMany({
+          where: { todoId: { in: uids } },
+        });
 
         const result = await tx.todos.updateMany({
           where: { uid: { in: uids } },
@@ -71,6 +74,7 @@ export const deleteAction = async (data: DeleteActionInput) => {
     const rs = await prisma.$transaction(async (tx) => {
       await tx.todosFile.deleteMany({ where: { todoId: todo.uid } });
       await tx.todosComment.deleteMany({ where: { todoId: todo.uid } });
+      await tx.todosOption.deleteMany({ where: { todoId: todo.uid } });
 
       return await tx.todos.update({
         where: { uid: todo.uid },

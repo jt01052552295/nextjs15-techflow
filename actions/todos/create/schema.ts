@@ -6,16 +6,25 @@ export const FileDetailsSchema = z.object({
   todoId: z.string().optional(),
   name: z.string().optional(),
   url: z.string().optional(),
+  previewUrl: z.string().optional(),
 });
 
-export const OptionDetailsSchema = z.object({
-  idx: z.number().optional(),
-  uid: z.string().optional(),
-  todoId: z.string().optional(),
-  name: z.string().optional(),
-  age: z.number().optional(),
-  gender: z.string().optional(),
-});
+export const OptionDetailsSchema = (messages: Record<string, string>) =>
+  z.object({
+    idx: z.number().optional(),
+    uid: z.string().optional(),
+    todoId: z.string().optional(),
+    name: z.string().trim().min(1, {
+      message: messages.required,
+    }),
+    age: z.coerce.number().min(0, {
+      message: messages.numeric,
+    }),
+    gender: z.string().min(1, {
+      message: messages.required,
+    }),
+    _delete: z.boolean().optional(),
+  });
 
 export const CreateTodosSchema = (messages: Record<string, any>) =>
   z.object({
@@ -34,7 +43,7 @@ export const CreateTodosSchema = (messages: Record<string, any>) =>
     isUse: z.boolean().optional(),
     isVisible: z.boolean().optional(),
     todoFile: z.array(FileDetailsSchema).optional(),
-    todoOption: z.array(OptionDetailsSchema).optional(),
+    todoOption: z.array(OptionDetailsSchema(messages)).optional(),
   });
 
 export type CreateTodosType = z.infer<ReturnType<typeof CreateTodosSchema>>;

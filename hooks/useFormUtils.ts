@@ -5,6 +5,7 @@ import {
   FieldValues,
   Path,
 } from 'react-hook-form';
+import { get } from 'lodash';
 
 type UseFormUtilsProps<T extends FieldValues> = {
   trigger: UseFormTrigger<T>;
@@ -25,11 +26,10 @@ const useFormUtils = <T extends FieldValues>({
   };
 
   const getInputClass = (field: Path<T>) => {
+    const error = get(errors, field); // 중첩된 경로 지원
     const value = watch(field);
-    if (!value && !errors[field]) {
-      return '';
-    }
-    return errors[field] || !value ? 'is-invalid' : 'is-valid';
+    if (!value && !error) return '';
+    return error || !value ? 'is-invalid' : 'is-valid';
   };
 
   return { handleInputChange, getInputClass };

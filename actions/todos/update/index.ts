@@ -39,6 +39,7 @@ export const updateAction = async (data: UpdateTodosType) => {
       isVisible,
       todoFile,
       todoOption,
+      deleteOptionUids,
     } = validatedFields.data;
 
     // const now = dayjs(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss')
@@ -60,6 +61,16 @@ export const updateAction = async (data: UpdateTodosType) => {
     let rs = null;
 
     rs = await prisma.$transaction(async (prisma) => {
+      if (deleteOptionUids && deleteOptionUids.length > 0) {
+        await prisma.todosOption.deleteMany({
+          where: {
+            uid: {
+              in: deleteOptionUids,
+            },
+          },
+        });
+      }
+
       const createData: any = {
         where: { uid },
         data: {
