@@ -23,7 +23,8 @@ import {
 
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ITodosPart, ITodosOption } from '@/types/todos';
+import { ITodosPart, ITodosOption, ITodosComment } from '@/types/todos';
+import CommentSection from './comment/CommentSection';
 
 type TypeProps = {
   rs: ITodosPart;
@@ -266,6 +267,26 @@ export default function ShowForm(props: TypeProps) {
                     </div>
                   )}
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-12 mb-2">
+            <div className="card">
+              <div className="card-header">
+                <h5 className="card-title m-0">
+                  {t('columns.todos.TodosComment')}
+                </h5>
+              </div>
+              <div className="card-body">
+                {props.rs && props.rs.uid ? (
+                  <CommentSection
+                    todoId={props.rs.uid}
+                    initialComments={props.rs.TodosComment ?? []}
+                  />
+                ) : (
+                  <div className="text-muted">댓글을 불러오는 중입니다...</div>
+                )}
               </div>
             </div>
           </div>

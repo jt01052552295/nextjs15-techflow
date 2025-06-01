@@ -9,7 +9,7 @@ export const FileDetailsSchema = z.object({
   previewUrl: z.string().optional(),
 });
 
-export const OptionDetailsSchema = (messages: Record<string, string>) =>
+export const OptionDetailsSchema = (messages: Record<string, any>) =>
   z.object({
     idx: z.number().optional(),
     uid: z.string().optional(),

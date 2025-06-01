@@ -319,6 +319,7 @@ model Todos {
 model TodosComment {
   idx       Int      @id @default(autoincrement())
   uid       String   @unique @default(uuid())
+  parentIdx Int?     // ← 답글일 경우 연결
   todoId    String
   author    String
   content   String   @db.Text
