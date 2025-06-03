@@ -30,9 +30,18 @@ export interface ITodosComment {
   content2: string;
   createdAt: Date;
   updatedAt: Date;
+  likeCount: number;
   // todo: ITodos // 관계된 Todos
 }
 export type ITodosCommentPart = Partial<ITodosComment>;
+
+export interface ITodosCommentLike {
+  idx: number;
+  commentId: number;
+  userId: string;
+  createdAt: Date;
+}
+export type ITodosCommentLikePart = Partial<ITodosCommentLike>;
 
 export interface ITodosFile {
   idx: number;

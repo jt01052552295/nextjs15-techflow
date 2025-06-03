@@ -280,10 +280,7 @@ export default function ShowForm(props: TypeProps) {
               </div>
               <div className="card-body">
                 {props.rs && props.rs.uid ? (
-                  <CommentSection
-                    todoId={props.rs.uid}
-                    initialComments={props.rs.TodosComment ?? []}
-                  />
+                  <CommentSection todoId={props.rs.uid} />
                 ) : (
                   <div className="text-muted">댓글을 불러오는 중입니다...</div>
                 )}

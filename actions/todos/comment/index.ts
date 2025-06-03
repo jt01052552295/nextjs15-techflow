@@ -1,6 +1,7 @@
 'use server';
 // import { auth } from '@/auth'
 import prisma from '@/lib/prisma';
+import type { Prisma } from '@prisma/client';
 import { CommentTodoSchema } from './schema';
 import { cookies } from 'next/headers';
 import dayjs from 'dayjs';
@@ -12,6 +13,13 @@ import { getAuthSession } from '@/lib/auth-utils';
 import { getUserById } from '@/actions/user/info';
 import { __ts, getDictionary } from '@/utils/get-dictionary';
 import { ckLocale } from '@/lib/cookie';
+
+interface CommentFilter {
+  todoId: string;
+  orderBy?: 'latest' | 'popular';
+  page?: number;
+  take?: number;
+}
 
 export const createCommentAction = async (data: ITodosCommentPart) => {
   const language = await ckLocale();
@@ -223,4 +231,61 @@ export const deleteCommentAction = async (data: ITodosCommentPart) => {
   // revalidatePath(`/auth/login`)
   // 해당 /URL에 있던 캐시를 삭제하고 다시 생성해주는 함수인데 페이지를 다시 로드해주는 기능도 있음,
   // 새로고침이 아니라 차이점만 바꿔주는 새로고침
+};
+
+export const listCommentAction = async (filters: CommentFilter) => {
+  try {
+    const take = filters.take ?? 20;
+    const page = filters.page ?? 1;
+    const skip = (page - 1) * take;
+
+    const where: Prisma.TodosCommentWhereInput = {
+      todoId: filters.todoId,
+      parentIdx: null, // 답글 제외 → 최상위 댓글만
+    };
+
+    let orderBy: Prisma.TodosCommentOrderByWithRelationInput[] = [
+      { createdAt: 'desc' },
+    ];
+
+    if (filters.orderBy === 'popular') {
+      orderBy = [
+        { likeCount: 'desc' }, // ← 좋아요 수 기준
+        { createdAt: 'desc' }, // 동점일 경우 최신순
+      ];
+    }
+
+    const queryOptions = {
+      where,
+      take,
+      skip,
+      orderBy,
+    };
+
+    const [items, totalCount] = await Promise.all([
+      prisma.todosComment.findMany(queryOptions),
+      prisma.todosComment.count({ where }),
+    ]);
+
+    const totalPages = Math.ceil(totalCount / take);
+
+    console.log('[listCommentAction]', {
+      page,
+      take,
+      skip,
+      orderBy,
+      totalCount,
+    });
+
+    return {
+      items,
+      page,
+      totalPages,
+      hasMore: page < totalPages,
+      totalCount,
+    };
+  } catch (error) {
+    console.error('listCommentAction 오류:', error);
+    return undefined;
+  }
 };

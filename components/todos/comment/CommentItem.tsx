@@ -31,7 +31,7 @@ export default function CommentItem({
   onDelete,
 }: Props) {
   return (
-    <li className="list-group-item">
+    <div className="border rounded p-3 mb-2 bg-light-subtle">
       <div className="d-flex justify-content-between align-items-center mb-1">
         <strong>{item.author}</strong>
         <small className="text-muted">{dayjs(item.createdAt).fromNow()}</small>
@@ -76,6 +76,6 @@ export default function CommentItem({
           </div>
         </>
       )}
-    </li>
+    </div>
   );
 }
