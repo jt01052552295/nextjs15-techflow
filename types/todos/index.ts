@@ -31,6 +31,7 @@ export interface ITodosComment {
   createdAt: Date;
   updatedAt: Date;
   likeCount: number;
+  liked?: boolean;
   // todo: ITodos // 관계된 Todos
 }
 export type ITodosCommentPart = Partial<ITodosComment>;

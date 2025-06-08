@@ -267,6 +267,19 @@ export const listCommentAction = async (filters: CommentFilter) => {
       prisma.todosComment.count({ where }),
     ]);
 
+    const user = await getAuthSession();
+    let likedMap = new Set<number>();
+    if (user) {
+      const likes = await prisma.todosCommentLike.findMany({
+        where: {
+          userId: user.id,
+          commentId: { in: items.map((c) => c.idx) },
+        },
+        select: { commentId: true },
+      });
+      likedMap = new Set(likes.map((like) => like.commentId));
+    }
+
     const totalPages = Math.ceil(totalCount / take);
 
     console.log('[listCommentAction]', {
@@ -277,8 +290,13 @@ export const listCommentAction = async (filters: CommentFilter) => {
       totalCount,
     });
 
+    const itemsWithLiked = items.map((c) => ({
+      ...c,
+      liked: likedMap.has(c.idx),
+    }));
+
     return {
-      items,
+      items: itemsWithLiked,
       page,
       totalPages,
       hasMore: page < totalPages,

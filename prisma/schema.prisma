@@ -328,6 +328,7 @@ model TodosComment {
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
   likeCount Int      @default(0)
   Todos     Todos    @relation(fields: [todoId], references: [uid], onDelete: Cascade)
+  likes       TodosCommentLike[]
 
   @@index([todoId], map: "todoId_index")
   @@map("ec_todosComments")
@@ -339,6 +340,7 @@ model TodosCommentLike {
   userId     String
   createdAt  DateTime @default(now())
 
+  TodosComment  TodosComment  @relation(fields: [commentId], references: [idx])
   @@unique([commentId, userId])
   @@index([commentId])
   @@map("ec_todosCommentLikes")
