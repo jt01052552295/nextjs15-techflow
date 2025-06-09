@@ -327,6 +327,7 @@ model TodosComment {
   createdAt DateTime @default(now())
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
   likeCount Int      @default(0)
+  replyCount Int     @default(0) 
   Todos     Todos    @relation(fields: [todoId], references: [uid], onDelete: Cascade)
   likes       TodosCommentLike[]
 

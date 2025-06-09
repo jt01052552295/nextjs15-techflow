@@ -6,6 +6,7 @@ import { toggleCommentLikeAction } from '@/actions/todos/comment/like';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/ko';
+import CommentReplies from './CommentReplies';
 
 dayjs.extend(relativeTime);
 dayjs.locale('ko');
@@ -32,7 +33,7 @@ export default function CommentItem({
   onDelete,
 }: Props) {
   const [showReplies, setShowReplies] = useState(false);
-  // const [liked, setLiked] = useState(false); // UI용 토글
+  const [replyContent, setReplyContent] = useState('');
 
   const [isPending, startTransition] = useTransition();
   const [liked, setLiked] = useState(item.liked ?? false); // 추후 item.liked가 필요
@@ -88,14 +89,18 @@ export default function CommentItem({
               onClick={handleToggleLike}
               disabled={isPending}
             >
-              👍 {likeCount}
+              {liked ? '❤️' : '🤍'} {likeCount}
             </button>
 
             <button
               className="btn btn-sm btn-outline-secondary"
               onClick={toggleReplies}
             >
-              {showReplies ? '답글 숨기기' : '답글 보기'}
+              {showReplies
+                ? '답글 숨기기'
+                : item.replyCount > 0
+                  ? `답글 ${item.replyCount}개 보기`
+                  : '답글 달기'}
             </button>
 
             <button
@@ -113,31 +118,7 @@ export default function CommentItem({
           </div>
 
           {showReplies && (
-            <div className="mt-2 ms-4 border-start ps-3">
-              {/* 답글 작성 폼 (나중에 실제 컴포넌트 분리) */}
-              <TextareaAutosize
-                className="form-control mb-2"
-                placeholder="답글을 입력하세요"
-                minRows={2}
-              />
-              <button className="btn btn-sm btn-primary mb-3">답글 등록</button>
-
-              {/* 답글 목록 (임시) */}
-              <div className="mb-2">
-                <div className="border rounded p-2 mb-2 bg-white">
-                  <strong>답글 작성자</strong>
-                  <p className="mb-1">이것은 샘플 답글입니다.</p>
-                  <div className="d-flex gap-2">
-                    <button className="btn btn-sm btn-outline-primary">
-                      수정
-                    </button>
-                    <button className="btn btn-sm btn-outline-danger">
-                      삭제
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <CommentReplies todoId={item.todoId} parentIdx={item.idx} />
           )}
         </>
       )}
