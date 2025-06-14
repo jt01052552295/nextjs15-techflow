@@ -1,3 +1,5 @@
+import { IUser } from '@/types/user';
+
 export interface ITodos {
   idx: number;
   uid: string;
@@ -35,6 +37,7 @@ export interface ITodosComment {
   replyCount: number;
   liked?: boolean;
   // todo: ITodos // 관계된 Todos
+  user?: IUser;
 }
 export type ITodosCommentPart = Partial<ITodosComment>;
 

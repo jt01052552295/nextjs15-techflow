@@ -9,12 +9,10 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
-
-
 
 enum VerificationPurpose {
   SIGNUP
@@ -32,40 +30,39 @@ enum UserRole {
   USER
 }
 
-
 model User {
-  idx        Int      @id @default(autoincrement())
-  id         String   @unique @default(uuid())
-  email      String   @unique
-  emailVerified   DateTime?
-  phone      String   @unique
-  password   String
-  name       String
-  nick       String   @unique
-  level      Int      @default(1)
-  zipcode    String? 
-  addr1      String? 
-  addr2      String?
-  role       UserRole  @default(USER)
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @default(now()) @updatedAt @map("updated_at")
-  signUpVerified  DateTime?
-  isUse      Boolean  @default(true) @map("is_use")
-  isVisible  Boolean  @default(true) @map("is_visible")
-  isSignout  Boolean  @default(false) @map("is_signout")
-  accounts   Account[]
-  profile    UserProfile[]
-  sessions   Session[]
-  company    Company? 
-  setting    Setting?
-  devices    ElectricDevice[] 
-  point      CarbonPoint[] 
-  selectedPartners Partner[] @relation("SelectedUser")  // 내가 선택한 파트너들
-  partnerAsUser    Partner[] @relation("PartnerUser")   // 나를 선택한 파트너들
-  ElectricBill     ElectricBill[]
+  idx                Int                  @id @default(autoincrement())
+  id                 String               @unique @default(uuid())
+  email              String               @unique
+  emailVerified      DateTime?
+  phone              String               @unique
+  password           String
+  name               String
+  nick               String               @unique
+  level              Int                  @default(1)
+  zipcode            String?
+  addr1              String?
+  addr2              String?
+  role               UserRole             @default(USER)
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @default(now()) @updatedAt @map("updated_at")
+  signUpVerified     DateTime?
+  isUse              Boolean              @default(true) @map("is_use")
+  isVisible          Boolean              @default(true) @map("is_visible")
+  isSignout          Boolean              @default(false) @map("is_signout")
+  accounts           Account[]
+  profile            UserProfile[]
+  sessions           Session[]
+  company            Company?
+  setting            Setting?
+  devices            ElectricDevice[]
+  point              CarbonPoint[]
+  selectedPartners   Partner[]            @relation("SelectedUser") // 내가 선택한 파트너들
+  partnerAsUser      Partner[]            @relation("PartnerUser") // 나를 선택한 파트너들
+  ElectricBill       ElectricBill[]
   ElectricStatistics ElectricStatistics[]
-  KepcoStatistics KepcoStatistics[]
-
+  KepcoStatistics    KepcoStatistics[]
+  comments           TodosComment[]       @relation("UserToComments")
 
   @@map("ec_user")
 }
@@ -76,80 +73,74 @@ model UserProfile {
   userId String
   name   String
   url    String @db.VarChar(255)
-  User  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId], map: "userId_index")
   @@map("ec_user_profile")
 }
 
-
-
 model Company {
-  idx       Int       @id @default(autoincrement())
-  uid       String    @unique @default(uuid())
-  cid       String    @default(cuid())
-  userId    String    @unique @map("user_id")
+  idx       Int      @id @default(autoincrement())
+  uid       String   @unique @default(uuid())
+  cid       String   @default(cuid())
+  userId    String   @unique @map("user_id")
   name      String
   address   String?
   phone     String?
   email     String?
-  custNo    String?   @map("cust_no")
-  bizNo     String?   @map("biz_no")
-  corpNo    String?   @map("corp_no")
-  isUse     Boolean   @default(true) @map("is_use")
-  isVisible Boolean   @default(true) @map("is_visible")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
-  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  custNo    String?  @map("cust_no")
+  bizNo     String?  @map("biz_no")
+  corpNo    String?  @map("corp_no")
+  isUse     Boolean  @default(true) @map("is_use")
+  isVisible Boolean  @default(true) @map("is_visible")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("ec_company")
-  
 }
 
 model Partner {
-  idx          Int       @id @default(autoincrement())
-  uid          String    @unique @default(uuid())
-  cid          String    @default(cuid())
-  userId       String    
-  partnerId    String   
-  isUse     Boolean   @default(true) @map("is_use")
-  isVisible Boolean   @default(true) @map("is_visible")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
-  user      User?     @relation(name: "SelectedUser", fields: [userId], references: [id], onDelete: Cascade)
-  partner   User?     @relation(name: "PartnerUser", fields: [partnerId], references: [id], onDelete: Cascade) 
+  idx       Int      @id @default(autoincrement())
+  uid       String   @unique @default(uuid())
+  cid       String   @default(cuid())
+  userId    String
+  partnerId String
+  isUse     Boolean  @default(true) @map("is_use")
+  isVisible Boolean  @default(true) @map("is_visible")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  user      User?    @relation(name: "SelectedUser", fields: [userId], references: [id], onDelete: Cascade)
+  partner   User?    @relation(name: "PartnerUser", fields: [partnerId], references: [id], onDelete: Cascade)
 
-  @@map("ec_partner")
-  @@index([userId]) 
-  @@index([partnerId])
   @@unique([userId, partnerId]) // 동일 파트너 중복 선택 방지
+  @@index([userId])
+  @@index([partnerId])
+  @@map("ec_partner")
 }
 
-
-
 model Account {
-  idx               Int      @id @default(autoincrement())
-  userId            String   @map("user_id")
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token      String? @db.Text
-  access_token       String? @db.Text
+  idx                Int      @id @default(autoincrement())
+  userId             String   @map("user_id")
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
   expires_at         Int?
   token_type         String?
   scope              String?
-  id_token           String? @db.Text
+  id_token           String?  @db.Text
   session_state      String?
   oauth_token_secret String?
   oauth_token        String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at")
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now()) @updatedAt @map("updated_at")
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@index([userId])
-
   @@map("ec_user_account")
 }
 
@@ -165,151 +156,148 @@ model Session {
 }
 
 model Verification {
-  idx          Int                 @id @default(autoincrement())
-  identifier   String              // email or phone
-  code         String
-  type         String              // 'email' or 'phone'
-  purpose      VerificationPurpose 
-  createdAt    DateTime @default(now())
-  expiresAt    DateTime
+  idx        Int                 @id @default(autoincrement())
+  identifier String // email or phone
+  code       String
+  type       String // 'email' or 'phone'
+  purpose    VerificationPurpose
+  createdAt  DateTime            @default(now())
+  expiresAt  DateTime
 
   @@map("ec_user_verification")
 }
 
 model Setting {
-  idx               Int     @id @default(autoincrement())
-  uid               String  @unique @default(uuid())
-  cid               String  @default(cuid())
-  userId            String  @unique @map("user_id")
-  gubun             String? @default("") 
-  kepcoContract     String? @default("") 
-  kw                Int     @default(0)
-  powerFactor       Int     @default(0) 
-  readingDate       Int     @default(0)
-  efficiency        Float   @default(0)
-  pushPoint         Boolean  @default(true) 
-  pushBill          Boolean  @default(true) 
-  isUse             Boolean  @default(true) @map("is_use")
-  isVisible         Boolean  @default(true) @map("is_visible")
-  skin              String  @default("basic")
-  kepcoApi          Boolean  @default(false)
-  kepcoMonthApi     Boolean  @default(false)
-  user              User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  idx           Int     @id @default(autoincrement())
+  uid           String  @unique @default(uuid())
+  cid           String  @default(cuid())
+  userId        String  @unique @map("user_id")
+  gubun         String? @default("")
+  kepcoContract String? @default("")
+  kw            Int     @default(0)
+  powerFactor   Int     @default(0)
+  readingDate   Int     @default(0)
+  efficiency    Float   @default(0)
+  pushPoint     Boolean @default(true)
+  pushBill      Boolean @default(true)
+  isUse         Boolean @default(true) @map("is_use")
+  isVisible     Boolean @default(true) @map("is_visible")
+  skin          String  @default("basic")
+  kepcoApi      Boolean @default(false)
+  kepcoMonthApi Boolean @default(false)
+  user          User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("ec_settings")
 }
 
 model ElectricDevice {
-  idx         Int      @id @default(autoincrement())
-  uid         String   @unique @default(uuid())
-  cid         String   @default(cuid())
-  userId      String   @db.VarChar(100) @map("user_id")
-  name        String   @default("")
-  companyIp   String   @db.VarChar(45) @map("company_ip") 
-  iotNum      String   @unique @db.VarChar(100) @map("iot_num")
-  level       Int      @default(1)
-  manuDate    String   @default("")
-  deviceType  String?  @default("") @db.VarChar(10)
-  desc        String?  @db.Text 
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
-  isUse       Boolean  @default(true) @map("is_use")
-  isVisible   Boolean  @default(true) @map("is_visible")
-  isCron      Boolean  @default(true) @map("is_cron")
-  
-  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  ElectricDeviceFile    ElectricDeviceFile[]
-  ElectricIotData       ElectricIotData[]
+  idx        Int      @id @default(autoincrement())
+  uid        String   @unique @default(uuid())
+  cid        String   @default(cuid())
+  userId     String   @map("user_id") @db.VarChar(100)
+  name       String   @default("")
+  companyIp  String   @map("company_ip") @db.VarChar(45)
+  iotNum     String   @unique @map("iot_num") @db.VarChar(100)
+  level      Int      @default(1)
+  manuDate   String   @default("")
+  deviceType String?  @default("") @db.VarChar(10)
+  desc       String?  @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+  isUse      Boolean  @default(true) @map("is_use")
+  isVisible  Boolean  @default(true) @map("is_visible")
+  isCron     Boolean  @default(true) @map("is_cron")
+
+  user               User?                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ElectricDeviceFile ElectricDeviceFile[]
+  ElectricIotData    ElectricIotData[]
 
   @@index([userId])
   @@map("ec_electric_device")
 }
 
 model ElectricDeviceFile {
-  idx    Int    @id @default(autoincrement())
-  uid    String @unique @default(uuid())
-  deviceId String
-  name   String
-  url    String @db.VarChar(255)
-  ElectricDevice  ElectricDevice  @relation(fields: [deviceId], references: [uid], onDelete: Cascade)
+  idx            Int            @id @default(autoincrement())
+  uid            String         @unique @default(uuid())
+  deviceId       String
+  name           String
+  url            String         @db.VarChar(255)
+  ElectricDevice ElectricDevice @relation(fields: [deviceId], references: [uid], onDelete: Cascade)
 
   @@index([deviceId], map: "deviceId_index")
   @@map("ec_electric_device_files")
 }
 
-
 model GreenCard {
-  idx          Int     @id @default(autoincrement())
+  idx         Int      @id @default(autoincrement())
   uid         String   @unique @default(uuid())
   cid         String   @default(cuid())
-  userId       String  @map("user_id")
-  customerUid  String? @default("") @map("customer_uid")
-  billingKey   String? @default("") @map("billing_key")
-  name         String? @default("")
-  cardName     String? @default("") @map("card_name")
-  cardNumber1  String? @default("") @map("card_number1")
-  cardNumber2  String? @default("") @map("card_number2")
-  cardNumber3  String? @default("") @map("card_number3")
-  cardNumber4  String? @default("") @map("card_number4")
-  cardMm       String? @default("") @map("card_mm")
-  cardYy       String? @default("") @map("card_yy")
-  cardPwd      String? @default("") @map("card_pwd")
-  cardCvc      String? @default("") @map("card_cvc")
-  juminOrCorp  String? @default("") @map("juminOrCorp")
-  represent    Boolean @default(true) @map("represent")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at")
-  isUse        Boolean @default(true) @map("use")
-  isVisible    Boolean @default(true) @map("visible")
-  
+  userId      String   @map("user_id")
+  customerUid String?  @default("") @map("customer_uid")
+  billingKey  String?  @default("") @map("billing_key")
+  name        String?  @default("")
+  cardName    String?  @default("") @map("card_name")
+  cardNumber1 String?  @default("") @map("card_number1")
+  cardNumber2 String?  @default("") @map("card_number2")
+  cardNumber3 String?  @default("") @map("card_number3")
+  cardNumber4 String?  @default("") @map("card_number4")
+  cardMm      String?  @default("") @map("card_mm")
+  cardYy      String?  @default("") @map("card_yy")
+  cardPwd     String?  @default("") @map("card_pwd")
+  cardCvc     String?  @default("") @map("card_cvc")
+  juminOrCorp String?  @default("") @map("juminOrCorp")
+  represent   Boolean  @default(true) @map("represent")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+  isUse       Boolean  @default(true) @map("use")
+  isVisible   Boolean  @default(true) @map("visible")
+
   @@map("ec_green_card")
 }
 
-
 model CarbonPoint {
-  idx          Int      @id @default(autoincrement())
-  uid         String   @unique @default(uuid())
-  cid         String   @default(cuid())
-  userId       String   @map("user_id")
-  point        Int?     @default(0)
-  usePoint     Int?     @default(0) @map("use_point")
-  mbPoint      Int?     @default(0) @map("mb_point")
-  status       String?  @default("") @map("status")
-  expired      Int?     @default(0) @map("expired")
-  expiredDate  DateTime? @map("expired_date")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at")
-  isVisible    Boolean  @default(true) @map("visible")
-  isUse        Boolean  @default(true) @map("use")
-  
-  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  idx         Int       @id @default(autoincrement())
+  uid         String    @unique @default(uuid())
+  cid         String    @default(cuid())
+  userId      String    @map("user_id")
+  point       Int?      @default(0)
+  usePoint    Int?      @default(0) @map("use_point")
+  mbPoint     Int?      @default(0) @map("mb_point")
+  status      String?   @default("") @map("status")
+  expired     Int?      @default(0) @map("expired")
+  expiredDate DateTime? @map("expired_date")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
+  isVisible   Boolean   @default(true) @map("visible")
+  isUse       Boolean   @default(true) @map("use")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
   @@map("ec_carbon_point")
 }
 
-
 model Todos {
-  idx          Int            @id @default(autoincrement())
-  uid          String         @unique @default(uuid())
-  cid          String         @default(cuid())
-  name         String         @db.VarChar(255)
-  email        String         @db.VarChar(255)
-  gender       String?        @db.VarChar(255)
-  img1         String?        @db.VarChar(255)
-  ipAddress    String?        @map("ip_address") @db.VarChar(255)
-  sortOrder    Int            @default(0) @map("sort_order")
-  createdAt    DateTime       @default(now()) @map("created_at")
-  updatedAt    DateTime       @default(now()) @updatedAt @map("updated_at")
-  isUse        Boolean        @default(true) @map("is_use")
-  isVisible    Boolean        @default(true) @map("is_visible")
-  content      String?        @db.LongText
-  content2     String?        @db.LongText
-  password     String?        @db.VarChar(255)
+  idx       Int      @id @default(autoincrement())
+  uid       String   @unique @default(uuid())
+  cid       String   @default(cuid())
+  name      String   @db.VarChar(255)
+  email     String   @db.VarChar(255)
+  gender    String?  @db.VarChar(255)
+  img1      String?  @db.VarChar(255)
+  ipAddress String?  @map("ip_address") @db.VarChar(255)
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  isUse     Boolean  @default(true) @map("is_use")
+  isVisible Boolean  @default(true) @map("is_visible")
+  content   String?  @db.LongText
+  content2  String?  @db.LongText
+  password  String?  @db.VarChar(255)
 
   TodosComment TodosComment[]
   TodosFile    TodosFile[]
-  TodosOption    TodosOption[]
+  TodosOption  TodosOption[]
 
   @@index([uid], map: "uid_index")
   @@index([cid], map: "cid_index")
@@ -317,31 +305,34 @@ model Todos {
 }
 
 model TodosComment {
-  idx       Int      @id @default(autoincrement())
-  uid       String   @unique @default(uuid())
-  parentIdx Int?     // ← 답글일 경우 연결
-  todoId    String
-  author    String
-  content   String   @db.Text
-  content2  String   @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
-  likeCount Int      @default(0)
-  replyCount Int     @default(0) 
-  Todos     Todos    @relation(fields: [todoId], references: [uid], onDelete: Cascade)
-  likes       TodosCommentLike[]
+  idx        Int      @id @default(autoincrement())
+  uid        String   @unique @default(uuid())
+  parentIdx  Int? // ← 답글일 경우 연결
+  todoId     String
+  author     String
+  content    String   @db.Text
+  content2   String   @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+  likeCount  Int      @default(0)
+  replyCount Int      @default(0)
+
+  user  User               @relation("UserToComments", fields: [author], references: [id])
+  Todos Todos              @relation(fields: [todoId], references: [uid], onDelete: Cascade)
+  likes TodosCommentLike[]
 
   @@index([todoId], map: "todoId_index")
   @@map("ec_todosComments")
 }
 
 model TodosCommentLike {
-  idx        Int     @id @default(autoincrement())
-  commentId  Int     // ← TodosComment.idx
-  userId     String
-  createdAt  DateTime @default(now())
+  idx       Int      @id @default(autoincrement())
+  commentId Int // ← TodosComment.idx
+  userId    String
+  createdAt DateTime @default(now())
 
-  TodosComment  TodosComment  @relation(fields: [commentId], references: [idx])
+  TodosComment TodosComment @relation(fields: [commentId], references: [idx])
+
   @@unique([commentId, userId])
   @@index([commentId])
   @@map("ec_todosCommentLikes")
@@ -360,7 +351,7 @@ model TodosFile {
 }
 
 model TodosOption {
-  idx     Int    @id @default(autoincrement())
+  idx    Int    @id @default(autoincrement())
   uid    String @unique @default(uuid())
   name   String
   age    Int
@@ -372,230 +363,220 @@ model TodosOption {
   @@map("ec_todosOptions")
 }
 
-
 model Popup {
-  idx         Int       @id @default(autoincrement())
-  uid         String    @unique @default(uuid())
-  cid         String    @default(cuid())
-  title       String    @default("") 
-  content     String?   @db.LongText
-  posX        Int       @default(0) @map("posX")
-  posY        Int       @default(0) @map("posY")
-  startTime   DateTime  @default(now())
-  endTime     DateTime  @default(now()) 
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
-  isUse       Boolean   @default(true) @map("is_use")
-  isVisible   Boolean   @default(true) @map("is_visible")
-  isMobile    Boolean   @default(true) @map("is_mobile")
-  
+  idx       Int      @id @default(autoincrement())
+  uid       String   @unique @default(uuid())
+  cid       String   @default(cuid())
+  title     String   @default("")
+  content   String?  @db.LongText
+  posX      Int      @default(0) @map("posX")
+  posY      Int      @default(0) @map("posY")
+  startTime DateTime @default(now())
+  endTime   DateTime @default(now())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  isUse     Boolean  @default(true) @map("is_use")
+  isVisible Boolean  @default(true) @map("is_visible")
+  isMobile  Boolean  @default(true) @map("is_mobile")
+
   @@map("ec_popup")
 }
 
 model Banner {
-  idx        Int       @id @default(autoincrement())
-  uid        String    @unique @default(uuid())
-  cid        String    @default(cuid())
-  gubun      String    @default("") @map("gubun")
-  title      String    @default("") @map("title")
-  img1       String    @default("") @map("img1")
-  img2       String    @default("") @map("img2")
-  url        String    @default("") @map("url")
-  ord        Int       @default(0) @map("ord")
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @default(now()) @updatedAt @map("updated_at")
-  isUse      Boolean   @default(true) @map("is_use")
-  isVisible  Boolean   @default(true) @map("is_visible")
-  isMobile   Boolean   @default(true) @map("is_mobile")
-  
+  idx       Int      @id @default(autoincrement())
+  uid       String   @unique @default(uuid())
+  cid       String   @default(cuid())
+  gubun     String   @default("") @map("gubun")
+  title     String   @default("") @map("title")
+  img1      String   @default("") @map("img1")
+  img2      String   @default("") @map("img2")
+  url       String   @default("") @map("url")
+  ord       Int      @default(0) @map("ord")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  isUse     Boolean  @default(true) @map("is_use")
+  isVisible Boolean  @default(true) @map("is_visible")
+  isMobile  Boolean  @default(true) @map("is_mobile")
 
   @@map("ec_banner")
 }
 
 model Config {
-  idx         Int      @id @default(autoincrement())
-  uid        String    @unique @default(uuid())
-  cid        String    @default(cuid())
-  CNFname     String   @db.VarChar(255)  
-  CNFvalue    String?  @db.LongText      
-  CNFvalue_en String?  @db.LongText      
-  CNFvalue_ja String?  @db.LongText      
-  CNFvalue_zh String?  @db.LongText      
-  ord         Int      @default(0)        
+  idx         Int     @id @default(autoincrement())
+  uid         String  @unique @default(uuid())
+  cid         String  @default(cuid())
+  CNFname     String  @db.VarChar(255)
+  CNFvalue    String? @db.LongText
+  CNFvalue_en String? @db.LongText
+  CNFvalue_ja String? @db.LongText
+  CNFvalue_zh String? @db.LongText
+  ord         Int     @default(0)
 
-  @@map("ec_config") 
+  @@map("ec_config")
 }
 
 model AgentLog {
-  idx         Int      @id @default(autoincrement())
-  uid        String    @unique @default(uuid())
-  cid        String    @default(cuid())
-  browser     String
+  idx            Int      @id @default(autoincrement())
+  uid            String   @unique @default(uuid())
+  cid            String   @default(cuid())
+  browser        String
   browserVersion String
-  os          String
-  osVersion   String
-  device      String
-  ip          String
-  referer     String
-  host        String
-  isMobile    Boolean
-  isTablet    Boolean
-  isDesktop   Boolean
-  isRobot     Boolean
-  keyword     String
-  createdAt  DateTime  @default(now()) @map("created_at")
+  os             String
+  osVersion      String
+  device         String
+  ip             String
+  referer        String
+  host           String
+  isMobile       Boolean
+  isTablet       Boolean
+  isDesktop      Boolean
+  isRobot        Boolean
+  keyword        String
+  createdAt      DateTime @default(now()) @map("created_at")
 
-  @@map("ec_agent_log") 
+  @@map("ec_agent_log")
 }
-
 
 model Management {
-  idx        Int       @id @default(autoincrement())
-  uid        String    @unique @default(uuid())
-  cid        String    @default(cuid())
-  gubun      String    @db.VarChar(255)  
-  key        String    @db.VarChar(255)  
-  value      String    @db.VarChar(255)    
-  value_en   String?   @db.VarChar(255)     
-  value_ja   String?   @db.VarChar(255)     
-  value_zh   String?   @db.VarChar(255)      
-  ord        Int       @default(0)        
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @default(now()) @updatedAt @map("updated_at")
-  isUse      Boolean   @default(true) @map("is_use")
-  isVisible  Boolean   @default(true) @map("is_visible")
+  idx       Int      @id @default(autoincrement())
+  uid       String   @unique @default(uuid())
+  cid       String   @default(cuid())
+  gubun     String   @db.VarChar(255)
+  key       String   @db.VarChar(255)
+  value     String   @db.VarChar(255)
+  value_en  String?  @db.VarChar(255)
+  value_ja  String?  @db.VarChar(255)
+  value_zh  String?  @db.VarChar(255)
+  ord       Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  isUse     Boolean  @default(true) @map("is_use")
+  isVisible Boolean  @default(true) @map("is_visible")
 
-  @@map("ec_management") 
+  @@map("ec_management")
 }
 
-
 model ElectricBill {
-  idx             Int      @id @default(autoincrement())
-  uid             String   @unique @default(uuid())
-  cid             String   @default(cuid())
-  userId          String   @map("user_id")
-  bill            Int      @default(0)   // 당월요금
-  kwh             Int      @default(0)   // 사용량
-  ym              String   @map("ym") @db.VarChar(10) // 청구년월
-  startDate       DateTime? @map("sdate") // 시작일
-  endDate         DateTime? @map("edate") // 종료일
-  appliedPower    Int      @default(0) @map("bill_aply_pwr") // 요금적용전력
-  baseBill        Decimal      @default(0.00) @map("base_bill") @db.Decimal(17,2) // 기본요금
-  kwhBill         Decimal      @default(0.00) @map("kwh_bill") @db.Decimal(17,2)  // 전력량요금
-  discountBill    Int      @default(0) @map("dc_bill")   // 할인공제계
-  totalBill       Int      @default(0) @map("req_bill")  // 전기요금계
-  requestedAmount Int      @default(0) @map("req_amt")   // 청구요금
-  lowLoadUsage    Int      @default(0) @map("lload_usekwh") // 경부하사용량
-  midLoadUsage    Int      @default(0) @map("mload_usekwh") // 중부하사용량
-  maxLoadUsage    Int      @default(0) @map("maxload_usekwh") // 최대부하사용량
-  lowLoadReading  Int      @default(0) @map("lload_needle") // 경부하당월지침
-  midLoadReading  Int      @default(0) @map("mload_needle") // 중부하당월지침
-  maxLoadReading  Int      @default(0) @map("maxload_needle") // 최대부하당월지침
-  leadingPowerFactor Decimal   @default(0.000) @map("jn_pwrfact") @db.Decimal(17,3)  // 진상역률
-  laggingPowerFactor Decimal   @default(0.000) @map("ji_pwrfact") @db.Decimal(17,3)  // 지상역률
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at")
-  isUse      Boolean   @default(true) @map("is_use")
-  isVisible  Boolean   @default(true) @map("is_visible")
-  
-  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  @@index([userId])
+  idx                Int       @id @default(autoincrement())
+  uid                String    @unique @default(uuid())
+  cid                String    @default(cuid())
+  userId             String    @map("user_id")
+  bill               Int       @default(0) // 당월요금
+  kwh                Int       @default(0) // 사용량
+  ym                 String    @map("ym") @db.VarChar(10) // 청구년월
+  startDate          DateTime? @map("sdate") // 시작일
+  endDate            DateTime? @map("edate") // 종료일
+  appliedPower       Int       @default(0) @map("bill_aply_pwr") // 요금적용전력
+  baseBill           Decimal   @default(0.00) @map("base_bill") @db.Decimal(17, 2) // 기본요금
+  kwhBill            Decimal   @default(0.00) @map("kwh_bill") @db.Decimal(17, 2) // 전력량요금
+  discountBill       Int       @default(0) @map("dc_bill") // 할인공제계
+  totalBill          Int       @default(0) @map("req_bill") // 전기요금계
+  requestedAmount    Int       @default(0) @map("req_amt") // 청구요금
+  lowLoadUsage       Int       @default(0) @map("lload_usekwh") // 경부하사용량
+  midLoadUsage       Int       @default(0) @map("mload_usekwh") // 중부하사용량
+  maxLoadUsage       Int       @default(0) @map("maxload_usekwh") // 최대부하사용량
+  lowLoadReading     Int       @default(0) @map("lload_needle") // 경부하당월지침
+  midLoadReading     Int       @default(0) @map("mload_needle") // 중부하당월지침
+  maxLoadReading     Int       @default(0) @map("maxload_needle") // 최대부하당월지침
+  leadingPowerFactor Decimal   @default(0.000) @map("jn_pwrfact") @db.Decimal(17, 3) // 진상역률
+  laggingPowerFactor Decimal   @default(0.000) @map("ji_pwrfact") @db.Decimal(17, 3) // 지상역률
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at")
+  isUse              Boolean   @default(true) @map("is_use")
+  isVisible          Boolean   @default(true) @map("is_visible")
 
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
   @@map("ec_electric_bill")
 }
 
-
 model ElectricIotData {
-  idx                Int       @id @default(autoincrement())
-  dataDate           DateTime  @map("data_date") // 일자 (NOT NULL)
-  dataTime           DateTime  @map("data_time") // 시간 (NOT NULL)
-  companyIp          String    @db.VarChar(45) @map("company_ip") // 업체 ip주소 (NOT NULL)
-  iotNum             String    @db.VarChar(100) @map("iot_num") // 업체 iot번호 (NOT NULL)
-  l1Volt             Float?    @db.Float @default(0) @map("l1_volt") // L1 전압
-  l2Volt             Float?    @db.Float @default(0) @map("l2_volt") // L2 전압
-  l3Volt             Float?    @db.Float @default(0) @map("l3_volt") // L3 전압
-  l1Current          Float?    @db.Float @default(0) @map("l1_current") // L1 전류
-  l2Current          Float?    @db.Float @default(0) @map("l2_current") // L2 전류
-  l3Current          Float?    @db.Float @default(0) @map("l3_current") // L3 전류
-  l1ActivePower      Float?    @db.Float @default(0) @map("l1_active_power") // L1 유효전력
-  l2ActivePower      Float?    @db.Float @default(0) @map("l2_active_power") // L2 유효전력
-  l3ActivePower      Float?    @db.Float @default(0) @map("l3_active_power") // L3 유효전력
-  l1ReactivePower    Float?    @db.Float @default(0) @map("l1_reactive_power") // L1 무효전력
-  l2ReactivePower    Float?    @db.Float @default(0) @map("l2_reactive_power") // L2 무효전력
-  l3ReactivePower    Float?    @db.Float @default(0) @map("l3_reactive_power") // L3 무효전력
-  l1ApparentPower    Float?    @db.Float @default(0) @map("l1_apparent_power") // L1 피상전력
-  l2ApparentPower    Float?    @db.Float @default(0) @map("l2_apparent_power") // L2 피상전력
-  l3ApparentPower    Float?    @db.Float @default(0) @map("l3_apparent_power") // L3 피상전력
-  l1PowerFactor      Float?    @db.Float @default(0) @map("l1_power_factor") // L1 역률
-  l2PowerFactor      Float?    @db.Float @default(0) @map("l2_power_factor") // L2 역률
-  l3PowerFactor      Float?    @db.Float @default(0) @map("l3_power_factor") // L3 역률
-  l1PhaseAngle       Float?    @db.Float @default(0) @map("l1_phase_angle") // L1 위상각
-  l2PhaseAngle       Float?    @db.Float @default(0) @map("l2_phase_angle") // L2 위상각
-  l3PhaseAngle       Float?    @db.Float @default(0) @map("l3_phase_angle") // L3 위상각
-  l1L2Volt           Float?    @db.Float @default(0) @map("l1_l2_volt") // L1 L2간 전압
-  l2L3Volt           Float?    @db.Float @default(0) @map("l2_l3_volt") // L2 L3간 전압
-  l3L1Volt           Float?    @db.Float @default(0) @map("l3_l1_volt") // L3 L1간 전압
-  supplyVoltFreq     Float?    @db.Float @default(0) @map("supply_volt_freq") // 공급전압 주파수
-  totActivePower     Float?    @db.Float @default(0) @map("tot_active_power") // 전체 유효전력
-  totReactivePower   Float?    @db.Float @default(0) @map("tot_reactive_power") // 전체 무효전력
-  totApparentPower   Float?    @db.Float @default(0) @map("tot_apparent_power") // 전체 피상전력
-  totPowerFactor     Float?    @db.Float @default(0) @map("tot_power_factor") // 전체 역률
-  totPhaseAngle      Float?    @db.Float @default(0) @map("tot_phase_angle") // 전체 위상각
-  sumCurrent         Float?    @db.Float @default(0) @map("sum_current") // 합계 전류
-  avgNeutralVolt     Float?    @db.Float @default(0) @map("avg_neutral_volt") // 평균 중립 전압
-  avgVolt            Float?    @db.Float @default(0) @map("avg_volt") // 평균 전압
-  avgCurrent         Float?    @db.Float @default(0) @map("avg_current") // 평균 전류
-  neutralCurrent     Float?    @db.Float @default(0) @map("neutral_current") // 중립 전류
-  totImportActive    Float?    @db.Float @default(0) @map("tot_import_active") // 전체 입력 유효전력
-  totExportActive    Float?    @db.Float @default(0) @map("tot_export_active") // 전체 출력 유효전력
-  totActive          Float?    @db.Float @default(0) @map("tot_active") // 전체 유효전력
-  totImportReactive  Float?    @db.Float @default(0) @map("tot_import_reactive") // 전체 입력 무효전력
-  totExportReactive  Float?    @db.Float @default(0) @map("tot_export_reactive") // 전체 출력 무효전력
-  totReactive        Float?    @db.Float @default(0) @map("tot_reactive") // 전체 무효전력
-  createdAt          DateTime  @default(now()) @map("regdate") // 등록일시
-  isUse              String    @default("y") @db.VarChar(1) @map("use") // 사용 여부
-  isVisible          String    @default("y") @db.VarChar(1) @map("visible") // 표시 여부
+  idx               Int      @id @default(autoincrement())
+  dataDate          DateTime @map("data_date") // 일자 (NOT NULL)
+  dataTime          DateTime @map("data_time") // 시간 (NOT NULL)
+  companyIp         String   @map("company_ip") @db.VarChar(45) // 업체 ip주소 (NOT NULL)
+  iotNum            String   @map("iot_num") @db.VarChar(100) // 업체 iot번호 (NOT NULL)
+  l1Volt            Float?   @default(0) @map("l1_volt") @db.Float // L1 전압
+  l2Volt            Float?   @default(0) @map("l2_volt") @db.Float // L2 전압
+  l3Volt            Float?   @default(0) @map("l3_volt") @db.Float // L3 전압
+  l1Current         Float?   @default(0) @map("l1_current") @db.Float // L1 전류
+  l2Current         Float?   @default(0) @map("l2_current") @db.Float // L2 전류
+  l3Current         Float?   @default(0) @map("l3_current") @db.Float // L3 전류
+  l1ActivePower     Float?   @default(0) @map("l1_active_power") @db.Float // L1 유효전력
+  l2ActivePower     Float?   @default(0) @map("l2_active_power") @db.Float // L2 유효전력
+  l3ActivePower     Float?   @default(0) @map("l3_active_power") @db.Float // L3 유효전력
+  l1ReactivePower   Float?   @default(0) @map("l1_reactive_power") @db.Float // L1 무효전력
+  l2ReactivePower   Float?   @default(0) @map("l2_reactive_power") @db.Float // L2 무효전력
+  l3ReactivePower   Float?   @default(0) @map("l3_reactive_power") @db.Float // L3 무효전력
+  l1ApparentPower   Float?   @default(0) @map("l1_apparent_power") @db.Float // L1 피상전력
+  l2ApparentPower   Float?   @default(0) @map("l2_apparent_power") @db.Float // L2 피상전력
+  l3ApparentPower   Float?   @default(0) @map("l3_apparent_power") @db.Float // L3 피상전력
+  l1PowerFactor     Float?   @default(0) @map("l1_power_factor") @db.Float // L1 역률
+  l2PowerFactor     Float?   @default(0) @map("l2_power_factor") @db.Float // L2 역률
+  l3PowerFactor     Float?   @default(0) @map("l3_power_factor") @db.Float // L3 역률
+  l1PhaseAngle      Float?   @default(0) @map("l1_phase_angle") @db.Float // L1 위상각
+  l2PhaseAngle      Float?   @default(0) @map("l2_phase_angle") @db.Float // L2 위상각
+  l3PhaseAngle      Float?   @default(0) @map("l3_phase_angle") @db.Float // L3 위상각
+  l1L2Volt          Float?   @default(0) @map("l1_l2_volt") @db.Float // L1 L2간 전압
+  l2L3Volt          Float?   @default(0) @map("l2_l3_volt") @db.Float // L2 L3간 전압
+  l3L1Volt          Float?   @default(0) @map("l3_l1_volt") @db.Float // L3 L1간 전압
+  supplyVoltFreq    Float?   @default(0) @map("supply_volt_freq") @db.Float // 공급전압 주파수
+  totActivePower    Float?   @default(0) @map("tot_active_power") @db.Float // 전체 유효전력
+  totReactivePower  Float?   @default(0) @map("tot_reactive_power") @db.Float // 전체 무효전력
+  totApparentPower  Float?   @default(0) @map("tot_apparent_power") @db.Float // 전체 피상전력
+  totPowerFactor    Float?   @default(0) @map("tot_power_factor") @db.Float // 전체 역률
+  totPhaseAngle     Float?   @default(0) @map("tot_phase_angle") @db.Float // 전체 위상각
+  sumCurrent        Float?   @default(0) @map("sum_current") @db.Float // 합계 전류
+  avgNeutralVolt    Float?   @default(0) @map("avg_neutral_volt") @db.Float // 평균 중립 전압
+  avgVolt           Float?   @default(0) @map("avg_volt") @db.Float // 평균 전압
+  avgCurrent        Float?   @default(0) @map("avg_current") @db.Float // 평균 전류
+  neutralCurrent    Float?   @default(0) @map("neutral_current") @db.Float // 중립 전류
+  totImportActive   Float?   @default(0) @map("tot_import_active") @db.Float // 전체 입력 유효전력
+  totExportActive   Float?   @default(0) @map("tot_export_active") @db.Float // 전체 출력 유효전력
+  totActive         Float?   @default(0) @map("tot_active") @db.Float // 전체 유효전력
+  totImportReactive Float?   @default(0) @map("tot_import_reactive") @db.Float // 전체 입력 무효전력
+  totExportReactive Float?   @default(0) @map("tot_export_reactive") @db.Float // 전체 출력 무효전력
+  totReactive       Float?   @default(0) @map("tot_reactive") @db.Float // 전체 무효전력
+  createdAt         DateTime @default(now()) @map("regdate") // 등록일시
+  isUse             String   @default("y") @map("use") @db.VarChar(1) // 사용 여부
+  isVisible         String   @default("y") @map("visible") @db.VarChar(1) // 표시 여부
 
-  ElectricDevice  ElectricDevice  @relation(fields: [iotNum], references: [iotNum], onDelete: Cascade)
+  ElectricDevice ElectricDevice @relation(fields: [iotNum], references: [iotNum], onDelete: Cascade)
 
-  
   @@index([dataDate], map: "data_date")
   @@index([dataTime], map: "data_time")
   @@index([iotNum], map: "iot_num")
   @@index([iotNum, dataDate, dataTime], map: "idx_iot_datetime")
-
   @@map("ec_electric_iot_data")
 }
 
-
 model ElectricStatistics {
-  idx        Int       @id @default(autoincrement())
-  userId     String    @db.VarChar(255) @map("user_id")
-  iotNum     String    @db.VarChar(255) @map("iot_num")
-  minDate    DateTime? @db.DateTime(3) @map("min_date")
-  maxDate    DateTime? @db.DateTime(3) @map("max_date")
-  dispDate   DateTime? @db.DateTime(3) @map("disp_date")
-  power      Decimal   @default(0.00) @db.Decimal(13, 2)
-  manual     String?   @default("auto") @db.VarChar(45)
+  idx      Int       @id @default(autoincrement())
+  userId   String    @map("user_id") @db.VarChar(255)
+  iotNum   String    @map("iot_num") @db.VarChar(255)
+  minDate  DateTime? @map("min_date") @db.DateTime(3)
+  maxDate  DateTime? @map("max_date") @db.DateTime(3)
+  dispDate DateTime? @map("disp_date") @db.DateTime(3)
+  power    Decimal   @default(0.00) @db.Decimal(13, 2)
+  manual   String?   @default("auto") @db.VarChar(45)
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId, iotNum, dispDate], map: "idx_user_iotnum_dispdate")  // 복합 인덱스
-  @@index([dispDate], map: "idx_dispdate")  // 날짜 필터링에 대한 인덱스
-
+  @@index([userId, iotNum, dispDate], map: "idx_user_iotnum_dispdate") // 복합 인덱스
+  @@index([dispDate], map: "idx_dispdate") // 날짜 필터링에 대한 인덱스
   @@map("ec_electric_statistics")
 }
 
 model KepcoStatistics {
   idx        Int       @id @default(autoincrement())
-  userId     String    @db.VarChar(255) @map("user_id")
-  dispDate   DateTime? @db.DateTime(3) @map("disp_date")
-  kepcoPower Decimal   @default(0.00) @db.Decimal(13, 2) @map("kepco_power")
+  userId     String    @map("user_id") @db.VarChar(255)
+  dispDate   DateTime? @map("disp_date") @db.DateTime(3)
+  kepcoPower Decimal   @default(0.00) @map("kepco_power") @db.Decimal(13, 2)
 
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId, dispDate], map: "idx_kepco_user_dispdate")  // 복합 인덱스
-  @@index([dispDate], map: "idx_kepco_dispdate")  // 날짜 필터링에 대한 인덱스
-
+  @@index([userId, dispDate], map: "idx_kepco_user_dispdate") // 복합 인덱스
+  @@index([dispDate], map: "idx_kepco_dispdate") // 날짜 필터링에 대한 인덱스
   @@map("ec_kepco_statistics")
 }

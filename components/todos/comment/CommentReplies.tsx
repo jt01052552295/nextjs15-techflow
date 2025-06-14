@@ -1,5 +1,5 @@
 'use client';
-
+import { useEffect } from 'react';
 import { useReply } from './useReply';
 import { useReplyList } from './useReplyList';
 import ReplyForm from './ReplyForm';
@@ -9,9 +9,14 @@ import ReplyDeleteModal from './ReplyDeleteModal';
 type Props = {
   todoId: string;
   parentIdx: number;
+  onReplyCountChange?: (count: number) => void;
 };
 
-export default function CommentReplies({ todoId, parentIdx }: Props) {
+export default function CommentReplies({
+  todoId,
+  parentIdx,
+  onReplyCountChange,
+}: Props) {
   const { replies, setReplies, loading, hasMore, loadMore } = useReplyList({
     todoId,
     parentIdx,
@@ -32,6 +37,10 @@ export default function CommentReplies({ todoId, parentIdx }: Props) {
     toggleLike,
     isPending,
   } = useReply(replies, setReplies);
+
+  useEffect(() => {
+    onReplyCountChange?.(replies.length); // ✅ 초기값 반영
+  }, [replies.length]);
 
   return (
     <div className="mt-2 ms-4 border-start ps-3">

@@ -12,6 +12,9 @@ import {
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { maskingName, maskingEmail } from '@/lib/util';
+import Image from 'next/image';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
 
 dayjs.extend(relativeTime);
 dayjs.locale('ko');
@@ -43,10 +46,43 @@ export default function ReplyItem({
 }: Props) {
   const isEditing = editId === reply.idx;
 
+  const staticUrl = process.env.NEXT_PUBLIC_HTTP_STATIC_URL || '';
+  const profile = reply.user?.profile?.[0];
+  const profileImageUrl = profile?.url ? `${staticUrl}${profile.url}` : null;
+
   return (
     <div className="border rounded p-2 mb-2 bg-white">
-      <div className="d-flex justify-content-between align-items-center mb-1">
-        <strong>{reply.author}</strong>
+      <div className="d-flex justify-content-between align-items-center mb-2">
+        {/* 프로필 + 이름/이메일 */}
+        <div className="d-flex align-items-center gap-2">
+          {profileImageUrl ? (
+            <Image
+              src={profileImageUrl}
+              alt={reply.user?.name || '사용자'}
+              width={32}
+              height={32}
+              className="rounded-circle border"
+            />
+          ) : (
+            <div
+              className="avatar-placeholder rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white border"
+              style={{ width: 32, height: 32 }}
+            >
+              <FontAwesomeIcon icon={faUser} />
+            </div>
+          )}
+
+          <div className="d-flex gap-1">
+            <span className="fw-semibold">
+              {maskingName(reply.user?.name ?? '')}
+            </span>
+            <small className="text-muted">
+              {maskingEmail(reply.user?.email ?? '')}
+            </small>
+          </div>
+        </div>
+
+        {/* 작성일 */}
         <small className="text-muted">{dayjs(reply.createdAt).fromNow()}</small>
       </div>
 

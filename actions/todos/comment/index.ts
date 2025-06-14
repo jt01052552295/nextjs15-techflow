@@ -83,7 +83,27 @@ export const createCommentAction = async (data: ITodosCommentPart) => {
       };
 
       const todo = await prisma.todosComment.create(createData);
-      return todo;
+
+      // 작성자 정보 포함된 데이터 다시 조회
+      const fullTodo = await prisma.todosComment.findUnique({
+        where: { idx: todo.idx },
+        include: {
+          user: {
+            select: {
+              name: true,
+              email: true,
+              profile: {
+                select: {
+                  url: true,
+                },
+                take: 1,
+              },
+            },
+          },
+        },
+      });
+
+      return fullTodo;
     });
 
     const save_success = await __ts('common.save_success', {}, language);
@@ -260,6 +280,20 @@ export const listCommentAction = async (filters: CommentFilter) => {
       take,
       skip,
       orderBy,
+      include: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+            profile: {
+              select: {
+                url: true,
+              },
+              take: 1,
+            },
+          },
+        },
+      },
     };
 
     const [items, totalCount] = await Promise.all([

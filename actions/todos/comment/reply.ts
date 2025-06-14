@@ -85,12 +85,30 @@ export const createReplyAction = async (data: ITodosCommentPart) => {
         },
       });
 
+      const fullTodo = await tx.todosComment.findUnique({
+        where: { idx: created.idx },
+        include: {
+          user: {
+            select: {
+              name: true,
+              email: true,
+              profile: {
+                select: {
+                  url: true,
+                },
+                take: 1,
+              },
+            },
+          },
+        },
+      });
+
       await tx.todosComment.update({
         where: { idx: parentIdx },
         data: { replyCount: { increment: 1 } },
       });
 
-      return created;
+      return fullTodo;
     });
 
     const save_success = await __ts('common.save_success', {}, language);
@@ -203,6 +221,20 @@ export const listReplyAction = async (filters: CommentFilter) => {
       take,
       skip,
       orderBy: { createdAt: 'asc' },
+      include: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+            profile: {
+              select: {
+                url: true,
+              },
+              take: 1,
+            },
+          },
+        },
+      },
     } satisfies Prisma.TodosCommentFindManyArgs;
 
     const [items, totalCount] = await Promise.all([

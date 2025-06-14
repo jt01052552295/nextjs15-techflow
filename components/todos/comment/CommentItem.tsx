@@ -7,6 +7,10 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/ko';
 import CommentReplies from './CommentReplies';
+import { maskingName, maskingEmail } from '@/lib/util';
+import Image from 'next/image';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
 
 dayjs.extend(relativeTime);
 dayjs.locale('ko');
@@ -33,11 +37,15 @@ export default function CommentItem({
   onDelete,
 }: Props) {
   const [showReplies, setShowReplies] = useState(false);
-  const [replyContent, setReplyContent] = useState('');
+  const [replyCount, setReplyCount] = useState(item.replyCount);
 
   const [isPending, startTransition] = useTransition();
   const [liked, setLiked] = useState(item.liked ?? false); // 추후 item.liked가 필요
   const [likeCount, setLikeCount] = useState(item.likeCount ?? 0);
+
+  const staticUrl = process.env.NEXT_PUBLIC_HTTP_STATIC_URL || '';
+  const profile = item.user?.profile?.[0];
+  const profileImageUrl = profile?.url ? `${staticUrl}${profile.url}` : null;
 
   const handleToggleLike = () => {
     startTransition(async () => {
@@ -53,8 +61,37 @@ export default function CommentItem({
 
   return (
     <div className="border rounded p-3 mb-2 bg-light-subtle">
-      <div className="d-flex justify-content-between align-items-center mb-1">
-        <strong>{item.author}</strong>
+      <div className="d-flex justify-content-between align-items-center mb-2">
+        {/* 프로필 + 이름/이메일 */}
+        <div className="d-flex align-items-center gap-2">
+          {profileImageUrl ? (
+            <Image
+              src={profileImageUrl}
+              alt={item.user?.name || '사용자'}
+              width={32}
+              height={32}
+              className="rounded-circle border"
+            />
+          ) : (
+            <div
+              className="avatar-placeholder rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white border"
+              style={{ width: 32, height: 32 }}
+            >
+              <FontAwesomeIcon icon={faUser} />
+            </div>
+          )}
+
+          <div className="d-flex gap-1">
+            <span className="fw-semibold">
+              {maskingName(item.user?.name ?? '')}
+            </span>
+            <small className="text-muted">
+              {maskingEmail(item.user?.email ?? '')}
+            </small>
+          </div>
+        </div>
+
+        {/* 작성일 */}
         <small className="text-muted">{dayjs(item.createdAt).fromNow()}</small>
       </div>
 
@@ -96,11 +133,7 @@ export default function CommentItem({
               className="btn btn-sm btn-outline-secondary"
               onClick={toggleReplies}
             >
-              {showReplies
-                ? '답글 숨기기'
-                : item.replyCount > 0
-                  ? `답글 ${item.replyCount}개 보기`
-                  : '답글 달기'}
+              {showReplies ? `답글 ${replyCount}` : `답글 ${replyCount}`}
             </button>
 
             <button
@@ -118,7 +151,11 @@ export default function CommentItem({
           </div>
 
           {showReplies && (
-            <CommentReplies todoId={item.todoId} parentIdx={item.idx} />
+            <CommentReplies
+              todoId={item.todoId}
+              parentIdx={item.idx}
+              onReplyCountChange={(count) => setReplyCount(count)}
+            />
           )}
         </>
       )}
