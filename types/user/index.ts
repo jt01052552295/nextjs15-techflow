@@ -26,6 +26,14 @@ export interface IUser {
 }
 export type IUserPart = Partial<IUser>;
 
+export interface IUserMini {
+  name: string;
+  email: string;
+  profile?: {
+    url: string;
+  }[];
+}
+
 export interface IUserProfile {
   idx?: number;
   uid: string;

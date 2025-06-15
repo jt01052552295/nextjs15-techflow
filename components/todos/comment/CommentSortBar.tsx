@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
+import { useLanguage } from '@/components/context/LanguageContext';
 
 interface Props {
   orderBy: 'latest' | 'popular';
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export default function CommentSortBar({ orderBy, onChange }: Props) {
+  const { t } = useLanguage();
   const handleChange = useCallback(
     (order: 'latest' | 'popular') => {
       if (order !== orderBy) {
@@ -23,13 +25,13 @@ export default function CommentSortBar({ orderBy, onChange }: Props) {
         className={`btn btn-sm me-2 ${orderBy === 'latest' ? 'btn-primary' : 'btn-outline-primary'}`}
         onClick={() => handleChange('latest')}
       >
-        최신순
+        {t('common.latest')}
       </button>
       <button
         className={`btn btn-sm ${orderBy === 'popular' ? 'btn-primary' : 'btn-outline-primary'}`}
         onClick={() => handleChange('popular')}
       >
-        인기순
+        {t('common.popular')}
       </button>
     </div>
   );

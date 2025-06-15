@@ -1,4 +1,5 @@
 'use client';
+import { useLanguage } from '@/components/context/LanguageContext';
 
 interface Props {
   visible: boolean;
@@ -11,6 +12,8 @@ export default function CommentDeleteModal({
   onCancel,
   onConfirm,
 }: Props) {
+  const { t } = useLanguage();
+
   if (!visible) return null;
 
   return (
@@ -22,7 +25,7 @@ export default function CommentDeleteModal({
       <div className="modal-dialog modal-dialog-centered">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">댓글 삭제</h5>
+            <h5 className="modal-title">{t('common.delete')}</h5>
             <button
               type="button"
               className="btn-close"
@@ -30,14 +33,14 @@ export default function CommentDeleteModal({
             ></button>
           </div>
           <div className="modal-body">
-            <p>정말 삭제하시겠습니까?</p>
+            <p>{t('common.confirm_delete')}</p>
           </div>
           <div className="modal-footer">
             <button className="btn btn-secondary" onClick={onCancel}>
-              취소
+              {t('common.cancel')}
             </button>
             <button className="btn btn-danger" onClick={onConfirm}>
-              확인
+              {t('common.confirm')}
             </button>
           </div>
         </div>

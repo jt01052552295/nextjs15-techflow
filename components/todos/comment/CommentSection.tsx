@@ -15,11 +15,18 @@ type Props = {
 export default function CommentSection({ todoId }: Props) {
   const [sort, setSort] = useState<'latest' | 'popular'>('latest');
 
-  const { comments, setComments, loadMore, hasMore, isLoading, totalCount } =
-    useCommentList({
-      todoId,
-      orderBy: sort,
-    });
+  const {
+    comments,
+    setComments,
+    loadMore,
+    hasMore,
+    isLoading,
+    totalCount,
+    setTotalCount,
+  } = useCommentList({
+    todoId,
+    orderBy: sort,
+  });
 
   const {
     editId,
@@ -33,14 +40,14 @@ export default function CommentSection({ todoId }: Props) {
     cancelEdit,
     saveEdit,
     addComment,
-  } = useComment(comments, setComments, setSort); // setSort는 새로 등록시 최신순으로 전환할 때 쓸 수 있음
+  } = useComment(comments, setComments, setSort, setTotalCount);
   return (
     <div>
       <CommentWrite todoId={todoId} onSuccess={addComment} />
 
       <div className="d-flex justify-content-between align-items-center mb-2">
         <h6>
-          댓글 <span className="text-primary">{totalCount}</span>개
+          Total. <span className="text-primary">{totalCount}</span>
         </h6>
         <CommentSortBar orderBy={sort} onChange={setSort} />
       </div>

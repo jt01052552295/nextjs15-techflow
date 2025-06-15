@@ -12,6 +12,7 @@ export function useComment(
   comments: ITodosComment[],
   setComments: React.Dispatch<React.SetStateAction<ITodosComment[]>>, // 정확한 타입 지정
   setSort?: (sort: 'latest' | 'popular') => void,
+  setTotalCount?: React.Dispatch<React.SetStateAction<number>>,
 ) {
   const [editId, setEditId] = useState<number | null>(null);
   const [editContent, setEditContent] = useState('');
@@ -23,8 +24,9 @@ export function useComment(
       setComments((prev: ITodosComment[]) => [comment, ...prev]);
 
       if (setSort) setSort('latest');
+      if (setTotalCount) setTotalCount((prev) => prev + 1);
     },
-    [setComments, setSort],
+    [setComments, setSort, setTotalCount],
   );
 
   // 수정 시작
@@ -77,6 +79,7 @@ export function useComment(
       setComments((prev: ITodosComment[]) =>
         prev.filter((c) => c.idx !== deleteId),
       );
+      if (setTotalCount) setTotalCount((prev) => Math.max(prev - 1, 0));
     } else {
       toast.error(response.message);
     }

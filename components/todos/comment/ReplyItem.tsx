@@ -15,6 +15,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { maskingName, maskingEmail } from '@/lib/util';
 import Image from 'next/image';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { useLanguage } from '@/components/context/LanguageContext';
 
 dayjs.extend(relativeTime);
 dayjs.locale('ko');
@@ -44,6 +45,7 @@ export default function ReplyItem({
   onToggleLike,
   isPending,
 }: Props) {
+  const { t } = useLanguage();
   const isEditing = editId === reply.idx;
 
   const staticUrl = process.env.NEXT_PUBLIC_HTTP_STATIC_URL || '';
@@ -58,7 +60,7 @@ export default function ReplyItem({
           {profileImageUrl ? (
             <Image
               src={profileImageUrl}
-              alt={reply.user?.name || '사용자'}
+              alt={reply.user?.name || ''}
               width={32}
               height={32}
               className="rounded-circle border"
@@ -100,14 +102,14 @@ export default function ReplyItem({
               onClick={() => onEditSave(reply.idx)}
               disabled={isPending}
             >
-              <FontAwesomeIcon icon={faSave} /> 저장
+              <FontAwesomeIcon icon={faSave} /> {t('common.save')}
             </button>
             <button
               className="btn btn-sm btn-secondary"
               onClick={onEditCancel}
               disabled={isPending}
             >
-              <FontAwesomeIcon icon={faTimes} /> 취소
+              <FontAwesomeIcon icon={faTimes} /> {t('common.cancel')}
             </button>
           </div>
         </div>
@@ -131,14 +133,14 @@ export default function ReplyItem({
               onClick={() => onEdit(reply)}
               disabled={isPending}
             >
-              <FontAwesomeIcon icon={faPen} /> 수정
+              <FontAwesomeIcon icon={faPen} /> {t('common.edit')}
             </button>
             <button
               className="btn btn-sm btn-outline-danger"
               onClick={() => onDelete(reply.idx)}
               disabled={isPending}
             >
-              <FontAwesomeIcon icon={faTrash} /> 삭제
+              <FontAwesomeIcon icon={faTrash} /> {t('common.delete')}
             </button>
           </>
         )}

@@ -11,6 +11,7 @@ import { maskingName, maskingEmail } from '@/lib/util';
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { useLanguage } from '@/components/context/LanguageContext';
 
 dayjs.extend(relativeTime);
 dayjs.locale('ko');
@@ -36,6 +37,7 @@ export default function CommentItem({
   onEditCancel,
   onDelete,
 }: Props) {
+  const { t } = useLanguage();
   const [showReplies, setShowReplies] = useState(false);
   const [replyCount, setReplyCount] = useState(item.replyCount);
 
@@ -67,7 +69,7 @@ export default function CommentItem({
           {profileImageUrl ? (
             <Image
               src={profileImageUrl}
-              alt={item.user?.name || '사용자'}
+              alt={item.user?.name || ''}
               width={32}
               height={32}
               className="rounded-circle border"
@@ -108,10 +110,10 @@ export default function CommentItem({
               className="btn btn-sm btn-primary"
               onClick={() => onEditSave(item.idx)}
             >
-              저장
+              {t('common.save')}
             </button>
             <button className="btn btn-sm btn-secondary" onClick={onEditCancel}>
-              취소
+              {t('common.cancel')}
             </button>
           </div>
         </>
@@ -133,20 +135,22 @@ export default function CommentItem({
               className="btn btn-sm btn-outline-secondary"
               onClick={toggleReplies}
             >
-              {showReplies ? `답글 ${replyCount}` : `답글 ${replyCount}`}
+              {showReplies
+                ? `${t('common.reply')} ${replyCount}`
+                : `${t('common.reply')} ${replyCount}`}
             </button>
 
             <button
               className="btn btn-sm btn-outline-primary"
               onClick={() => onEdit(item)}
             >
-              수정
+              {t('common.edit')}
             </button>
             <button
               className="btn btn-sm btn-outline-danger"
               onClick={() => onDelete(item.idx)}
             >
-              삭제
+              {t('common.delete')}
             </button>
           </div>
 

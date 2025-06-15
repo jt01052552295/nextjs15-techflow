@@ -5,6 +5,7 @@ import TextareaAutosize from 'react-textarea-autosize';
 import { createReplyAction } from '@/actions/todos/comment/reply';
 import type { ITodosComment } from '@/types/todos';
 import { toast } from 'sonner';
+import { useLanguage } from '@/components/context/LanguageContext';
 
 type Props = {
   todoId: string;
@@ -13,12 +14,14 @@ type Props = {
 };
 
 export default function ReplyForm({ todoId, parentIdx, onAdd }: Props) {
+  const { t } = useLanguage();
   const [content, setContent] = useState('');
   const [isPending, startTransition] = useTransition();
+  const required = t('common.form.required');
 
   const handleSubmit = () => {
     if (!content.trim()) {
-      toast.warning('내용을 입력해주세요');
+      toast.warning(required);
       return;
     }
 
@@ -28,7 +31,7 @@ export default function ReplyForm({ todoId, parentIdx, onAdd }: Props) {
         onAdd(res.data);
         setContent('');
       } else {
-        toast.error(res.message || '등록 실패');
+        toast.error(res.message);
       }
     });
   };
@@ -37,19 +40,20 @@ export default function ReplyForm({ todoId, parentIdx, onAdd }: Props) {
     <div className="mb-3">
       <TextareaAutosize
         className="form-control mb-2"
-        placeholder="답글을 입력하세요"
-        minRows={2}
-        maxRows={5}
+        placeholder={required}
+        minRows={1}
+        maxRows={3}
         value={content}
         onChange={(e) => setContent(e.target.value)}
         disabled={isPending}
+        required
       />
       <button
         className="btn btn-sm btn-primary"
         onClick={handleSubmit}
         disabled={isPending}
       >
-        {isPending ? '등록 중...' : '답글 등록'}
+        {isPending ? t('common.loading') : t('common.save')}
       </button>
     </div>
   );

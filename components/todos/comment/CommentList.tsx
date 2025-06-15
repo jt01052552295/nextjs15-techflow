@@ -4,6 +4,7 @@ import CommentItem from './CommentItem';
 import { ITodosComment } from '@/types/todos';
 import { useInView } from 'react-intersection-observer';
 import { useEffect } from 'react';
+import { useLanguage } from '@/components/context/LanguageContext';
 
 type Props = {
   comments: ITodosComment[];
@@ -32,6 +33,7 @@ export default function CommentList({
   hasMore = false,
   isLoading = false,
 }: Props) {
+  const { t } = useLanguage();
   const { ref, inView } = useInView({ threshold: 0 });
 
   useEffect(() => {
@@ -59,10 +61,10 @@ export default function CommentList({
           ))}
           <li className="list-group-item text-center" ref={ref}>
             {isLoading
-              ? '불러오는 중...'
+              ? t('common.loading')
               : hasMore
-                ? '댓글 불러오기'
-                : '댓글 끝'}
+                ? t('common.more')
+                : t('common.all_items_loaded')}
           </li>
           {/* {hasMore && (
             <li className="list-group-item text-center">
@@ -77,7 +79,7 @@ export default function CommentList({
           )} */}
         </>
       ) : (
-        <li className="list-group-item text-muted">댓글이 없습니다.</li>
+        <li className="list-group-item text-muted">{t('common.no_items')}</li>
       )}
     </ul>
   );

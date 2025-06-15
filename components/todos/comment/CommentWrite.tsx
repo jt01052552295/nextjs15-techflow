@@ -2,9 +2,9 @@
 
 import TextareaAutosize from 'react-textarea-autosize';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { SubmitHandler, useForm, FormProvider } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import useFormUtils from '@/hooks/useFormUtils';
-import { useTransition, useEffect, useState } from 'react';
+import { useTransition, useEffect } from 'react';
 import { toast } from 'sonner';
 import {
   CommentTodoType,
@@ -30,7 +30,6 @@ export default function CommentWrite({ todoId, onSuccess }: Props) {
     trigger,
     watch,
     reset,
-    setError,
   } = useForm<CommentTodoType>({
     mode: 'onChange',
     resolver: zodResolver(CommentTodoSchema(dictionary.common.form)),

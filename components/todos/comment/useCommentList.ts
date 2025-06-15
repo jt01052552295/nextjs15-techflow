@@ -69,5 +69,6 @@ export function useCommentList({
     hasMore,
     isLoading,
     totalCount,
+    setTotalCount,
   };
 }

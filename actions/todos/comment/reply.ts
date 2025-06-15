@@ -84,6 +84,10 @@ export const createReplyAction = async (data: ITodosCommentPart) => {
           createdAt: now,
         },
       });
+      await tx.todosComment.update({
+        where: { idx: parentIdx },
+        data: { replyCount: { increment: 1 } },
+      });
 
       const fullTodo = await tx.todosComment.findUnique({
         where: { idx: created.idx },
@@ -101,11 +105,6 @@ export const createReplyAction = async (data: ITodosCommentPart) => {
             },
           },
         },
-      });
-
-      await tx.todosComment.update({
-        where: { idx: parentIdx },
-        data: { replyCount: { increment: 1 } },
       });
 
       return fullTodo;
@@ -210,11 +209,6 @@ export const listReplyAction = async (filters: CommentFilter) => {
 
     const { todoId, parentIdx } = filters;
     if (!todoId || !parentIdx) return undefined;
-
-    const where: Prisma.TodosCommentWhereInput = {
-      todoId,
-      parentIdx,
-    };
 
     const queryOptions = {
       where: { todoId: filters.todoId, parentIdx: filters.parentIdx },

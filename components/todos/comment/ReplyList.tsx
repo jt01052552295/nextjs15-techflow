@@ -4,6 +4,7 @@ import { ITodosComment } from '@/types/todos';
 import { useInView } from 'react-intersection-observer';
 import { useEffect } from 'react';
 import ReplyItem from './ReplyItem';
+import { useLanguage } from '@/components/context/LanguageContext';
 
 type Props = {
   replies: ITodosComment[];
@@ -44,6 +45,7 @@ export default function ReplyList({
   onToggleLike,
   isPending,
 }: Props) {
+  const { t } = useLanguage();
   const { ref, inView } = useInView({ threshold: 1 });
 
   useEffect(() => {
@@ -55,7 +57,7 @@ export default function ReplyList({
   return (
     <div className="mt-3">
       {replies.length === 0 && !loading && (
-        <p className="text-muted">등록된 답글이 없습니다.</p>
+        <p className="text-muted">{t('common.no_items')}</p>
       )}
 
       {replies.map((reply) => (
@@ -74,7 +76,7 @@ export default function ReplyList({
         />
       ))}
 
-      {loading && <p className="text-muted">로딩 중...</p>}
+      {loading && <p className="text-muted">{t('common.loading')}</p>}
 
       {hasMore && !loading && <div ref={ref} style={{ height: 1 }} />}
     </div>
