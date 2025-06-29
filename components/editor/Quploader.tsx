@@ -1,31 +1,62 @@
 'use client';
 
 import { editorUploadAction } from '@/actions/editor';
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { UseFormSetValue, FieldValues } from 'react-hook-form';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/ko';
 
-interface FormInputProps {
-  label: string;
+dayjs.extend(relativeTime);
+dayjs.locale('ko');
+
+interface FormInputProps<T extends FieldValues> {
+  label: keyof T;
   errors: any;
-  setValue?: any;
+  setValue: UseFormSetValue<T>;
   value?: any;
 }
 
-function Quploader({ label, errors, setValue, value }: FormInputProps) {
+function Quploader<T extends FieldValues>({
+  label,
+  errors,
+  setValue,
+  value,
+}: FormInputProps<T>) {
   const [content, setContent] = useState('');
-  //   const { locale, dictionary } = useLanguage();
+  const [editor, setEditor] = useState<any>(null);
+  const subdomain = process.env.NEXT_PUBLIC_STATIC_SUBDOMAIN ?? '';
+  const date = dayjs(new Date().getTime()).format('YYYYMMDD');
 
-  if (!process.env.NEXT_PUBLIC_STATIC_SUBDOMAIN) {
+  if (!subdomain) {
     throw new Error('NEXT_PUBLIC_STATIC_SUBDOMAIN is not defined');
   }
 
-  const quillRef = useRef<ReactQuill>(null);
-  const subdmoain = process.env.NEXT_PUBLIC_STATIC_SUBDOMAIN;
-  const date = dayjs(new Date().getTime()).format('YYYYMMDD');
+  const uploadImageToEditor = async (
+    file: File,
+    editor: any,
+    insertPosition: number,
+  ) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('domain', subdomain);
+    formData.append('dir', date);
+
+    try {
+      const response = await editorUploadAction(formData);
+      if (response.status === 'success' && response.output) {
+        response.output.forEach((file: any) => {
+          editor.insertEmbed(insertPosition, 'image', file.url);
+        });
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (err) {
+      console.error('이미지 업로드 실패:', err);
+    }
+  };
 
   const imageHandler = () => {
     const input = document.createElement('input');
@@ -33,66 +64,27 @@ function Quploader({ label, errors, setValue, value }: FormInputProps) {
     input.setAttribute('accept', 'image/*');
     input.click();
 
-    input.addEventListener('change', async () => {
-      if (input.files && input.files[0]) {
-        const file = input.files[0];
-        const formData = new FormData();
-        formData.append('image', file);
-        formData.append('domain', subdmoain);
-        formData.append('dir', date);
+    input.onchange = async () => {
+      if (!input.files?.length) return;
 
-        try {
-          // for (const pair of formData.entries()) {
-          //   console.log(pair[0], pair[1])
-          // }
-
-          const response = await editorUploadAction(formData);
-          console.log(response);
-          if (response.status == 'success' && response.output) {
-            const serverOutput = response.output;
-
-            serverOutput.map((file: any) => {
-              if (quillRef.current) {
-                const editor = quillRef.current.getEditor();
-                const range = editor.getSelection();
-                if (range) {
-                  editor.insertEmbed(range.index, 'image', file.url);
-                }
-              }
-            });
-          } else {
-            throw Error(response.message);
-          }
-        } catch (error) {
-          console.error(error);
-        }
+      const file = input.files[0];
+      const range = editor?.getSelection();
+      if (range) {
+        await uploadImageToEditor(file, range.index);
       }
-    });
+    };
   };
 
-  const handleContentChange = (content: any) => {
-    setContent(content);
-    setValue(label, content);
-
-    // if (errors[label]?.message) {
-    //     console.error(errors)
-    // }
+  const handleContentChange = (val: string) => {
+    setContent(val);
+    setValue(label, val);
   };
 
   useEffect(() => {
-    if (value) {
+    if (value !== undefined && content !== value) {
       setContent(value);
-      setValue(label, value);
     }
-
-    // if (errors) {
-    //     console.error(errors)
-    // }
-
-    // if (errors[label]?.message) {
-    //     console.error(errors)
-    // }
-  }, [value, errors, label, setValue]);
+  }, [value]);
 
   const modules = useMemo(() => {
     return {
@@ -147,13 +139,13 @@ function Quploader({ label, errors, setValue, value }: FormInputProps) {
 
   return (
     <ReactQuill
-      ref={quillRef}
+      value={content}
+      onChange={handleContentChange}
+      onEditorCreated={setEditor} // ✅ 여기서 에디터 인스턴스를 받음
       modules={modules}
       formats={formats}
       theme="snow"
-      className={`${errors[label] && 'is-invalid'}`}
-      value={content}
-      onChange={handleContentChange}
+      className={errors[label] ? 'is-invalid' : ''}
     />
   );
 }

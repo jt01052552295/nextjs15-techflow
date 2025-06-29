@@ -22,12 +22,20 @@ import {
   CreateTodosSchema,
 } from '@/actions/todos/create/schema';
 import { createAction } from '@/actions/todos/create';
-import { SubmitHandler, useForm, FormProvider } from 'react-hook-form';
+import {
+  SubmitHandler,
+  useForm,
+  FormProvider,
+  Controller,
+} from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import useFormUtils from '@/hooks/useFormUtils';
 import ResultConfirm from '@/components/todos/modal/ResultConfirm';
 import { useListMemory } from '@/hooks/useListMemory';
 import { OptionForm } from './OptionForm';
+import QEditor from '@/components/editor/QEditor';
+import ImageUploader from './ImageUploader';
+import FileUploader from './FileUploader';
 
 export default function CreateForm() {
   const { dictionary, locale, t } = useLanguage();
@@ -47,11 +55,13 @@ export default function CreateForm() {
       uid: uuidv4(),
       email: 'test@test.com',
       name: 'jtm',
+      content2: '',
     },
   });
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors, isValid },
     setValue,
@@ -206,25 +216,24 @@ export default function CreateForm() {
                         <label className="form-label" htmlFor="content2">
                           {t('columns.todos.content2')}
                         </label>
-                        <TextareaAutosize
-                          className={`form-control ${getInputClass('content2')}`}
-                          maxRows={10}
-                          {...register('content2', {
-                            onChange: () => handleInputChange('content2'),
-                            onBlur: () => handleInputChange('content2'),
-                          })}
-                          readOnly={isPending}
-                        ></TextareaAutosize>
-                        {errors.content2?.message && (
-                          <div className="invalid-feedback">
-                            {errors.content2?.message}
-                          </div>
-                        )}
-                        {!errors.content2 && (
-                          <div className="valid-feedback">
-                            {t('common.form.valid')}
-                          </div>
-                        )}
+                        <Controller
+                          name="content2"
+                          control={control}
+                          render={({ field, fieldState }) => (
+                            <>
+                              <QEditor
+                                value={field.value ?? ''}
+                                onChange={field.onChange}
+                                error={fieldState.error?.message}
+                              />
+                              {fieldState.error?.message && (
+                                <div className="invalid-feedback d-block">
+                                  {fieldState.error.message}
+                                </div>
+                              )}
+                            </>
+                          )}
+                        />
                       </div>
                     </div>
                   </div>
@@ -306,6 +315,44 @@ export default function CreateForm() {
                             })}
                           </small>
                         </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-md-12 mb-2">
+              <div className="card">
+                <div className="card-header">
+                  <h5 className="card-title m-0">
+                    {t('common.additional_info')}
+                  </h5>
+                </div>
+                <div className="card-body">
+                  <div className="row">
+                    <div className="col">
+                      <div className="mb-2">
+                        <ImageUploader />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-md-12 mb-2">
+              <div className="card">
+                <div className="card-header">
+                  <h5 className="card-title m-0">
+                    {t('common.additional_info')}
+                  </h5>
+                </div>
+                <div className="card-body">
+                  <div className="row">
+                    <div className="col">
+                      <div className="mb-2">
+                        <FileUploader />
                       </div>
                     </div>
                   </div>
