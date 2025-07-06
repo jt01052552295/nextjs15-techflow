@@ -44,6 +44,7 @@ export default function CreateForm() {
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | undefined>('');
   const [isResultOpen, setIsResultOpen] = useState<boolean>(false);
+  const [uploadedImages, setUploadedImages] = useState<any[]>([]); // ✅ 업로드된 이미지 상태
 
   const pathname = 'todos';
   const listMemory = useListMemory(pathname);
@@ -84,6 +85,7 @@ export default function CreateForm() {
       try {
         const finalData = {
           ...data,
+          todoFile: uploadedImages,
         };
         console.log(finalData);
         const response = await createAction(finalData);
@@ -101,6 +103,7 @@ export default function CreateForm() {
 
           toast.success(response.message);
           reset();
+          setUploadedImages([]); // ✅ 이미지 초기화
           setIsResultOpen(true);
         } else {
           throw new Error(`${response.message}:: ${response.error}`);
@@ -123,6 +126,7 @@ export default function CreateForm() {
   const formReset = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     reset(); // update form back to default values
+    setUploadedImages([]); // ✅ 이미지 초기화
   };
 
   return (
@@ -333,7 +337,12 @@ export default function CreateForm() {
                   <div className="row">
                     <div className="col">
                       <div className="mb-2">
-                        <ImageUploader />
+                        <ImageUploader
+                          dir={pathname}
+                          pid={watch('uid')}
+                          onChange={setUploadedImages} // ✅ 작성폼은 업로드된 이미지만 관리
+                          mode="create"
+                        />
                       </div>
                     </div>
                   </div>

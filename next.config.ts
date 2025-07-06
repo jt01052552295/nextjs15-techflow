@@ -4,6 +4,8 @@
 
 import path from 'path';
 
+const isDev = process.env.NODE_ENV === 'development';
+
 const getDomainConfig = () => {
   return [
     process.env.NEXT_PUBLIC_ROOT_DOMAIN,
@@ -30,7 +32,7 @@ const nextConfig = {
   `, // 모든 SCSS 파일에 자동으로 포함
   },
   images: {
-    // unoptimized: true,
+    unoptimized: isDev,
     remotePatterns: [
       {
         protocol: 'https',
@@ -43,6 +45,12 @@ const nextConfig = {
       {
         protocol: 'http',
         hostname: 'static.mymedia.work',
+        port: '8080',
+      },
+      {
+        protocol: 'https',
+        hostname: 'static.mymedia.work',
+        port: '8443',
       },
     ],
   },

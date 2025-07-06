@@ -40,6 +40,7 @@ export const updateAction = async (data: UpdateTodosType) => {
       todoFile,
       todoOption,
       deleteOptionUids,
+      deleteFileUrls,
     } = validatedFields.data;
 
     // const now = dayjs(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss')
@@ -71,6 +72,16 @@ export const updateAction = async (data: UpdateTodosType) => {
         });
       }
 
+      // ✅ 이미지 삭제 처리 (프론트에서 삭제한 것만)
+      if (deleteFileUrls && deleteFileUrls.length > 0) {
+        await prisma.todosFile.deleteMany({
+          where: {
+            todoId: uid,
+            url: { in: deleteFileUrls }, // 이 URL 목록만 제거
+          },
+        });
+      }
+
       const createData: any = {
         where: { uid },
         data: {
@@ -91,8 +102,21 @@ export const updateAction = async (data: UpdateTodosType) => {
         },
       };
 
+      // ✅ 1. 현재 DB에 저장된 이미지 목록 조회
+      const existingFiles = await prisma.todosFile.findMany({
+        where: { todoId: uid },
+        select: { url: true },
+      });
+      const existingUrls = existingFiles.map((file) => file.url);
+
+      // ✅ 2. 새로 추가할 이미지만 필터링
+
       if (uid && todoFile && todoFile?.length > 0) {
-        const fileRecords = todoFile.map((file) => ({
+        const newFiles = todoFile.filter(
+          (file) => file.url && !existingUrls.includes(file.url),
+        );
+
+        const fileRecords = newFiles.map((file) => ({
           //todoId: uid,
           name: file.name,
           url: file.url,

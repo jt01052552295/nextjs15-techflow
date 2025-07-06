@@ -11,7 +11,7 @@ interface UserProfileWidgetProps {
 
 const UserProfileWidget = ({ collapse }: UserProfileWidgetProps) => {
   const { user } = useAuth();
-  const staticUrl = process.env.NEXT_PUBLIC_HTTP_STATIC_URL || '';
+  const staticUrl = process.env.NEXT_PUBLIC_STATIC_URL || '';
 
   // 프로필 이미지 URL 가져오기 (첫 번째 프로필만 사용)
   const profileImageUrl =

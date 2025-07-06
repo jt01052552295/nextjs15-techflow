@@ -48,7 +48,7 @@ export default function ReplyItem({
   const { t } = useLanguage();
   const isEditing = editId === reply.idx;
 
-  const staticUrl = process.env.NEXT_PUBLIC_HTTP_STATIC_URL || '';
+  const staticUrl = process.env.NEXT_PUBLIC_STATIC_URL || '';
   const profile = reply.user?.profile?.[0];
   const profileImageUrl = profile?.url ? `${staticUrl}${profile.url}` : null;
 

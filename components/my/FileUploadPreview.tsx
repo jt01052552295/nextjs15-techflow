@@ -75,7 +75,7 @@ const FileUploadPreview = forwardRef<
     const fileInputRef = useRef<HTMLInputElement>(null);
     // 파일 크기 제한
     const maxSizeBytes = maxSize * 1024 * 1024; // MB를 바이트로 변환
-    const staticUrl = process.env.NEXT_PUBLIC_HTTP_STATIC_URL || '';
+    const staticUrl = process.env.NEXT_PUBLIC_STATIC_URL || '';
 
     // 초기 이미지 로드
     useEffect(() => {

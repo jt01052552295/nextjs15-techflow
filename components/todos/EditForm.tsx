@@ -35,6 +35,8 @@ import { useListMemory } from '@/hooks/useListMemory';
 import { ITodosPart } from '@/types/todos';
 import { OptionForm } from './OptionForm';
 import QEditor from '@/components/editor/QEditor';
+import ImageUploader from './ImageUploader';
+import FileUploader from './FileUploader';
 
 type TypeProps = {
   rs: ITodosPart;
@@ -46,6 +48,8 @@ export default function EditForm(props: TypeProps) {
   const [isDataFetched, setIsDataFetched] = useState<boolean | undefined>(
     false,
   );
+  const [uploadedImages, setUploadedImages] = useState<any[]>([]); // ✅ 업로드된 이미지 상태
+  const [deletedImages, setDeletedImages] = useState<string[]>([]);
 
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | undefined>('');
@@ -97,6 +101,16 @@ export default function EditForm(props: TypeProps) {
       if (props.rs.TodosOption) {
         setValue('todoOption', props.rs.TodosOption, { shouldValidate: true });
       }
+
+      if (props.rs.TodosFile) {
+        const initialImages = props.rs.TodosFile.map((file) => ({
+          preview: process.env.NEXT_PUBLIC_STATIC_URL + file.url,
+          name: file.name,
+          url: file.url,
+        }));
+        console.log(initialImages);
+        setUploadedImages(initialImages);
+      }
     }
   }, [props.rs, setValue]);
 
@@ -133,6 +147,8 @@ export default function EditForm(props: TypeProps) {
           deleteOptionUids: deleteOptions
             .map((opt) => opt.uid)
             .filter(Boolean) as string[],
+          todoFile: uploadedImages,
+          deleteFileUrls: deletedImages, // ✅ 삭제된 이미지들
         };
         console.log(finalData);
         const response = await updateAction(finalData);
@@ -174,6 +190,7 @@ export default function EditForm(props: TypeProps) {
   const formReset = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     onSubmit();
+    setIsDataFetched(false);
   };
 
   return (
@@ -436,6 +453,53 @@ export default function EditForm(props: TypeProps) {
                             })}
                           </small>
                         </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-md-12 mb-2">
+              <div className="card">
+                <div className="card-header">
+                  <h5 className="card-title m-0">
+                    {t('common.additional_info')}
+                  </h5>
+                </div>
+                <div className="card-body">
+                  <div className="row">
+                    <div className="col">
+                      <div className="mb-2">
+                        <ImageUploader
+                          dir={pathname}
+                          pid={watch('uid')}
+                          onChange={(images, removed) => {
+                            setUploadedImages(images); // ✅ 남아있는 이미지들
+                            setDeletedImages(removed ?? []); // ✅ 삭제된 이미지들
+                          }}
+                          initialImages={uploadedImages}
+                          mode="edit"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-md-12 mb-2">
+              <div className="card">
+                <div className="card-header">
+                  <h5 className="card-title m-0">
+                    {t('common.additional_info')}
+                  </h5>
+                </div>
+                <div className="card-body">
+                  <div className="row">
+                    <div className="col">
+                      <div className="mb-2">
+                        <FileUploader />
                       </div>
                     </div>
                   </div>

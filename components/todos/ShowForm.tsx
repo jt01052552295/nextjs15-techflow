@@ -25,7 +25,8 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ITodosPart, ITodosOption, ITodosComment } from '@/types/todos';
 import CommentSection from './comment/CommentSection';
-
+import Image from 'next/image';
+import ImageView from './ImgeView';
 type TypeProps = {
   rs: ITodosPart;
 };
@@ -37,6 +38,7 @@ export default function ShowForm(props: TypeProps) {
     false,
   );
   const [optionData, setOptionData] = useState<ITodosOption[]>([]);
+  const [images, setUploadedImages] = useState<any[]>([]);
 
   const { register, setValue, getValues } = useForm<UpdateTodosType>({
     mode: 'onChange',
@@ -61,6 +63,14 @@ export default function ShowForm(props: TypeProps) {
 
       if (props.rs.TodosOption) {
         setOptionData(props.rs.TodosOption);
+      }
+      if (props.rs.TodosFile) {
+        const initialImages = props.rs.TodosFile.map((file) => ({
+          preview: process.env.NEXT_PUBLIC_STATIC_URL + file.url,
+          name: file.name,
+          url: file.url,
+        }));
+        setUploadedImages(initialImages);
       }
     }
   }, [props.rs, setValue]);
@@ -266,6 +276,21 @@ export default function ShowForm(props: TypeProps) {
                       추가 정보가 없습니다.
                     </div>
                   )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-12 mb-2">
+            <div className="card">
+              <div className="card-header">
+                <h5 className="card-title m-0">
+                  {t('common.additional_info')}
+                </h5>
+              </div>
+              <div className="card-body">
+                <div className="row g-4">
+                  <ImageView images={images} />
                 </div>
               </div>
             </div>

@@ -50,6 +50,7 @@ export const UpdateTodosSchema = (messages: Record<string, any>) =>
     todoFile: z.array(FileDetailsSchema).optional(),
     todoOption: z.array(OptionDetailsSchema(messages)).optional(),
     deleteOptionUids: z.array(z.string()).optional(),
+    deleteFileUrls: z.array(z.string()).optional(),
   });
 
 export type UpdateTodosType = z.infer<ReturnType<typeof UpdateTodosSchema>>;

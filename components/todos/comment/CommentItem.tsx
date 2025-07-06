@@ -45,7 +45,7 @@ export default function CommentItem({
   const [liked, setLiked] = useState(item.liked ?? false); // 추후 item.liked가 필요
   const [likeCount, setLikeCount] = useState(item.likeCount ?? 0);
 
-  const staticUrl = process.env.NEXT_PUBLIC_HTTP_STATIC_URL || '';
+  const staticUrl = process.env.NEXT_PUBLIC_STATIC_URL || '';
   const profile = item.user?.profile?.[0];
   const profileImageUrl = profile?.url ? `${staticUrl}${profile.url}` : null;
 
