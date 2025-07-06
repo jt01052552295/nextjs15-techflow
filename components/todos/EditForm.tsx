@@ -105,8 +105,12 @@ export default function EditForm(props: TypeProps) {
       if (props.rs.TodosFile) {
         const initialImages = props.rs.TodosFile.map((file) => ({
           preview: process.env.NEXT_PUBLIC_STATIC_URL + file.url,
-          name: file.name,
-          url: file.url,
+          name: file.name, // 저장된 파일명
+          url: file.url, // 상대 URL
+          originalName: file.originalName, // ✅ 원본 파일명
+          size: file.size, // ✅ 파일 크기
+          ext: file.ext, // ✅ 확장자
+          type: file.type, // ✅ MIME 타입
         }));
         console.log(initialImages);
         setUploadedImages(initialImages);
@@ -471,7 +475,7 @@ export default function EditForm(props: TypeProps) {
                   <div className="row">
                     <div className="col">
                       <div className="mb-2">
-                        <ImageUploader
+                        {/* <ImageUploader
                           dir={pathname}
                           pid={watch('uid')}
                           onChange={(images, removed) => {
@@ -480,7 +484,7 @@ export default function EditForm(props: TypeProps) {
                           }}
                           initialImages={uploadedImages}
                           mode="edit"
-                        />
+                        /> */}
                       </div>
                     </div>
                   </div>
@@ -499,7 +503,16 @@ export default function EditForm(props: TypeProps) {
                   <div className="row">
                     <div className="col">
                       <div className="mb-2">
-                        <FileUploader />
+                        <FileUploader
+                          dir={pathname}
+                          pid={watch('uid')}
+                          onChange={(images, removed) => {
+                            setUploadedImages(images); // ✅ 남아있는 이미지들
+                            setDeletedImages(removed ?? []); // ✅ 삭제된 이미지들
+                          }}
+                          initialFiles={uploadedImages}
+                          mode="edit"
+                        />
                       </div>
                     </div>
                   </div>

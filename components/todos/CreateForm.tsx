@@ -361,7 +361,12 @@ export default function CreateForm() {
                   <div className="row">
                     <div className="col">
                       <div className="mb-2">
-                        <FileUploader />
+                        <FileUploader
+                          dir={pathname}
+                          pid={watch('uid')}
+                          onChange={setUploadedImages} // ✅ 작성폼은 업로드된 이미지만 관리
+                          mode="create"
+                        />
                       </div>
                     </div>
                   </div>

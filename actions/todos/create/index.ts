@@ -93,17 +93,35 @@ export const createAction = async (data: CreateTodosType) => {
         },
       };
 
-      if (uid && todoFile && todoFile?.length > 0) {
+      if (uid && todoFile && todoFile.length > 0) {
         const fileRecords = todoFile
           .filter(
-            (file): file is { name: string; url: string } =>
-              file.name !== undefined && file.url !== undefined,
+            (
+              file,
+            ): file is {
+              name: string;
+              url: string;
+              originalName: string;
+              size: number;
+              ext: string;
+              type: string;
+            } =>
+              file.name !== undefined &&
+              file.url !== undefined &&
+              file.originalName !== undefined &&
+              file.size !== undefined &&
+              file.ext !== undefined &&
+              file.type !== undefined,
           )
-          .map((file: { name: string; url: string }) => ({
-            //todoId: uid,
+          .map((file) => ({
             name: file.name,
+            originalName: file.originalName, // ✅ 원본 파일명
             url: file.url,
+            size: file.size, // ✅ 파일 크기
+            ext: file.ext, // ✅ 확장자
+            type: file.type, // ✅ MIME 타입
           }));
+
         createData.data.TodosFile = {
           create: fileRecords,
         };

@@ -5,8 +5,12 @@ export const FileDetailsSchema = z.object({
   uid: z.string().optional(),
   todoId: z.string().optional(),
   name: z.string().optional(),
-  url: z.string().optional(),
-  previewUrl: z.string().optional(),
+  originalName: z.string(), // 원본 파일명
+  url: z.string(), // 서버 경로
+  previewUrl: z.string().optional(), // 미리보기 URL (선택)
+  size: z.number(), // 파일 크기 (bytes)
+  ext: z.string(), // 확장자 (예: pdf, jpg)
+  type: z.string(), // MIME 타입 (예: image/jpeg)
 });
 
 export const OptionDetailsSchema = (messages: Record<string, any>) =>

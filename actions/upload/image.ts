@@ -11,6 +11,10 @@ type UploadResult = {
   files?: Array<{
     fileUrl: string;
     fileName: string;
+    originalName: string;
+    size: number;
+    ext: string;
+    type: string;
   }>;
 };
 
@@ -20,6 +24,10 @@ interface UploadResponseData {
   files?: Array<{
     fileUrl: string;
     fileName: string;
+    originalName: string;
+    size: number;
+    ext: string;
+    type: string;
   }>;
 }
 
@@ -90,6 +98,10 @@ export const imageUploadAction = async (
           files: responseData.files.map((fileInfo) => ({
             fileUrl: fileInfo.fileUrl,
             fileName: fileInfo.fileName,
+            originalName: fileInfo.originalName, // ✅ 원본 파일명
+            size: fileInfo.size, // ✅ 파일 크기 (bytes)
+            ext: fileInfo.ext, // ✅ 확장자명 (pdf, jpg, zip 등)
+            type: fileInfo.type, // ✅ MIME 타입 (application/pdf 등)
           })),
         };
       }

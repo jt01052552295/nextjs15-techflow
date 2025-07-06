@@ -343,7 +343,14 @@ model TodosFile {
   uid    String @unique @default(uuid())
   todoId String
   name   String
+  originalName  String              // ✅ 원본 파일명
   url    String @db.VarChar(255)
+  size          Int                  // ✅ 파일 크기 (bytes)
+  ext           String   @db.VarChar(10)  // ✅ 확장자명
+  type          String   @db.VarChar(50)  // ✅ MIME 타입
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
   Todos  Todos  @relation(fields: [todoId], references: [uid], onDelete: Cascade)
 
   @@index([todoId], map: "todoId_index")

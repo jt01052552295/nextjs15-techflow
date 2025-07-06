@@ -119,7 +119,11 @@ export const updateAction = async (data: UpdateTodosType) => {
         const fileRecords = newFiles.map((file) => ({
           //todoId: uid,
           name: file.name,
+          originalName: file.originalName, // ✅ 원본 파일명
           url: file.url,
+          size: file.size, // ✅ 파일 크기
+          ext: file.ext, // ✅ 확장자
+          type: file.type, // ✅ MIME 타입
         }));
         createData.data.TodosFile = {
           create: fileRecords,
