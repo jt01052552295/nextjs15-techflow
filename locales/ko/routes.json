@@ -150,6 +150,24 @@
       "desc": "할일수정"
     }
   },
+  "practice": {
+    "index": {
+      "name": "RQ",
+      "desc": "목록"
+    },
+    "create": {
+      "name": "Create",
+      "desc": "생성"
+    },
+    "show": {
+      "name": "Show",
+      "desc": "보기"
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": "수정"
+    }
+  },
   "carbonpoint": {
     "index": {
       "name": "탄소포인트",

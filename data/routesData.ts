@@ -29,6 +29,12 @@ export const routesData = {
     show: '/todos/{id}',
     edit: '/todos/{id}/edit',
   },
+  practice: {
+    index: '/practice',
+    create: '/practice/create',
+    show: '/practice/{id}',
+    edit: '/practice/{id}/edit',
+  },
   user: {
     index: '/user',
     create: '/user/p/create',

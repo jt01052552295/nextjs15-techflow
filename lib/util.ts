@@ -1,3 +1,14 @@
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+type DayjsArguType = Parameters<typeof dayjs>;
+export const dayjsWithTimezone = (...args: DayjsArguType) =>
+  dayjs(...args).tz('Asia/Seoul');
+
 type StringType =
   | 'numeric'
   | 'alphanumericLower'
@@ -222,4 +233,18 @@ export const isValidFileType = (file: File, accept: string): boolean => {
 
     return file.type === type;
   });
+};
+
+/** base64url helpers */
+export const b64e = (o: any) =>
+  Buffer.from(JSON.stringify(o))
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+
+export const b64d = (s: string) => {
+  const pad = s.length % 4 ? '='.repeat(4 - (s.length % 4)) : '';
+  const b64 = s.replace(/-/g, '+').replace(/_/g, '/') + pad;
+  return JSON.parse(Buffer.from(b64, 'base64').toString('utf8'));
 };

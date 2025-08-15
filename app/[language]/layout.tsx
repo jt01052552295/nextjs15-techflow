@@ -9,6 +9,7 @@ import { Toaster } from 'sonner';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import { ThemeProvider } from '@/components/context/ThemeProvider';
+
 config.autoAddCss = false;
 
 export async function generateMetadata({
