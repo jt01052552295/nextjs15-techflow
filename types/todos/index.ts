@@ -35,8 +35,9 @@ export interface ITodosComment {
   updatedAt: Date;
   likeCount: number;
   replyCount: number;
-  liked?: boolean;
   user?: IUserMini;
+  isMine?: boolean;
+  isLiked?: boolean;
 }
 export type ITodosCommentPart = Partial<ITodosComment>;
 

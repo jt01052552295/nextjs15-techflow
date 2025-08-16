@@ -322,6 +322,9 @@ model TodosComment {
   likes TodosCommentLike[]
 
   @@index([todoId], map: "todoId_index")
+  @@index([todoId, parentIdx, createdAt])
+  @@index([todoId, parentIdx, likeCount, createdAt])
+  @@index([todoId, parentIdx, replyCount, createdAt])
   @@map("ec_todosComments")
 }
 
