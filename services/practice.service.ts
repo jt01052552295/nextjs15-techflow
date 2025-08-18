@@ -1,4 +1,4 @@
-import prisma from '@/lib/prisma';
+import prisma, { captureQueries } from '@/lib/prisma';
 import { type Prisma } from '@prisma/client';
 import { b64e, b64d } from '@/lib/util';
 import type {
@@ -20,6 +20,7 @@ import type { UpdateType } from '@/actions/practice/update/schema';
  */
 export async function list(params: ListParams = {}): Promise<ListResult> {
   const {
+    q,
     name,
     email,
     dateType,
@@ -45,11 +46,17 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
     ...(typeof isVisible === 'boolean' && { isVisible }),
   };
 
-  const filteredWhere: Prisma.TodosWhereInput = {
-    ...baseWhere,
-    ...(name?.trim() ? { name: { contains: name.trim() } } : {}),
-    ...(email?.trim() ? { email: { contains: email.trim() } } : {}),
-  };
+  // 통합 검색(q)이 들어오면 name/email OR 매칭. 없으면 기존 name/email 개별 필드 사용
+  const filteredWhere: Prisma.TodosWhereInput = q
+    ? {
+        ...baseWhere,
+        OR: [{ name: { contains: q } }, { email: { contains: q } }],
+      }
+    : {
+        ...baseWhere,
+        ...(name?.trim() ? { name: { contains: name.trim() } } : {}),
+        ...(email?.trim() ? { email: { contains: email.trim() } } : {}),
+      };
 
   if (dateType && (startDate || endDate)) {
     const gte = startDate ? new Date(startDate) : undefined;
@@ -98,24 +105,30 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
     ? { AND: [filteredWhere, keysetWhere] }
     : filteredWhere;
 
-  const rows = await prisma.todos.findMany({
-    where: whereForPage,
-    orderBy,
-    take: safeLimit + 1, // +1로 다음 페이지 유무 확인
-    include: {
-      _count: {
-        select: {
-          TodosComment: true,
-          TodosFile: true,
-          TodosOption: true,
+  const { result: rows, logs } = await captureQueries(() =>
+    prisma.todos.findMany({
+      where: whereForPage,
+      orderBy,
+      take: safeLimit + 1,
+      include: {
+        _count: {
+          select: { TodosComment: true, TodosFile: true, TodosOption: true },
         },
+        TodosFile: { orderBy: { createdAt: 'desc' }, take: 1 },
       },
-      TodosFile: {
-        orderBy: { createdAt: 'desc' },
-        take: 1,
-      },
-    },
-  });
+    }),
+  );
+
+  if (process.env.NODE_ENV !== 'production') {
+    for (const { query, params, duration } of logs) {
+      let parsed: unknown = params;
+      try {
+        parsed = JSON.parse(params);
+      } catch {}
+      console.log('[SQL]', query);
+      console.log('      params:', parsed, `(${duration}ms)`);
+    }
+  }
 
   const hasMore = rows.length > safeLimit;
   const items = hasMore ? rows.slice(0, safeLimit) : rows;

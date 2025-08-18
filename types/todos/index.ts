@@ -23,6 +23,18 @@ export interface ITodos {
 }
 export type ITodosPart = Partial<ITodos>;
 
+export type ITodosCounts = {
+  TodosComment: number;
+  TodosFile: number;
+  TodosOption: number;
+};
+
+export type ITodosListRow = ITodos & {
+  createdAt: string; // DTO에서 ISO 문자열로 변환
+  updatedAt: string; // DTO에서 ISO 문자열로 변환
+  _count: ITodosCounts;
+};
+
 export interface ITodosComment {
   idx: number;
   uid: string;

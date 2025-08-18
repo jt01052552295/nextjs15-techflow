@@ -248,3 +248,51 @@ export const b64d = (s: string) => {
   const b64 = s.replace(/-/g, '+').replace(/_/g, '/') + pad;
   return JSON.parse(Buffer.from(b64, 'base64').toString('utf8'));
 };
+
+export function fmt(dateISO?: string) {
+  if (!dateISO) return '';
+  return new Date(dateISO).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+}
+
+// ─────────────────────────────────────────────
+// 공통 타입/유틸
+// ─────────────────────────────────────────────
+type DateInput = string | Date | null | undefined;
+
+type CommonOpts = {
+  tz?: string; // 기본 'Asia/Seoul'
+  pad?: boolean; // 2자리 패딩(월/일/시/분/초)
+  sep?: '.' | '-' | '/'; // 날짜 구분자
+};
+
+type DateTimeOpts = CommonOpts & { hour12?: boolean };
+
+/** YYYY.M.D 또는 YYYY.MM.DD (pad 옵션) */
+export function fmtDateD(input: DateInput, opts: CommonOpts = {}) {
+  if (!input) return '';
+  const { tz = 'Asia/Seoul', pad = false, sep = '.' } = opts;
+
+  const d = dayjs(input).tz(tz);
+  if (!d.isValid()) return '';
+
+  // pad=false → M/D, pad=true → MM/DD
+  const md = pad ? 'MM' : 'M';
+  const dd = pad ? 'DD' : 'D';
+  return `${d.format('YYYY')}${sep} ${d.format(md)}${sep} ${d.format(dd)}`;
+}
+
+/** YYYY.M.D HH:mm:ss (hour12 옵션 지원: '오전/오후 h:mm:ss') */
+export function fmtDateTimeD(input: DateInput, opts: DateTimeOpts = {}) {
+  if (!input) return '';
+  const { tz = 'Asia/Seoul', pad = true, sep = '.', hour12 = false } = opts;
+
+  const d = dayjs(input).tz(tz);
+  if (!d.isValid()) return '';
+
+  const md = pad ? 'MM' : 'M';
+  const dd = pad ? 'DD' : 'D';
+  const datePart = `${d.format('YYYY')}${sep} ${d.format(md)}${sep} ${d.format(dd)}`;
+
+  const timePart = hour12 ? d.format('A h:mm:ss') : d.format('HH:mm:ss');
+  return `${datePart} ${timePart}`;
+}

@@ -37,6 +37,12 @@ const Navigation = () => {
       route: 'todos.index',
       subMenus: [],
     },
+    {
+      id: 'Practice',
+      icon: faUser,
+      route: 'practice.index',
+      subMenus: [],
+    },
     // {
     //   id: 'members',
     //   icon: faUser,

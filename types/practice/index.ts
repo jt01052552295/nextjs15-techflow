@@ -1,4 +1,4 @@
-import type { ITodosCommentPart } from '@/types/todos';
+import type { ITodosPart, ITodosCommentPart } from '@/types/todos';
 
 export type SortBy =
   | 'idx'
@@ -11,6 +11,7 @@ export type SortBy =
 export type SortOrder = 'asc' | 'desc';
 
 export type ListParams = {
+  q?: string;
   name?: string;
   email?: string;
   dateType?: 'createdAt' | 'updatedAt';
@@ -33,7 +34,7 @@ export type ListParams = {
   cursor?: string | null;
 };
 
-export type ListResult<T = any> = {
+export type ListResult<T = ITodosPart> = {
   items: T[];
   nextCursor?: string;
   totalAll: number;

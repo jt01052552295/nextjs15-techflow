@@ -1,44 +1,52 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 
-// 싱글톤 패턴 함수
-const prismaClientSingleton = () => {
-  // 로깅 옵션을 사용하여 PrismaClient 생성
-  return new PrismaClient({
-    log:
-      process.env.NODE_ENV !== 'production'
-        ? [
-            {
-              emit: 'event',
-              level: 'query',
-            },
-            'info',
-            'warn',
-            'error',
-          ]
-        : [],
+// 1) 옵션에 query 이벤트 방출 켜기
+const prismaClientSingleton = () =>
+  new PrismaClient({
+    log: [{ level: 'query', emit: 'event' }],
   });
-};
 
-// Next.js를 위한 전역 타입 정의
+// 2) 전역 타입을 "생성 함수의 반환 타입"으로 보존
 declare global {
-  var prisma: PrismaClient | undefined;
+  // eslint-disable-next-line no-var
+  var prisma: ReturnType<typeof prismaClientSingleton> | undefined;
 }
 
-// 전역에 저장된 prisma 인스턴스 사용 또는 새로 생성
-const prisma = global.prisma || prismaClientSingleton();
+// 3) 싱글톤
+const prisma = globalThis.prisma ?? prismaClientSingleton();
+if (!globalThis.prisma) globalThis.prisma = prisma;
 
-// 개발 환경에서 이벤트 리스너 추가
-if (process.env.NODE_ENV !== 'production') {
-  // 타입 단언 사용 - Prisma의 타입 시스템 제한 때문
-  (prisma as any).$on('query', (e: any) => {
-    console.log('SQL:');
-    console.log('Query:', e.query);
-    console.log('Params:', e.params);
-    console.log('Duration:', e.duration, 'ms');
-    console.log('-----------------------------------');
-  });
+// 4) 해당 구간만 쿼리 캡처 유틸
+export type QueryLog = { query: string; params: string; duration: number };
 
-  global.prisma = prisma;
+let CAPTURE = false;
+let BUFFER: QueryLog[] = [];
+let FILTER: ((e: Prisma.QueryEvent) => boolean) | null = null;
+
+// 전역 리스너 (옵션 보존으로 'query'가 정상 인식됨)
+prisma.$on('query', (e) => {
+  if (!CAPTURE) return;
+  if (FILTER && !FILTER(e)) return;
+  BUFFER.push({ query: e.query, params: e.params, duration: e.duration });
+});
+
+export async function captureQueries<T>(
+  fn: () => Promise<T>,
+  opts?: { filter?: (e: Prisma.QueryEvent) => boolean },
+): Promise<{ result: T; logs: QueryLog[] }> {
+  const prevCapture = CAPTURE;
+  const prevFilter = FILTER;
+  CAPTURE = true;
+  FILTER = opts?.filter ?? null;
+  BUFFER = [];
+  try {
+    const result = await fn();
+    return { result, logs: [...BUFFER] };
+  } finally {
+    CAPTURE = prevCapture;
+    FILTER = prevFilter;
+    BUFFER = [];
+  }
 }
 
 export default prisma;

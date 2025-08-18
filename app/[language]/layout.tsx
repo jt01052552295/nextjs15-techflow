@@ -9,6 +9,7 @@ import { Toaster } from 'sonner';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import { ThemeProvider } from '@/components/context/ThemeProvider';
+import RQProvider from '@/components/util/RQProvider';
 
 config.autoAddCss = false;
 
@@ -59,22 +60,24 @@ export default async function RootLayout({
       <AuthProvider>
         <html lang={language} suppressHydrationWarning>
           <body>
-            <ThemeProvider
-              enableSystem={false}
-              attribute="data-bs-theme"
-              disableTransitionOnChange
-            >
-              <InstallBootstrap />
-              {children}
-              <Toaster
-                closeButton
-                richColors
-                position="top-center"
-                expand={false}
-                visibleToasts={1}
-                duration={3000}
-              />
-            </ThemeProvider>
+            <RQProvider>
+              <ThemeProvider
+                enableSystem={false}
+                attribute="data-bs-theme"
+                disableTransitionOnChange
+              >
+                <InstallBootstrap />
+                {children}
+                <Toaster
+                  closeButton
+                  richColors
+                  position="top-center"
+                  expand={false}
+                  visibleToasts={1}
+                  duration={3000}
+                />
+              </ThemeProvider>
+            </RQProvider>
           </body>
         </html>
       </AuthProvider>
