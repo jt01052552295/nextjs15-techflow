@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState, useId } from 'react';
-import type { PracticeBaseParams } from '@/types/practice/search';
+import { DEFAULTS, type PracticeBaseParams } from '@/types/practice/search';
 
 type Props = {
   value: PracticeBaseParams; // 현재 URL에서 온 값
@@ -44,6 +44,68 @@ export default function SearchForm({
     onApply(next);
   };
 
+  // ───────── 버튼 라벨 (항상 "적용값 value" 기준!) ─────────
+  const dateBtnLabel = (() => {
+    if (!value.dateType && !value.startDate && !value.endDate)
+      return '날짜·기간';
+    const type =
+      value.dateType === 'createdAt'
+        ? '작성일'
+        : value.dateType === 'updatedAt'
+          ? '수정일'
+          : '날짜';
+    const range =
+      value.startDate || value.endDate
+        ? ` ${value.startDate ?? '..'}~${value.endDate ?? '..'}`
+        : '';
+    return `${type}${range}`;
+  })();
+
+  const isUseBtnLabel =
+    value.isUse === undefined ? '사용' : value.isUse ? '사용(ON)' : '미사용';
+
+  const isVisibleBtnLabel =
+    value.isVisible === undefined
+      ? '노출'
+      : value.isVisible
+        ? '노출(ON)'
+        : '비노출';
+
+  const sortBtnLabel = (() => {
+    const map: Record<string, string> = {
+      createdAt: '작성일',
+      updatedAt: '수정일',
+      idx: 'IDX',
+      name: '이름',
+      email: '이메일',
+      sortOrder: '정렬값',
+    };
+    const by = map[value.sortBy ?? DEFAULTS.sortBy!] ?? '작성일';
+    const arrow = (value.order ?? DEFAULTS.order) === 'desc' ? '↓' : '↑';
+    return `${by} ${arrow}`;
+  })();
+
+  const limitBtnLabel = `${value.limit ?? DEFAULTS.limit}개`;
+
+  // ───────── 각 부분필터 "초기화"(편집값만 리셋; 적용은 확인 버튼에서) ─────────
+  const resetDate = () =>
+    setF((prev) => ({
+      ...prev,
+      dateType: undefined,
+      startDate: undefined,
+      endDate: undefined,
+    }));
+  const resetUse = () => setF((prev) => ({ ...prev, isUse: undefined }));
+  const resetVisible = () =>
+    setF((prev) => ({ ...prev, isVisible: undefined }));
+  const resetSort = () =>
+    setF((prev) => ({
+      ...prev,
+      sortBy: DEFAULTS.sortBy,
+      order: DEFAULTS.order,
+    }));
+  const resetLimit = () => setF((prev) => ({ ...prev, limit: DEFAULTS.limit }));
+
   return (
     <div className="mb-3">
       <div className="d-flex gap-2">
@@ -81,7 +143,7 @@ export default function SearchForm({
           data-bs-toggle="offcanvas"
           data-bs-target="#of-date"
         >
-          날짜·기간
+          {dateBtnLabel}
         </button>
         <button
           className="btn btn-outline-primary"
@@ -89,7 +151,7 @@ export default function SearchForm({
           data-bs-toggle="offcanvas"
           data-bs-target="#of-isUse-single"
         >
-          사용
+          {isUseBtnLabel}
         </button>
         <button
           className="btn btn-outline-primary"
@@ -97,7 +159,7 @@ export default function SearchForm({
           data-bs-toggle="offcanvas"
           data-bs-target="#of-isVisible-single"
         >
-          노출
+          {isVisibleBtnLabel}
         </button>
         <button
           className="btn btn-outline-primary"
@@ -105,7 +167,7 @@ export default function SearchForm({
           data-bs-toggle="offcanvas"
           data-bs-target="#of-sort-single"
         >
-          정렬
+          {sortBtnLabel}
         </button>
         <button
           className="btn btn-outline-primary"
@@ -113,7 +175,7 @@ export default function SearchForm({
           data-bs-toggle="offcanvas"
           data-bs-target="#of-limit-single"
         >
-          페이지크기
+          {limitBtnLabel}
         </button>
 
         <button
@@ -514,9 +576,16 @@ export default function SearchForm({
             </div>
           </div>
 
-          <div className="d-grid">
+          <div className="d-flex gap-2">
             <button
-              className="btn btn-primary"
+              className="btn btn-outline-secondary"
+              type="button"
+              onClick={resetDate}
+            >
+              초기화
+            </button>
+            <button
+              className="btn btn-primary ms-auto"
               type="button"
               data-bs-dismiss="offcanvas"
               onClick={apply}
@@ -593,9 +662,16 @@ export default function SearchForm({
             </label>
           </div>
 
-          <div className="d-grid mt-3">
+          <div className="d-flex gap-2 mt-3">
             <button
-              className="btn btn-primary"
+              className="btn btn-outline-secondary"
+              type="button"
+              onClick={resetUse}
+            >
+              초기화
+            </button>
+            <button
+              className="btn btn-primary ms-auto"
               type="button"
               data-bs-dismiss="offcanvas"
               onClick={apply}
@@ -672,9 +748,16 @@ export default function SearchForm({
             </label>
           </div>
 
-          <div className="d-grid mt-3">
+          <div className="d-flex gap-2 mt-3">
             <button
-              className="btn btn-primary"
+              className="btn btn-outline-secondary"
+              type="button"
+              onClick={resetVisible}
+            >
+              초기화
+            </button>
+            <button
+              className="btn btn-primary ms-auto"
               type="button"
               data-bs-dismiss="offcanvas"
               onClick={apply}
@@ -752,9 +835,16 @@ export default function SearchForm({
               </div>
             </div>
           </div>
-          <div className="d-grid mt-3">
+          <div className="d-flex gap-2 mt-3">
             <button
-              className="btn btn-primary"
+              className="btn btn-outline-secondary"
+              type="button"
+              onClick={resetSort}
+            >
+              초기화
+            </button>
+            <button
+              className="btn btn-primary ms-auto"
               type="button"
               data-bs-dismiss="offcanvas"
               onClick={apply}
@@ -804,9 +894,16 @@ export default function SearchForm({
             ))}
           </div>
 
-          <div className="d-grid mt-3">
+          <div className="d-flex gap-2 mt-3">
             <button
-              className="btn btn-primary"
+              className="btn btn-outline-secondary"
+              type="button"
+              onClick={resetLimit}
+            >
+              초기화
+            </button>
+            <button
+              className="btn btn-primary ms-auto"
               type="button"
               data-bs-dismiss="offcanvas"
               onClick={apply}

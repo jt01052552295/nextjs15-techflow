@@ -23,7 +23,6 @@ type Props = {
 
 const ListRow = ({ row }: Props) => {
   const { locale } = useLanguage();
-
   const router = useRouter();
 
   //   const showUrl = getRouteUrl('todos.show', locale, { id: row.uid });
