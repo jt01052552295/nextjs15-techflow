@@ -80,7 +80,7 @@ export default function SearchForm({
       email: '이메일',
       sortOrder: '정렬값',
     };
-    const by = map[value.sortBy ?? DEFAULTS.sortBy!] ?? '작성일';
+    const by = map[value.sortBy ?? DEFAULTS.sortBy!] ?? '정렬값';
     const arrow = (value.order ?? DEFAULTS.order) === 'desc' ? '↓' : '↑';
     return `${by} ${arrow}`;
   })();
@@ -394,7 +394,7 @@ export default function SearchForm({
               <div className="col">
                 <select
                   className="form-select"
-                  value={f.sortBy ?? 'createdAt'}
+                  value={f.sortBy ?? 'sortOrder'}
                   onChange={(e) =>
                     setF({ ...f, sortBy: e.target.value as any })
                   }
@@ -791,7 +791,7 @@ export default function SearchForm({
             <div className="col">
               <select
                 className="form-select"
-                value={f.sortBy ?? 'createdAt'}
+                value={f.sortBy ?? 'sortOrder'}
                 onChange={(e) => setF({ ...f, sortBy: e.target.value as any })}
               >
                 <option value="createdAt">작성일</option>

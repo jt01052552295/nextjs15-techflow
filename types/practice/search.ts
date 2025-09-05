@@ -4,7 +4,7 @@ import type { ListParams } from '@/types/practice';
 export type PracticeBaseParams = Omit<ListParams, 'cursor'>;
 
 export const DEFAULTS: PracticeBaseParams = {
-  sortBy: 'createdAt',
+  sortBy: 'sortOrder',
   order: 'desc',
   limit: 20,
 };
@@ -77,7 +77,7 @@ export function isSameBaseParams(a: PracticeBaseParams, b: PracticeBaseParams) {
     norm(a.endDate) === norm(b.endDate) &&
     (a.isUse ?? null) === (b.isUse ?? null) &&
     (a.isVisible ?? null) === (b.isVisible ?? null) &&
-    (a.sortBy ?? 'createdAt') === (b.sortBy ?? 'createdAt') &&
+    (a.sortBy ?? 'sortOrder') === (b.sortBy ?? 'sortOrder') &&
     (a.order ?? 'desc') === (b.order ?? 'desc') &&
     (a.limit ?? 20) === (b.limit ?? 20)
   );

@@ -29,7 +29,7 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
     isUse,
     isVisible,
 
-    sortBy = 'createdAt',
+    sortBy = 'sortOrder',
     order = 'desc',
 
     limit = 20,

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import type { ITodosListRow, ITodosFilterType } from '@/types/todos';
+import type { ITodos, ITodosListRow, ITodosFilterType } from '@/types/todos';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -19,9 +19,12 @@ import { useListMemory } from '@/hooks/useListMemory';
 
 type Props = {
   row: ITodosListRow;
+  setSelectedRow: (row: ITodos) => void;
+  isChecked: boolean;
+  onCheck: (uid: string, checked: boolean) => void;
 };
 
-const ListRow = ({ row }: Props) => {
+const ListRow = ({ row, setSelectedRow, isChecked, onCheck }: Props) => {
   const { locale } = useLanguage();
   const router = useRouter();
 
@@ -41,9 +44,11 @@ const ListRow = ({ row }: Props) => {
           type="checkbox"
           id={`checkedRow${row.idx}`}
           autoComplete="off"
+          checked={isChecked}
+          onChange={(e) => onCheck(row.uid, e.target.checked)}
         />
         <label className="btn border-0 p-0" htmlFor={`checkedRow${row.idx}`}>
-          <FontAwesomeIcon icon={faSquare} />
+          <FontAwesomeIcon icon={isChecked ? faSquareCheck : faSquare} />
           &nbsp;
           {row.idx}
         </label>
@@ -81,7 +86,7 @@ const ListRow = ({ row }: Props) => {
             className="btn btn-danger btn-sm"
             data-bs-toggle="modal"
             data-bs-target={`#confirmDeleteModal`}
-            onClick={() => console.log('123')}
+            onClick={() => setSelectedRow(row)}
           >
             <FontAwesomeIcon icon={faTrash} />
           </button>

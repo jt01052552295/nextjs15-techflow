@@ -1,4 +1,5 @@
 'use client';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useLanguage } from '@/components/context/LanguageContext';
@@ -6,7 +7,7 @@ import { getRouteUrl } from '@/utils/routes';
 import { usePracticeInfinite } from '@/hooks/react-query/usePractice';
 import ListRowSkeleton from './ListRowSkeleton';
 import ListRow from './ListRow';
-import type { ITodosListRow } from '@/types/todos';
+import type { ITodos, ITodosListRow } from '@/types/todos';
 import ScrollToTopButton from '../common/ScrollToTopButton';
 
 import {
@@ -16,10 +17,29 @@ import {
   type PracticeBaseParams,
 } from '@/types/practice/search';
 import SearchForm from './SearchForm';
+import { listUpdateAction } from '@/actions/practice/list/update';
+import { listSortAction } from '@/actions/practice/list/sort';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faCaretUp,
+  faCaretDown,
+  faSquareCheck,
+  faTrash,
+  faArrowUpWideShort,
+  faArrowUp,
+  faArrowDown,
+  faArrowDownWideShort,
+  faPlus,
+} from '@fortawesome/free-solid-svg-icons';
+import { faSquare } from '@fortawesome/free-regular-svg-icons';
+import { toast } from 'sonner';
+import DeleteConfirmModal from './modal/DeleteConfirmModal';
 
 type Props = { baseParams: PracticeBaseParams };
 
 const ListForm = ({ baseParams }: Props) => {
+  const queryClient = useQueryClient();
   const { locale, t } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
@@ -83,6 +103,46 @@ const ListForm = ({ baseParams }: Props) => {
     return () => io.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  const [selectedRow, setSelectedRow] = useState<ITodos | null>(null);
+  const [selectedUids, setSelectedUids] = useState<string[]>([]);
+  const isSingleSelected = selectedUids.length === 1;
+  const [checkAll, setCheckAll] = useState(false);
+  const [modalType, setModalType] = useState<'single' | 'bulk'>('single');
+
+  const handleCheck = (uid: string, checked: boolean) => {
+    setSelectedUids((prev) =>
+      checked ? [...prev, uid] : prev.filter((id) => id !== uid),
+    );
+  };
+
+  const handleCheckAll = (checked: boolean) => {
+    setCheckAll(checked);
+    if (checked) {
+      setSelectedUids(items.map((item) => item.uid));
+    } else {
+      setSelectedUids([]);
+    }
+  };
+
+  const handleMove = async (direction: 'up' | 'down' | 'top' | 'bottom') => {
+    if (selectedUids.length !== 1) {
+      toast.warning(t('common.sort_single_only'));
+      return;
+    }
+
+    const selectedUid = selectedUids[0];
+    // console.log(selectedUid, direction);
+
+    const res = await listSortAction(selectedUid, direction);
+    console.log(res);
+    if (res.status === 'success') {
+      queryClient.invalidateQueries({ queryKey: ['practice', params] });
+      toast.success(res.message);
+    } else {
+      toast.error(res.message);
+    }
+  };
+
   return (
     <div className="position-relative">
       <SearchForm
@@ -103,6 +163,97 @@ const ListForm = ({ baseParams }: Props) => {
         </button>
       </div>
 
+      <div className="col-12">
+        <div className="row mb-3">
+          <div className="col-12">
+            <div className="row justify-content-between align-items-center">
+              <div className="col-auto ">
+                <div className="mailbox-controls">
+                  <div className="btn-group">
+                    <input
+                      className="btn-check"
+                      type="checkbox"
+                      id="checkAll"
+                      autoComplete="off"
+                      onChange={(e) => handleCheckAll(e.target.checked)}
+                    />
+                    <label className="btn border-0  p-1" htmlFor="checkAll">
+                      <FontAwesomeIcon
+                        icon={checkAll ? faSquareCheck : faSquare}
+                      />{' '}
+                      {t('common.select_all')}
+                    </label>
+                  </div>
+
+                  <div className="btn-group">
+                    <button
+                      type="button"
+                      className="btn btn-default btn-sm"
+                      data-bs-toggle="modal"
+                      data-bs-target="#confirmDeleteModal"
+                      onClick={() => {
+                        setSelectedRow(null);
+                        setModalType('bulk');
+                      }}
+                      disabled={selectedUids.length === 0}
+                    >
+                      <FontAwesomeIcon icon={faTrash} />{' '}
+                      {t('common.delete_selected')}
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="col-auto">
+                <button
+                  type="button"
+                  className="btn border-0  p-1"
+                  onClick={() => handleMove('top')}
+                  disabled={!isSingleSelected}
+                >
+                  <FontAwesomeIcon
+                    icon={faArrowUpWideShort}
+                    title={t('common.move_top')}
+                  />
+                </button>
+                <button
+                  type="button"
+                  className="btn border-0  p-1"
+                  onClick={() => handleMove('up')}
+                  disabled={!isSingleSelected}
+                >
+                  <FontAwesomeIcon
+                    icon={faArrowUp}
+                    title={t('common.move_up')}
+                  />
+                </button>
+                <button
+                  type="button"
+                  className="btn border-0  p-1"
+                  onClick={() => handleMove('down')}
+                  disabled={!isSingleSelected}
+                >
+                  <FontAwesomeIcon
+                    icon={faArrowDown}
+                    title={t('common.move_down')}
+                  />
+                </button>
+                <button
+                  type="button"
+                  className="btn border-0  p-1"
+                  onClick={() => handleMove('bottom')}
+                  disabled={!isSingleSelected}
+                >
+                  <FontAwesomeIcon
+                    icon={faArrowDownWideShort}
+                    title={t('common.move_bottom')}
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="table-responsive">
         <table className="table table-striped table-hover">
           <thead>
@@ -120,7 +271,13 @@ const ListForm = ({ baseParams }: Props) => {
           <tbody>
             {!isLoading &&
               items.map((row: ITodosListRow) => (
-                <ListRow key={row.idx} row={row} />
+                <ListRow
+                  key={row.idx}
+                  row={row}
+                  setSelectedRow={setSelectedRow}
+                  isChecked={selectedUids.includes(row.uid)}
+                  onCheck={handleCheck}
+                />
               ))}
             {isLoading &&
               [...Array(20)].map((_, i) => (
@@ -146,6 +303,39 @@ const ListForm = ({ baseParams }: Props) => {
 
       {/* 자동 로딩 */}
       <div ref={sentinelRef} style={{ height: 1 }} />
+
+      <DeleteConfirmModal
+        row={modalType === 'single' ? selectedRow : null}
+        uids={modalType === 'bulk' ? selectedUids : []}
+        onDeleted={(deletedUids) => {
+          // 1. 먼저 캐시 직접 업데이트
+          queryClient.setQueryData(['practice', params], (oldData: any) => {
+            if (!oldData) return oldData;
+
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page: any) => ({
+                ...page,
+                items: page.items.filter(
+                  (item: any) => !deletedUids.includes(item.uid),
+                ),
+                totalAll: Math.max(0, page.totalAll - deletedUids.length),
+                totalFiltered: Math.max(
+                  0,
+                  page.totalFiltered - deletedUids.length,
+                ),
+              })),
+            };
+          });
+          // 2. 그 다음 백그라운드에서 데이터 다시 불러오기 (정확한 데이터 갱신)
+          queryClient.invalidateQueries({ queryKey: ['practice', params] });
+
+          setSelectedUids([]);
+          setSelectedRow(null);
+          setCheckAll(false);
+          toast.success(t('common.delete_success'));
+        }}
+      />
 
       <ScrollToTopButton />
     </div>
