@@ -13,7 +13,17 @@ export async function createAction(data: CreateType) {
 
   const parsed = CreateSchema(dict.common.form).safeParse(data);
   if (!parsed.success) {
-    return { status: 'error', message: missingFields };
+    const errorDetails = parsed.error.errors.map((err) => ({
+      path: err.path.join('.'),
+      message: err.message,
+    }));
+    return {
+      status: 'error',
+      message: missingFields,
+      error: 'validation_error',
+      data,
+      errorDetails,
+    };
   }
 
   try {

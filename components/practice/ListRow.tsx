@@ -15,26 +15,43 @@ import EditableCell from './EditableCell';
 import { useLanguage } from '@/components/context/LanguageContext';
 import { getRouteUrl } from '@/utils/routes';
 import { useSearchParams } from 'next/navigation';
-import { useListMemory } from '@/hooks/useListMemory';
 
 type Props = {
   row: ITodosListRow;
   setSelectedRow: (row: ITodos) => void;
   isChecked: boolean;
   onCheck: (uid: string, checked: boolean) => void;
+  onFieldSave: (
+    uid: string,
+    field: 'name' | 'email',
+    newValue: string,
+    onSuccess: (val: string) => void,
+    onError: () => void,
+  ) => void;
 };
 
-const ListRow = ({ row, setSelectedRow, isChecked, onCheck }: Props) => {
+const ListRow = ({
+  row,
+  setSelectedRow,
+  isChecked,
+  onCheck,
+  onFieldSave,
+}: Props) => {
   const { locale } = useLanguage();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const queryString = searchParams.toString();
 
-  //   const showUrl = getRouteUrl('todos.show', locale, { id: row.uid });
-  //   const editUrl = getRouteUrl('todos.edit', locale, { id: row.uid });
+  const showUrl = getRouteUrl('practice.show', locale, { id: row.uid });
+  const editUrl = getRouteUrl('practice.edit', locale, { id: row.uid });
 
-  //   const handleNavigate = (url: string) => {
-  //     listMemory.save({ scrollY: window.scrollY, page, filters, items }); // ✅ 일괄 저장
-  //     router.push(url);
-  //   };
+  // console.log(showUrl);
+
+  //  listMemory.save({ scrollY: window.scrollY, page, filters, items }); // ✅ 일괄 저장
+  const handleNavigate = (href: string) => {
+    if (!href || typeof href !== 'string') return; // 방어
+    router.push(href, { scroll: false });
+  };
 
   return (
     <tr key={row.idx}>
@@ -56,8 +73,22 @@ const ListRow = ({ row, setSelectedRow, isChecked, onCheck }: Props) => {
       <td className="text-center">
         <span className="badge text-bg-secondary">{row.uid}</span>
       </td>
-      <td className="text-center">{row.name}</td>
-      <td className="text-center">{row.email}</td>
+      <td className="text-center">
+        <EditableCell
+          value={row.name}
+          onSave={(newVal, onSuccess, onError) =>
+            onFieldSave(row.uid, 'name', newVal, onSuccess, onError)
+          }
+        />
+      </td>
+      <td className="text-center">
+        <EditableCell
+          value={row.email}
+          onSave={(newVal, onSuccess, onError) =>
+            onFieldSave(row.uid, 'email', newVal, onSuccess, onError)
+          }
+        />
+      </td>
       <td className="text-center">{row.createdAt}</td>
       <td className="text-center">{row.updatedAt}</td>
       <td className="text-center">
@@ -65,11 +96,15 @@ const ListRow = ({ row, setSelectedRow, isChecked, onCheck }: Props) => {
         {row._count?.TodosOption ?? 0}
       </td>
       <td className="text-center">
-        <div className="d-flex gap-1">
+        <div className="d-flex justify-content-center gap-1">
           <button
             type="button"
             className="btn btn-secondary btn-sm"
-            onClick={() => console.log('123')}
+            onClick={() =>
+              handleNavigate(
+                `${showUrl}${queryString ? `?${queryString}` : ''}`,
+              )
+            }
           >
             <FontAwesomeIcon icon={faEye} />
           </button>
@@ -77,7 +112,11 @@ const ListRow = ({ row, setSelectedRow, isChecked, onCheck }: Props) => {
           <button
             type="button"
             className="btn btn-secondary btn-sm"
-            onClick={() => console.log('123')}
+            onClick={() =>
+              handleNavigate(
+                `${editUrl}${queryString ? `?${queryString}` : ''}`,
+              )
+            }
           >
             <FontAwesomeIcon icon={faPen} />
           </button>

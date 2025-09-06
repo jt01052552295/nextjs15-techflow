@@ -143,6 +143,33 @@ const ListForm = ({ baseParams }: Props) => {
     }
   };
 
+  const handleFieldSave = async (
+    uid: string,
+    field: 'name' | 'email',
+    newValue: string,
+    onSuccess: (val: string) => void,
+    onError: () => void,
+  ) => {
+    const res = await listUpdateAction({ uid, [field]: newValue });
+
+    if (res.status === 'success') {
+      queryClient.invalidateQueries({ queryKey: ['practice', params] });
+      toast.success(res.message);
+      onSuccess(newValue);
+    } else {
+      toast.error(res.message);
+      onError();
+    }
+  };
+
+  const handleCreate = () => {
+    const baseUrl = getRouteUrl('practice.create', locale);
+    const qs = new URLSearchParams(baseParams as any).toString();
+
+    const url = qs ? `${baseUrl}?${qs}` : baseUrl;
+    router.push(url, { scroll: false });
+  };
+
   return (
     <div className="position-relative">
       <SearchForm
@@ -277,6 +304,7 @@ const ListForm = ({ baseParams }: Props) => {
                   setSelectedRow={setSelectedRow}
                   isChecked={selectedUids.includes(row.uid)}
                   onCheck={handleCheck}
+                  onFieldSave={handleFieldSave}
                 />
               ))}
             {isLoading &&
@@ -338,6 +366,28 @@ const ListForm = ({ baseParams }: Props) => {
       />
 
       <ScrollToTopButton />
+
+      <button
+        type="button"
+        onClick={handleCreate}
+        className="btn btn-secondary rounded-circle shadow position-fixed"
+        style={{
+          position: 'fixed',
+          bottom: '90px',
+          right: '30px',
+          zIndex: 51,
+          borderRadius: '50%',
+          width: '48px',
+          height: '48px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          textDecoration: 'none',
+        }}
+      >
+        <FontAwesomeIcon icon={faPlus} />
+      </button>
     </div>
   );
 };

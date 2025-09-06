@@ -6,4 +6,5 @@ export type PracticeBaseParams = Omit<ListParams, 'cursor'>;
 /** React Query QueryKey 모음 */
 export const practiceQK = {
   list: (base: PracticeBaseParams) => ['practice', 'list', base] as const,
+  detail: (uid: string) => ['practice', 'detail', uid] as const,
 };

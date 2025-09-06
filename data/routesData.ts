@@ -31,7 +31,7 @@ export const routesData = {
   },
   practice: {
     index: '/practice',
-    create: '/practice/create',
+    create: '/practice/p/create',
     show: '/practice/{id}',
     edit: '/practice/{id}/edit',
   },
