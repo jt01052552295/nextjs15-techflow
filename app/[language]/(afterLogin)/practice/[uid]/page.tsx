@@ -7,6 +7,7 @@ import PageHeader from '@/components/common/PageHeader';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import ShowForm from '@/components/practice/ShowForm';
 import { showAction } from '@/actions/practice/show';
+import { listAction as commentsAction } from '@/actions/practice/comments';
 import {
   HydrationBoundary,
   dehydrate,
@@ -46,6 +47,20 @@ export default async function Page({ params }: Props) {
   await qc.prefetchQuery({
     queryKey: practiceQK.detail(uid),
     queryFn: () => showAction(uid),
+  });
+
+  // 루트 댓글(첫 페이지만)
+  const rootBase = {
+    todoId: uid,
+    sortBy: 'createdAt',
+    order: 'desc',
+    limit: 20,
+  } as const;
+  await qc.prefetchInfiniteQuery({
+    queryKey: practiceQK.comments(rootBase),
+    queryFn: ({ pageParam }) =>
+      commentsAction({ ...rootBase, cursor: pageParam ?? null }),
+    initialPageParam: null,
   });
 
   const breadcrumbPaths = [

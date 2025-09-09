@@ -74,9 +74,16 @@ export type CommentListParams = {
   currentUserId?: string;
 };
 
-export type CommentListResult = {
-  items: ITodosCommentPart[];
-  nextCursor?: string; // b64
-  totalAll: number; // baseWhere 기준 총합
-  totalFiltered: number; // filteredWhere 기준 총합
+// export type CommentListResult = {
+//   items: ITodosCommentPart[];
+//   nextCursor?: string; // b64
+//   totalAll: number; // baseWhere 기준 총합
+//   totalFiltered: number; // filteredWhere 기준 총합
+// };
+
+export type CommentListResult<T = ITodosCommentPart> = {
+  items: T[];
+  nextCursor?: string;
+  totalAll: number;
+  totalFiltered: number;
 };

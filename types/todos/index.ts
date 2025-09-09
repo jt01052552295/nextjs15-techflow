@@ -51,6 +51,12 @@ export interface ITodosComment {
   isMine?: boolean;
   isLiked?: boolean;
 }
+
+export type ITodosCommentRow = ITodosComment & {
+  createdAt: string; // DTO에서 ISO 문자열로 변환
+  updatedAt: string; // DTO에서 ISO 문자열로 변환
+};
+
 export type ITodosCommentPart = Partial<ITodosComment>;
 
 export interface ITodosCommentLike {

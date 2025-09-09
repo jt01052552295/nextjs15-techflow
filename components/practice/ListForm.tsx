@@ -22,8 +22,6 @@ import { listSortAction } from '@/actions/practice/list/sort';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faCaretUp,
-  faCaretDown,
   faSquareCheck,
   faTrash,
   faArrowUpWideShort,

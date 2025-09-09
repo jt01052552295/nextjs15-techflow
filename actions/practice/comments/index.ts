@@ -5,7 +5,8 @@ import { getAuthSession } from '@/lib/auth-utils';
 import { getUserById } from '@/actions/user/info';
 import { __ts, getDictionary } from '@/utils/get-dictionary';
 import { ckLocale } from '@/lib/cookie';
-import { ITodosCommentPart } from '@/types/todos';
+import { ITodosCommentPart, ITodosCommentRow } from '@/types/todos';
+import type { CommentListParams, CommentListResult } from '@/types/practice';
 import { CommentSchema } from './schema';
 import {
   listComments,
@@ -15,24 +16,29 @@ import {
   deleteManyCommentsByUids,
   likeComment,
 } from '@/services/comments.service';
+import { fmtDateD } from '@/lib/util';
 
-export async function listAction(params: {
-  todoId: string;
-  orderBy?: string; // createdAt, updatedAt, likeCount, replyCount
-  order?: 'asc' | 'desc';
-  page?: number;
-  size?: number;
-}) {
-  const language = await ckLocale();
-
+export async function listAction(
+  params: CommentListParams,
+): Promise<CommentListResult<ITodosCommentRow>> {
   try {
     const rs = await listComments(params);
-    return { status: 'success', data: rs };
-  } catch (e: any) {
-    console.error(e);
-    const fail = await __ts('common.fetch_failed', {}, language);
-    return { status: 'error', message: fail, error: e?.message };
+    return {
+      ...rs,
+      items: rs.items.map(toDTO),
+    };
+  } catch (err) {
+    console.error('[listAction - comment] error:', err);
+    throw err;
   }
+}
+
+function toDTO(row: any): ITodosCommentRow {
+  return {
+    ...row,
+    createdAt: fmtDateD(row.createdAt),
+    updatedAt: fmtDateD(row.updatedAt),
+  };
 }
 
 export async function createAction(data: ITodosCommentPart) {
