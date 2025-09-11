@@ -4,18 +4,10 @@ import { useLanguage } from '@/components/context/LanguageContext';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCommentsInfinite } from '@/hooks/react-query/usePractice';
 import { ITodosCommentRow, ITodosCommentPart } from '@/types/todos';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faThumbsUp,
-  faReply,
-  faEdit,
-  faTrash,
-  faSave,
-  faTimes,
-  faSort,
-} from '@fortawesome/free-solid-svg-icons';
-import TextareaAutosize from 'react-textarea-autosize';
 import { practiceQK } from '@/lib/queryKeys/practice';
+import SortOptions from './SortOptions';
+import CommentForm from './CommentForm';
+import CommentList from './CommentList';
 
 // 댓글 생성/수정/삭제 액션 함수 가져오기
 import {
@@ -35,25 +27,31 @@ type Props = {
 };
 
 export default function CommentSection({ todoId }: Props) {
-  const { dictionary, t } = useLanguage();
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   // 상태 관리
-  const [sortBy, setSortBy] = useState<
-    'createdAt' | 'replyCount' | 'likeCount'
-  >('createdAt');
+  const [sort, setSort] = useState<{
+    by: 'createdAt' | 'replyCount' | 'likeCount';
+    order: 'asc' | 'desc';
+  }>({ by: 'createdAt', order: 'desc' });
+
   const [commentForm, setCommentForm] = useState<CommentFormData>({
     content: '',
   });
-  const [editingId, setEditingId] = useState<string | null>(null);
+
   const [replyToId, setReplyToId] = useState<number | null>(null);
 
-  const rootBase = {
-    todoId,
-    sortBy: 'createdAt',
-    order: 'desc',
-    limit: 20,
-  } as const;
+  const rootBase = useMemo(
+    () =>
+      ({
+        todoId,
+        sortBy: sort.by,
+        order: sort.order,
+        limit: 20,
+      }) as const,
+    [todoId, sort],
+  );
 
   // 댓글 목록 가져오기
   const {
@@ -68,8 +66,6 @@ export default function CommentSection({ todoId }: Props) {
     const list = commentsData?.pages.flatMap((p) => p.items) ?? [];
     return [...new Map(list.map((item) => [item.uid, item])).values()];
   }, [commentsData]);
-
-  console.log(comments);
 
   // 댓글 등록 mutation
   const createMutation = useMutation({
@@ -93,7 +89,6 @@ export default function CommentSection({ todoId }: Props) {
       queryClient.invalidateQueries({
         queryKey: practiceQK.comments(rootBase),
       });
-      setEditingId(null);
     },
   });
 
@@ -121,220 +116,83 @@ export default function CommentSection({ todoId }: Props) {
   const handleSortChange = (
     sortType: 'createdAt' | 'replyCount' | 'likeCount',
   ) => {
-    setSortBy(sortType);
+    setSort({ by: sortType, order: 'desc' });
   };
 
   // 댓글 작성 핸들러
-  const handleSubmitComment = () => {
-    if (!commentForm.content.trim()) return;
+  const handleCommentSubmit = (content: string, parentIdx?: number | null) => {
+    if (!content.trim()) return;
 
     createMutation.mutate({
-      content: commentForm.content,
-      parentIdx: replyToId || undefined,
+      content,
+      parentIdx: parentIdx || undefined,
     });
   };
 
   // 댓글 수정 핸들러
-  const handleUpdateComment = (id: string, content: string) => {
+  const handleEdit = (id: string, content: string) => {
     updateMutation.mutate({ id, content });
   };
 
-  // 답글 폼 토글
-  const toggleReplyForm = (parentIdx: number | null) => {
-    setReplyToId(parentIdx);
-    if (parentIdx) {
-      setCommentForm({ content: '', parentIdx });
+  // 댓글 삭제 핸들러
+  const handleDelete = (comment: ITodosCommentRow) => {
+    if (window.confirm(t('common.confirm_delete'))) {
+      deleteMutation.mutate(comment);
     }
   };
 
-  // 수정 모드 토글
-  const toggleEditMode = (comment: ITodosCommentRow | null) => {
-    if (comment) {
-      setEditingId(comment.uid);
-      setCommentForm({ content: comment.content });
-    } else {
-      setEditingId(null);
-    }
+  // 댓글 목록에서 부모 댓글만 필터링
+  const parentComments = useMemo(() => {
+    return comments.filter((comment) => comment.parentIdx === null);
+  }, [comments]);
+
+  // 답글 작성 핸들러
+  const handleReplyTo = (commentId: number) => {
+    setReplyToId(commentId);
+    setCommentForm({ content: '', parentIdx: commentId });
+  };
+
+  // 답글 취소 핸들러
+  const handleReplyCancel = () => {
+    setReplyToId(null);
+  };
+
+  // 좋아요 핸들러
+  const handleLike = (commentId: string) => {
+    likeMutation.mutate(commentId);
   };
 
   return (
     <div className="comment-section">
       {/* 댓글 정렬 옵션 */}
-      <div className="d-flex justify-content-end mb-3">
-        <div className="btn-group">
-          <button
-            type="button"
-            className={`btn btn-sm ${sortBy === 'createdAt' ? 'btn-primary' : 'btn-outline-primary'}`}
-            onClick={() => handleSortChange('createdAt')}
-          >
-            <FontAwesomeIcon icon={faSort} /> {t('common.createdAt')}
-          </button>
-          <button
-            type="button"
-            className={`btn btn-sm ${sortBy === 'replyCount' ? 'btn-primary' : 'btn-outline-primary'}`}
-            onClick={() => handleSortChange('replyCount')}
-          >
-            <FontAwesomeIcon icon={faSort} /> {t('common.replyCount')}
-          </button>
-          <button
-            type="button"
-            className={`btn btn-sm ${sortBy === 'likeCount' ? 'btn-primary' : 'btn-outline-primary'}`}
-            onClick={() => handleSortChange('likeCount')}
-          >
-            <FontAwesomeIcon icon={faThumbsUp} /> {t('common.likeCount')}
-          </button>
-        </div>
-      </div>
+      <SortOptions
+        sort={sort}
+        onSortChange={handleSortChange}
+        onOrderChange={(order) => setSort({ ...sort, order })}
+      />
 
       {/* 댓글 작성 폼 */}
-      <div className="comment-form mb-4">
-        <h6>
-          {replyToId ? t('common.write_reply') : t('common.write_comment')}
-        </h6>
-        <div className="d-flex">
-          <TextareaAutosize
-            className="form-control me-2"
-            placeholder={t('common.write_comment_placeholder')}
-            value={commentForm.content}
-            onChange={(e) =>
-              setCommentForm({ ...commentForm, content: e.target.value })
-            }
-            minRows={2}
-            maxRows={5}
-          />
-          <div className="d-flex flex-column">
-            <button
-              className="btn btn-primary mb-1"
-              onClick={handleSubmitComment}
-              disabled={createMutation.isPending || !commentForm.content.trim()}
-            >
-              {createMutation.isPending
-                ? t('common.submitting')
-                : t('common.submit')}
-            </button>
-            {replyToId && (
-              <button
-                className="btn btn-outline-secondary"
-                onClick={() => toggleReplyForm(null)}
-              >
-                {t('common.cancel')}
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
+      <CommentForm
+        initialContent={commentForm.content}
+        isReply={replyToId !== null}
+        replyToId={replyToId}
+        onSubmit={handleCommentSubmit}
+        onCancel={handleReplyCancel}
+        isPending={createMutation.isPending}
+      />
 
       {/* 댓글 목록 */}
-      <div className="comments-list">
-        {comments.length === 0 ? (
-          <div className="text-center text-muted py-4">
-            {t('common.no_comments')}
-          </div>
-        ) : (
-          comments.map((comment) => (
-            <div
-              key={comment.uid}
-              className={`comment-item p-3 mb-3 ${comment.parentIdx ? 'ms-4 border-start border-3' : ''} border-bottom`}
-            >
-              {editingId === comment.uid ? (
-                <div className="edit-form">
-                  <TextareaAutosize
-                    className="form-control mb-2"
-                    value={commentForm.content}
-                    onChange={(e) =>
-                      setCommentForm({
-                        ...commentForm,
-                        content: e.target.value,
-                      })
-                    }
-                    minRows={2}
-                    maxRows={5}
-                  />
-                  <div className="d-flex gap-2 justify-content-end">
-                    <button
-                      className="btn btn-sm btn-primary"
-                      onClick={() =>
-                        handleUpdateComment(comment.uid, commentForm.content)
-                      }
-                      disabled={updateMutation.isPending}
-                    >
-                      <FontAwesomeIcon icon={faSave} /> {t('common.save')}
-                    </button>
-                    <button
-                      className="btn btn-sm btn-outline-secondary"
-                      onClick={() => toggleEditMode(null)}
-                    >
-                      <FontAwesomeIcon icon={faTimes} /> {t('common.cancel')}
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <div className="d-flex justify-content-between">
-                    <div>
-                      <strong>{comment.idx}</strong>
-                    </div>
-                    <small className="text-muted">{comment.createdAt}</small>
-                  </div>
-                  <div className="mt-2 mb-3">{comment.content}</div>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div className="d-flex gap-1">
-                      <button
-                        className="btn btn-sm btn-outline-primary"
-                        onClick={() => likeMutation.mutate(comment.uid)}
-                        disabled={likeMutation.isPending}
-                      >
-                        <FontAwesomeIcon icon={faThumbsUp} />{' '}
-                        {comment.likeCount || 0}
-                      </button>
-                      {!comment.parentIdx && (
-                        <button
-                          className="btn btn-sm btn-outline-secondary"
-                          onClick={() => toggleReplyForm(comment.idx)}
-                        >
-                          <FontAwesomeIcon icon={faReply} /> {t('common.reply')}
-                        </button>
-                      )}
-                    </div>
-                    <div className="d-flex gap-1">
-                      <button
-                        className="btn btn-sm btn-outline-secondary"
-                        onClick={() => toggleEditMode(comment)}
-                      >
-                        <FontAwesomeIcon icon={faEdit} /> {t('common.edit')}
-                      </button>
-                      <button
-                        className="btn btn-sm btn-outline-danger"
-                        onClick={() => {
-                          if (window.confirm(t('common.confirm_delete'))) {
-                            deleteMutation.mutate(comment);
-                          }
-                        }}
-                        disabled={deleteMutation.isPending}
-                      >
-                        <FontAwesomeIcon icon={faTrash} /> {t('common.delete')}
-                      </button>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-          ))
-        )}
-
-        {/* 더 보기 버튼 */}
-        {hasNextPage && (
-          <div className="text-center mt-3">
-            <button
-              className="btn btn-outline-primary btn-sm"
-              onClick={() => fetchNextPage()}
-              disabled={isFetchingNextPage}
-            >
-              {isFetchingNextPage ? t('common.loading') : t('common.load_more')}
-            </button>
-          </div>
-        )}
-      </div>
+      <CommentList
+        todoId={todoId}
+        comments={parentComments}
+        onReply={handleReplyTo}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onLike={handleLike}
+        fetchNextPage={fetchNextPage}
+        hasNextPage={hasNextPage || false}
+        isFetchingNextPage={isFetchingNextPage}
+      />
     </div>
   );
 }
