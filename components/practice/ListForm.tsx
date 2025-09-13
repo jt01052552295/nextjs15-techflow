@@ -320,7 +320,7 @@ const ListForm = ({ baseParams }: Props) => {
             onClick={() => fetchNextPage()}
             disabled={isFetchingNextPage}
           >
-            {isFetchingNextPage ? t('common.loading') : '더 보기'}
+            {isFetchingNextPage ? t('common.loading') : t('common.more')}
           </button>
         ) : (
           <span className="text-muted">{t('common.all_items_loaded')}</span>

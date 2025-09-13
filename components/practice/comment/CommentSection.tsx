@@ -1,6 +1,5 @@
 'use client';
 import { useState, useMemo } from 'react';
-import { useLanguage } from '@/components/context/LanguageContext';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCommentsInfinite } from '@/hooks/react-query/usePractice';
 import { ITodosCommentRow, ITodosCommentPart } from '@/types/todos';
@@ -8,6 +7,7 @@ import { practiceQK } from '@/lib/queryKeys/practice';
 import SortOptions from './SortOptions';
 import CommentForm from './CommentForm';
 import CommentList from './CommentList';
+import CommentDeleteModal from './CommentDeleteModal';
 
 // 댓글 생성/수정/삭제 액션 함수 가져오기
 import {
@@ -27,7 +27,6 @@ type Props = {
 };
 
 export default function CommentSection({ todoId }: Props) {
-  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   // 상태 관리
@@ -41,6 +40,8 @@ export default function CommentSection({ todoId }: Props) {
   });
 
   const [replyToId, setReplyToId] = useState<number | null>(null);
+  const [commentToDelete, setCommentToDelete] =
+    useState<ITodosCommentRow | null>(null);
 
   const rootBase = useMemo(
     () =>
@@ -71,7 +72,27 @@ export default function CommentSection({ todoId }: Props) {
   const createMutation = useMutation({
     mutationFn: (data: { content: string; parentIdx?: number | null }) =>
       createCommentAction({ todoId, ...data }),
-    onSuccess: () => {
+    onSuccess: (newComment) => {
+      // 캐시를 직접 업데이트하여 새 댓글 즉시 추가
+      queryClient.setQueryData(
+        practiceQK.comments(rootBase),
+        (oldData: any) => {
+          if (!oldData || !oldData.pages || oldData.pages.length === 0)
+            return oldData;
+
+          // 첫 페이지에 새 댓글 추가
+          const updatedPages = [...oldData.pages];
+          updatedPages[0] = {
+            ...updatedPages[0],
+            items: [newComment, ...updatedPages[0].items],
+          };
+
+          return {
+            ...oldData,
+            pages: updatedPages,
+          };
+        },
+      );
       // 성공 시 댓글 목록 갱신 및 폼 초기화
       queryClient.invalidateQueries({
         queryKey: practiceQK.comments(rootBase),
@@ -84,8 +105,28 @@ export default function CommentSection({ todoId }: Props) {
   // 댓글 수정 mutation
   const updateMutation = useMutation({
     mutationFn: ({ id, content }: { id: string; content: string }) =>
-      updateCommentAction({ uid: id, content }),
-    onSuccess: () => {
+      updateCommentAction({ todoId, uid: id, content }),
+    onSuccess: (updatedData, variables) => {
+      // 캐시를 직접 업데이트
+      queryClient.setQueryData(
+        practiceQK.comments(rootBase),
+        (oldData: any) => {
+          if (!oldData) return oldData;
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page: any) => ({
+              ...page,
+              items: page.items.map((comment: ITodosCommentRow) =>
+                comment.uid === variables.id
+                  ? { ...comment, content: variables.content }
+                  : comment,
+              ),
+            })),
+          };
+        },
+      );
+      // 백그라운드에서 데이터 최신화를 위해 쿼리 무효화도 함께 수행
       queryClient.invalidateQueries({
         queryKey: practiceQK.comments(rootBase),
       });
@@ -95,7 +136,25 @@ export default function CommentSection({ todoId }: Props) {
   // 댓글 삭제 mutation
   const deleteMutation = useMutation({
     mutationFn: (row: ITodosCommentPart) => deleteCommentAction(row),
-    onSuccess: () => {
+    onSuccess: (_, deletedComment) => {
+      // 캐시를 직접 업데이트하여 UI에서 즉시 제거
+      queryClient.setQueryData(
+        practiceQK.comments(rootBase),
+        (oldData: any) => {
+          if (!oldData) return oldData;
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page: any) => ({
+              ...page,
+              items: page.items.filter(
+                (comment: ITodosCommentRow) =>
+                  comment.uid !== deletedComment.uid,
+              ),
+            })),
+          };
+        },
+      );
       queryClient.invalidateQueries({
         queryKey: practiceQK.comments(rootBase),
       });
@@ -104,7 +163,7 @@ export default function CommentSection({ todoId }: Props) {
 
   // 좋아요 토글 mutation
   const likeMutation = useMutation({
-    mutationFn: (id: string) => likeCommentAction(id),
+    mutationFn: (commentId: number) => likeCommentAction({ commentId }),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: practiceQK.comments(rootBase),
@@ -136,8 +195,19 @@ export default function CommentSection({ todoId }: Props) {
 
   // 댓글 삭제 핸들러
   const handleDelete = (comment: ITodosCommentRow) => {
-    if (window.confirm(t('common.confirm_delete'))) {
-      deleteMutation.mutate(comment);
+    setCommentToDelete(comment);
+  };
+
+  // 모달에서 삭제 취소
+  const cancelDelete = () => {
+    setCommentToDelete(null);
+  };
+
+  // 모달에서 삭제 확인
+  const deleteComment = () => {
+    if (commentToDelete) {
+      deleteMutation.mutate(commentToDelete);
+      setCommentToDelete(null);
     }
   };
 
@@ -155,10 +225,12 @@ export default function CommentSection({ todoId }: Props) {
   // 답글 취소 핸들러
   const handleReplyCancel = () => {
     setReplyToId(null);
+    setCommentForm({ content: '' });
   };
 
   // 좋아요 핸들러
-  const handleLike = (commentId: string) => {
+  const handleLike = (commentId: number) => {
+    console.log('handleLike', commentId);
     likeMutation.mutate(commentId);
   };
 
@@ -174,10 +246,7 @@ export default function CommentSection({ todoId }: Props) {
       {/* 댓글 작성 폼 */}
       <CommentForm
         initialContent={commentForm.content}
-        isReply={replyToId !== null}
-        replyToId={replyToId}
         onSubmit={handleCommentSubmit}
-        onCancel={handleReplyCancel}
         isPending={createMutation.isPending}
       />
 
@@ -192,6 +261,16 @@ export default function CommentSection({ todoId }: Props) {
         fetchNextPage={fetchNextPage}
         hasNextPage={hasNextPage || false}
         isFetchingNextPage={isFetchingNextPage}
+        activeReplyId={replyToId}
+        onReplySubmit={handleCommentSubmit}
+        onReplyCancel={handleReplyCancel}
+        replyFormPending={createMutation.isPending}
+      />
+
+      <CommentDeleteModal
+        visible={commentToDelete !== null}
+        onCancel={cancelDelete}
+        onConfirm={deleteComment}
       />
     </div>
   );

@@ -15,14 +15,19 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import TextareaAutosize from 'react-textarea-autosize';
 import ReplyList from './ReplyList';
+import ReplyForm from './ReplyForm';
 
 interface CommentItemProps {
   todoId: string;
   comment: ITodosCommentRow;
-  onReply: () => void;
+  onReply: (commentId: number) => void;
   onEdit: (commentId: string, content: string) => void;
   onDelete: () => void;
   onLike: () => void;
+  isReplyFormOpen: boolean;
+  onReplySubmit: (content: string, parentId: number) => void;
+  onReplyCancel: () => void;
+  replyFormPending: boolean;
 }
 
 const CommentItem = ({
@@ -32,6 +37,10 @@ const CommentItem = ({
   onEdit,
   onDelete,
   onLike,
+  isReplyFormOpen,
+  onReplySubmit,
+  onReplyCancel,
+  replyFormPending,
 }: CommentItemProps) => {
   const { t } = useLanguage();
 
@@ -57,6 +66,15 @@ const CommentItem = ({
   const handleEditCancel = () => {
     setIsEditing(false);
     setEditContent(comment.content);
+  };
+
+  // 답글 버튼 클릭 시
+  const handleReplyClick = () => {
+    onReply(comment.idx);
+    // 답글이 보이도록 자동으로 토글
+    if (!showReplies) {
+      setShowReplies(true);
+    }
   };
 
   return (
@@ -108,7 +126,7 @@ const CommentItem = ({
               {!comment.parentIdx && (
                 <button
                   className="btn btn-sm btn-outline-secondary"
-                  onClick={onReply}
+                  onClick={handleReplyClick}
                 >
                   <FontAwesomeIcon icon={faReply} /> {t('common.reply')}
                 </button>
@@ -132,22 +150,33 @@ const CommentItem = ({
             </div>
           </div>
 
-          {/* 답글 수가 있는 경우에만 답글 토글 버튼 표시 */}
-          {!comment.parentIdx && comment.replyCount > 0 && (
-            <div className="mt-2">
-              <button
-                className="btn btn-sm btn-outline-secondary"
-                onClick={toggleReplies}
-              >
-                <FontAwesomeIcon
-                  icon={showReplies ? faChevronUp : faChevronDown}
-                />{' '}
-                {showReplies
-                  ? t('common.hide_replies')
-                  : t('common.show_replies', { count: comment.replyCount })}
-              </button>
-            </div>
+          {/* 답글 작성 폼 (해당 댓글이 답글 작성 대상일 때만) */}
+          {isReplyFormOpen && !comment.parentIdx && (
+            <ReplyForm
+              parentId={comment.idx}
+              onSubmit={onReplySubmit}
+              onCancel={onReplyCancel}
+              isPending={replyFormPending}
+            />
           )}
+
+          {/* 답글 수가 있는 경우에만 답글 토글 버튼 표시 */}
+          {!comment.parentIdx &&
+            (comment.replyCount > 0 || isReplyFormOpen) && (
+              <div className="mt-2">
+                <button
+                  className="btn btn-sm btn-outline-secondary"
+                  onClick={toggleReplies}
+                >
+                  <FontAwesomeIcon
+                    icon={showReplies ? faChevronUp : faChevronDown}
+                  />{' '}
+                  {showReplies
+                    ? t('common.hide_replies')
+                    : t('common.show_replies', { count: comment.replyCount })}
+                </button>
+              </div>
+            )}
 
           {/* 답글 목록 (토글 상태에 따라 표시) */}
           {showReplies && !comment.parentIdx && (

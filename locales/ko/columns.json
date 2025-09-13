@@ -204,6 +204,8 @@
     "isVisible": "표시 여부",
     "content": "내용",
     "content2": "내용2",
+    "replyCount": "답글",
+    "likeCount": "좋아요",
     "TodosComment": "댓글",
     "TodosFile": "파일",
     "TodosOption": "옵션"
