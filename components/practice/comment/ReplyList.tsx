@@ -2,10 +2,10 @@
 import { useMemo } from 'react';
 import { useLanguage } from '@/components/context/LanguageContext';
 import { ITodosCommentRow } from '@/types/todos';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { practiceQK } from '@/lib/queryKeys/practice';
 import { listAction } from '@/actions/practice/comments';
-import CommentItem from './CommentItem';
+import ReplyItem from './ReplyItem';
 
 interface ReplyListProps {
   todoId: string;
@@ -23,6 +23,7 @@ export default function ReplyList({
   onLike,
 }: ReplyListProps) {
   const { t } = useLanguage();
+  const queryClient = useQueryClient();
 
   const replyBase = {
     todoId,
@@ -55,6 +56,25 @@ export default function ReplyList({
     return [...new Map(list.map((item) => [item.uid, item])).values()];
   }, [repliesData]);
 
+  // 래핑된 함수로 변경하여 캐시 무효화 추가
+  const handleEdit = (commentId: string, content: string) => {
+    onEdit(commentId, content);
+    // 수정 후 캐시 무효화
+    queryClient.invalidateQueries({ queryKey: practiceQK.comments(replyBase) });
+  };
+
+  const handleDelete = (comment: ITodosCommentRow) => {
+    onDelete(comment);
+    // 삭제 후 캐시 무효화
+    queryClient.invalidateQueries({ queryKey: practiceQK.comments(replyBase) });
+  };
+
+  const handleLike = (commentId: string) => {
+    onLike(commentId);
+    // 좋아요 후 캐시 무효화
+    queryClient.invalidateQueries({ queryKey: practiceQK.comments(replyBase) });
+  };
+
   if (isLoading) {
     return (
       <div className="replies-loading text-center p-3">
@@ -76,14 +96,12 @@ export default function ReplyList({
     <div className="replies-container mt-3">
       <div className="replies-list ms-4 border-start border-3">
         {replies.map((reply) => (
-          <CommentItem
+          <ReplyItem
             key={reply.uid}
             comment={reply}
-            todoId={todoId}
-            onReply={() => {}} // 답글에는 답글을 달 수 없음
-            onEdit={onEdit}
-            onDelete={() => onDelete(reply)}
-            onLike={() => onLike(reply.uid)}
+            onEdit={handleEdit} // 수정된 핸들러 사용
+            onDelete={() => handleDelete(reply)} // 수정된 핸들러 사용
+            onLike={() => handleLike(reply.uid)} // 수정된 핸들러 사용
           />
         ))}
 

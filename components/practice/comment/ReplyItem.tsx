@@ -5,47 +5,26 @@ import { ITodosCommentRow } from '@/types/todos';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faThumbsUp,
-  faReply,
   faEdit,
   faTrash,
   faSave,
   faTimes,
 } from '@fortawesome/free-solid-svg-icons';
 import TextareaAutosize from 'react-textarea-autosize';
-import ReplyList from './ReplyList';
-import ReplyForm from './ReplyForm';
 
 interface CommentItemProps {
-  todoId: string;
   comment: ITodosCommentRow;
-  onReply: (commentId: number) => void;
   onEdit: (commentId: string, content: string) => void;
   onDelete: () => void;
   onLike: () => void;
-  isReplyFormOpen: boolean;
-  onReplySubmit: (content: string, parentId: number) => void;
-  onReplyCancel: () => void;
-  replyFormPending: boolean;
 }
 
-const CommentItem = ({
-  todoId,
-  comment,
-  onReply,
-  onEdit,
-  onDelete,
-  onLike,
-  isReplyFormOpen,
-  onReplySubmit,
-  onReplyCancel,
-  replyFormPending,
-}: CommentItemProps) => {
+const ReplyItem = ({ comment, onEdit, onDelete, onLike }: CommentItemProps) => {
   const { t } = useLanguage();
 
   // 상태 관리
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
-  const [showReplies, setShowReplies] = useState(false);
 
   // 수정 제출
   const handleEditSubmit = () => {
@@ -59,18 +38,6 @@ const CommentItem = ({
   const handleEditCancel = () => {
     setIsEditing(false);
     setEditContent(comment.content);
-  };
-
-  // 답글 버튼 클릭 시 - 답글폼과 목록을 함께 토글
-  const handleReplyClick = () => {
-    // 이미 열려있으면 닫고, 닫혀있으면 열기
-    if (isReplyFormOpen) {
-      onReplyCancel(); // 상위 컴포넌트의 isReplyFormOpen 상태 업데이트
-      setShowReplies(false); // 답글 목록도 함께 닫기
-    } else {
-      onReply(comment.idx); // 상위 컴포넌트의 isReplyFormOpen 상태 업데이트
-      setShowReplies(true); // 답글 목록 함께 열기
-    }
   };
 
   return (
@@ -118,21 +85,6 @@ const CommentItem = ({
               >
                 <FontAwesomeIcon icon={faThumbsUp} /> {comment.likeCount || 0}
               </button>
-
-              {!comment.parentIdx && (
-                <button
-                  className="btn btn-sm btn-outline-secondary"
-                  onClick={handleReplyClick}
-                >
-                  <FontAwesomeIcon icon={faReply} />
-                  {isReplyFormOpen
-                    ? t('common.hide_replies')
-                    : t('common.reply')}
-                  {comment.replyCount > 0 &&
-                    !isReplyFormOpen &&
-                    ` (${comment.replyCount})`}
-                </button>
-              )}
             </div>
 
             <div className="d-flex gap-1">
@@ -151,34 +103,10 @@ const CommentItem = ({
               </button>
             </div>
           </div>
-
-          {/* 답글 작성 폼 (해당 댓글이 답글 작성 대상일 때만) */}
-          {isReplyFormOpen && !comment.parentIdx && (
-            <ReplyForm
-              parentId={comment.idx}
-              onSubmit={onReplySubmit}
-              onCancel={() => {
-                onReplyCancel();
-                setShowReplies(false);
-              }}
-              isPending={replyFormPending}
-            />
-          )}
-
-          {/* 답글 목록 (토글 상태에 따라 표시) */}
-          {showReplies && !comment.parentIdx && comment.replyCount > 0 && (
-            <ReplyList
-              todoId={todoId}
-              parentId={comment.idx}
-              onEdit={onEdit}
-              onDelete={onDelete}
-              onLike={onLike}
-            />
-          )}
         </>
       )}
     </div>
   );
 };
 
-export default CommentItem;
+export default ReplyItem;
