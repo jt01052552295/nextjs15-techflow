@@ -72,31 +72,67 @@ export default function CommentSection({ todoId }: Props) {
   const createMutation = useMutation({
     mutationFn: (data: { content: string; parentIdx?: number | null }) =>
       createCommentAction({ todoId, ...data }),
-    onSuccess: (newComment) => {
-      // 캐시를 직접 업데이트하여 새 댓글 즉시 추가
-      queryClient.setQueryData(
-        practiceQK.comments(rootBase),
-        (oldData: any) => {
-          if (!oldData || !oldData.pages || oldData.pages.length === 0)
-            return oldData;
+    onSuccess: (updatedData, newComment) => {
+      console.log(updatedData);
 
-          // 첫 페이지에 새 댓글 추가
-          const updatedPages = [...oldData.pages];
-          updatedPages[0] = {
-            ...updatedPages[0],
-            items: [newComment, ...updatedPages[0].items],
-          };
+      // 1. 일반 댓글인 경우 (parentIdx가 없는 경우)
+      if (!newComment.parentIdx) {
+        // 일반 댓글 목록 캐시에 새 댓글 추가
+        queryClient.setQueryData(
+          practiceQK.comments(rootBase),
+          (oldData: any) => {
+            if (!oldData || !oldData.pages || oldData.pages.length === 0)
+              return oldData;
 
-          return {
-            ...oldData,
-            pages: updatedPages,
-          };
-        },
-      );
+            // 첫 페이지에 새 댓글 추가
+            const updatedPages = [...oldData.pages];
+            updatedPages[0] = {
+              ...updatedPages[0],
+              items: [newComment, ...updatedPages[0].items],
+            };
+
+            return {
+              ...oldData,
+              pages: updatedPages,
+            };
+          },
+        );
+      } else {
+        // 2-1. 부모 댓글의 replyCount 증가
+        queryClient.setQueryData(
+          practiceQK.comments(rootBase),
+          (oldData: any) => {
+            if (!oldData) return oldData;
+
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page: any) => ({
+                ...page,
+                items: page.items.map((comment: ITodosCommentRow) =>
+                  comment.idx === newComment.parentIdx
+                    ? { ...comment, replyCount: (comment.replyCount || 0) + 1 }
+                    : comment,
+                ),
+              })),
+            };
+          },
+        );
+        // 2-2. 답글 목록 캐시에 새 답글 추가
+        const replyBase = {
+          todoId,
+          parentIdx: newComment.parentIdx,
+          sortBy: 'createdAt',
+          order: 'asc',
+        } as const;
+        queryClient.invalidateQueries({
+          queryKey: practiceQK.comments(replyBase),
+        });
+      }
       // 성공 시 댓글 목록 갱신 및 폼 초기화
       queryClient.invalidateQueries({
         queryKey: practiceQK.comments(rootBase),
       });
+
       setCommentForm({ content: '' });
       setReplyToId(null);
     },
@@ -126,6 +162,20 @@ export default function CommentSection({ todoId }: Props) {
           };
         },
       );
+
+      if (updatedData.data?.parentIdx) {
+        const replyBase = {
+          todoId,
+          parentIdx: updatedData.data.parentIdx,
+          sortBy: 'createdAt',
+          order: 'asc',
+        } as const;
+
+        queryClient.invalidateQueries({
+          queryKey: practiceQK.comments(replyBase),
+        });
+      }
+
       // 백그라운드에서 데이터 최신화를 위해 쿼리 무효화도 함께 수행
       queryClient.invalidateQueries({
         queryKey: practiceQK.comments(rootBase),
@@ -155,6 +205,20 @@ export default function CommentSection({ todoId }: Props) {
           };
         },
       );
+
+      // 삭제된 댓글이 답글인 경우 해당 답글 목록 쿼리도 무효화
+      if (deletedComment.parentIdx) {
+        const replyBase = {
+          todoId,
+          parentIdx: deletedComment.parentIdx,
+          sortBy: 'createdAt',
+          order: 'asc',
+        } as const;
+
+        queryClient.invalidateQueries({
+          queryKey: practiceQK.comments(replyBase),
+        });
+      }
       queryClient.invalidateQueries({
         queryKey: practiceQK.comments(rootBase),
       });
@@ -167,6 +231,10 @@ export default function CommentSection({ todoId }: Props) {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: practiceQK.comments(rootBase),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['practice', 'comments'],
       });
     },
   });
@@ -190,11 +258,14 @@ export default function CommentSection({ todoId }: Props) {
 
   // 댓글 수정 핸들러
   const handleEdit = (id: string, content: string) => {
+    console.log('handleEdit');
+    console.log(id, content);
     updateMutation.mutate({ id, content });
   };
 
   // 댓글 삭제 핸들러
   const handleDelete = (comment: ITodosCommentRow) => {
+    console.log('CommentSection handleDelete:', comment);
     setCommentToDelete(comment);
   };
 
@@ -206,6 +277,7 @@ export default function CommentSection({ todoId }: Props) {
   // 모달에서 삭제 확인
   const deleteComment = () => {
     if (commentToDelete) {
+      console.log('CommentSection deleteComment:', commentToDelete);
       deleteMutation.mutate(commentToDelete);
       setCommentToDelete(null);
     }

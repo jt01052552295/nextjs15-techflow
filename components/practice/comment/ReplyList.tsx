@@ -2,7 +2,7 @@
 import { useMemo } from 'react';
 import { useLanguage } from '@/components/context/LanguageContext';
 import { ITodosCommentRow } from '@/types/todos';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { practiceQK } from '@/lib/queryKeys/practice';
 import { listAction } from '@/actions/practice/comments';
 import ReplyItem from './ReplyItem';
@@ -12,7 +12,7 @@ interface ReplyListProps {
   parentId: number;
   onEdit: (commentId: string, content: string) => void;
   onDelete: (comment: ITodosCommentRow) => void;
-  onLike: (commentId: string) => void;
+  onLike: (commentId: number) => void;
 }
 
 export default function ReplyList({
@@ -23,7 +23,6 @@ export default function ReplyList({
   onLike,
 }: ReplyListProps) {
   const { t } = useLanguage();
-  const queryClient = useQueryClient();
 
   const replyBase = {
     todoId,
@@ -59,20 +58,16 @@ export default function ReplyList({
   // 래핑된 함수로 변경하여 캐시 무효화 추가
   const handleEdit = (commentId: string, content: string) => {
     onEdit(commentId, content);
-    // 수정 후 캐시 무효화
-    queryClient.invalidateQueries({ queryKey: practiceQK.comments(replyBase) });
   };
 
   const handleDelete = (comment: ITodosCommentRow) => {
+    console.log('ReplyList handleDelete:', comment);
     onDelete(comment);
-    // 삭제 후 캐시 무효화
-    queryClient.invalidateQueries({ queryKey: practiceQK.comments(replyBase) });
   };
 
-  const handleLike = (commentId: string) => {
+  const handleLike = (commentId: number) => {
+    console.log(commentId);
     onLike(commentId);
-    // 좋아요 후 캐시 무효화
-    queryClient.invalidateQueries({ queryKey: practiceQK.comments(replyBase) });
   };
 
   if (isLoading) {
@@ -81,14 +76,14 @@ export default function ReplyList({
         <div className="spinner-border spinner-border-sm me-2" role="status">
           <span className="visually-hidden">{t('common.loading')}</span>
         </div>
-        {t('common.loading_replies')}
+        {t('common.loading')}
       </div>
     );
   }
 
   if (!replies || replies.length === 0) {
     return (
-      <div className="no-replies text-muted p-3">{t('common.no_replies')}</div>
+      <div className="no-replies text-muted p-3">{t('common.no_items')}</div>
     );
   }
 
@@ -101,7 +96,7 @@ export default function ReplyList({
             comment={reply}
             onEdit={handleEdit} // 수정된 핸들러 사용
             onDelete={() => handleDelete(reply)} // 수정된 핸들러 사용
-            onLike={() => handleLike(reply.uid)} // 수정된 핸들러 사용
+            onLike={() => handleLike(reply.idx)} // 수정된 핸들러 사용
           />
         ))}
 

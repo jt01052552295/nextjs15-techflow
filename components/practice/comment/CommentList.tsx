@@ -36,6 +36,18 @@ const CommentList = ({
 }: CommentListProps) => {
   const { t } = useLanguage();
 
+  // 답글 삭제를 위한 별도 핸들러 추가
+  const handleReplyDelete = (reply: ITodosCommentRow) => {
+    console.log('CommentList handleReplyDelete:', reply);
+    onDelete(reply); // 받은 reply 객체를 그대로 상위 컴포넌트에 전달
+  };
+
+  // 답글 좋아요를 위한 별도 핸들러 추가
+  const handleReplyLike = (replyId: number) => {
+    console.log('CommentList handleReplyLike:', replyId);
+    onLike(replyId); // 받은 replyId를 그대로 상위 컴포넌트에 전달
+  };
+
   if (comments.length === 0) {
     return (
       <div className="text-center text-muted py-4">{t('common.no_items')}</div>
@@ -52,12 +64,15 @@ const CommentList = ({
           comment={comment}
           onReply={() => onReply(comment.idx)}
           onEdit={onEdit}
-          onDelete={() => onDelete(comment)}
-          onLike={() => onLike(comment.idx)}
+          onDelete={() => onDelete(comment)} // 댓글 자체 삭제용
+          onLike={() => onLike(comment.idx)} // 댓글 자체 좋아요용
           isReplyFormOpen={activeReplyId === comment.idx}
           onReplySubmit={onReplySubmit}
           onReplyCancel={onReplyCancel}
           replyFormPending={replyFormPending}
+          // 새로운 props 추가
+          onReplyDelete={handleReplyDelete} // 답글 삭제용 별도 핸들러
+          onReplyLike={handleReplyLike} // 답글 좋아요용 별도 핸들러
         />
       ))}
 

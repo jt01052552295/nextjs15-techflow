@@ -20,12 +20,15 @@ interface CommentItemProps {
   comment: ITodosCommentRow;
   onReply: (commentId: number) => void;
   onEdit: (commentId: string, content: string) => void;
-  onDelete: () => void;
-  onLike: () => void;
+  onDelete: (comment: ITodosCommentRow) => void;
+  onLike: (commentId: number) => void;
   isReplyFormOpen: boolean;
   onReplySubmit: (content: string, parentId: number) => void;
   onReplyCancel: () => void;
   replyFormPending: boolean;
+  // 새로운 props 추가
+  onReplyDelete?: (reply: ITodosCommentRow) => void; // 답글 삭제용
+  onReplyLike?: (replyId: number) => void; // 답글 좋아요용
 }
 
 const CommentItem = ({
@@ -39,6 +42,8 @@ const CommentItem = ({
   onReplySubmit,
   onReplyCancel,
   replyFormPending,
+  onReplyDelete,
+  onReplyLike,
 }: CommentItemProps) => {
   const { t } = useLanguage();
 
@@ -114,7 +119,7 @@ const CommentItem = ({
             <div className="d-flex gap-1">
               <button
                 className="btn btn-sm btn-outline-primary"
-                onClick={onLike}
+                onClick={() => onLike(comment.idx)}
               >
                 <FontAwesomeIcon icon={faThumbsUp} /> {comment.likeCount || 0}
               </button>
@@ -145,7 +150,7 @@ const CommentItem = ({
 
               <button
                 className="btn btn-sm btn-outline-danger"
-                onClick={onDelete}
+                onClick={() => onDelete(comment)}
               >
                 <FontAwesomeIcon icon={faTrash} /> {t('common.delete')}
               </button>
@@ -171,8 +176,8 @@ const CommentItem = ({
               todoId={todoId}
               parentId={comment.idx}
               onEdit={onEdit}
-              onDelete={onDelete}
-              onLike={onLike}
+              onDelete={onReplyDelete || ((reply) => onDelete(reply))} // onReplyDelete가 있으면 사용, 없으면 기본 함수 사용
+              onLike={onReplyLike || ((replyId) => onLike(replyId))} // onReplyLike가 있으면 사용, 없으면 기본 함수 사용
             />
           )}
         </>

@@ -64,7 +64,16 @@ export async function createAction(data: ITodosCommentPart) {
 
   const parsed = CommentSchema(dictionary.common.form).safeParse(data);
   if (!parsed.success) {
-    return { status: 'error', message: missingFields };
+    console.error('Validation error:', parsed.error.format());
+    const errorDetails = parsed.error.errors
+      .map((err) => `${err.path.join('.')}: ${err.message}`)
+      .join(', ');
+    return {
+      status: 'error',
+      message: missingFields,
+      errors: parsed.error.format(), // 클라이언트에 전체 에러 구조 제공
+      errorDetails,
+    };
   }
 
   const { todoId, content, parentIdx = null } = parsed.data;
