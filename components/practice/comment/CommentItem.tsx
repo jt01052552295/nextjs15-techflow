@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/components/context/LanguageContext';
 import { ITodosCommentRow } from '@/types/todos';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -68,15 +68,16 @@ const CommentItem = ({
 
   // 답글 버튼 클릭 시 - 답글폼과 목록을 함께 토글
   const handleReplyClick = () => {
-    // 이미 열려있으면 닫고, 닫혀있으면 열기
-    if (isReplyFormOpen) {
-      onReplyCancel(); // 상위 컴포넌트의 isReplyFormOpen 상태 업데이트
-      setShowReplies(false); // 답글 목록도 함께 닫기
-    } else {
-      onReply(comment.idx); // 상위 컴포넌트의 isReplyFormOpen 상태 업데이트
-      setShowReplies(true); // 답글 목록 함께 열기
-    }
+    console.log(comment.idx, isReplyFormOpen);
+    onReply(comment.idx);
+    setShowReplies(isReplyFormOpen ? false : true);
   };
+
+  useEffect(() => {
+    if (isReplyFormOpen) {
+      setShowReplies(true);
+    }
+  }, [isReplyFormOpen]);
 
   return (
     <div className="comment-item p-3 mb-3 border-bottom">

@@ -38,13 +38,11 @@ const CommentList = ({
 
   // 답글 삭제를 위한 별도 핸들러 추가
   const handleReplyDelete = (reply: ITodosCommentRow) => {
-    console.log('CommentList handleReplyDelete:', reply);
     onDelete(reply); // 받은 reply 객체를 그대로 상위 컴포넌트에 전달
   };
 
   // 답글 좋아요를 위한 별도 핸들러 추가
   const handleReplyLike = (replyId: number) => {
-    console.log('CommentList handleReplyLike:', replyId);
     onLike(replyId); // 받은 replyId를 그대로 상위 컴포넌트에 전달
   };
 

@@ -133,7 +133,7 @@ export default function CommentSection({ todoId }: Props) {
         queryKey: practiceQK.comments(rootBase),
       });
 
-      setCommentForm({ content: '' });
+      setCommentForm({ content: '', parentIdx: null });
       setReplyToId(null);
     },
   });
@@ -290,14 +290,20 @@ export default function CommentSection({ todoId }: Props) {
 
   // 답글 작성 핸들러
   const handleReplyTo = (commentId: number) => {
-    setReplyToId(commentId);
-    setCommentForm({ content: '', parentIdx: commentId });
+    console.log('handleReplyTo', replyToId, commentId);
+    if (replyToId === commentId) {
+      setReplyToId(null);
+      setCommentForm({ content: '', parentIdx: null });
+    } else {
+      setReplyToId(commentId);
+      setCommentForm({ content: '', parentIdx: commentId });
+    }
   };
 
   // 답글 취소 핸들러
   const handleReplyCancel = () => {
     setReplyToId(null);
-    setCommentForm({ content: '' });
+    setCommentForm({ content: '', parentIdx: null });
   };
 
   // 좋아요 핸들러
