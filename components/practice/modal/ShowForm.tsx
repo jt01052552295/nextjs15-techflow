@@ -10,13 +10,12 @@ import {
 } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/components/context/LanguageContext';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faList, faSave, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import TextareaAutosize from 'react-textarea-autosize';
 import { UpdateType, UpdateSchema } from '@/actions/practice/update/schema';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ITodosPart, ITodosOption } from '@/types/todos';
+import { ITodosOption } from '@/types/todos';
+import CommentSection from '../comment/CommentSection';
 import ImageView from '../ImageView';
 import { useQuery } from '@tanstack/react-query';
 import { practiceQK } from '@/lib/queryKeys/practice';
@@ -29,7 +28,7 @@ type Props = {
 };
 
 export default function ShowForm({ uid }: Props) {
-  const { dictionary, locale, t } = useLanguage();
+  const { dictionary, t } = useLanguage();
   const router = useRouter();
   const { data, isLoading, error } = useQuery({
     queryKey: practiceQK.detail(uid),
@@ -366,9 +365,7 @@ export default function ShowForm({ uid }: Props) {
                       </h5>
                     </div>
                     <div className="card-body">
-                      <div className="text-muted">
-                        댓글을 불러오는 중입니다...
-                      </div>
+                      <CommentSection todoId={uid} />
                     </div>
                   </div>
                 </div>

@@ -53,7 +53,7 @@ const CommentForm = ({
             {/* 아바타 영역 */}
             <div
               className="rounded-circle bg-light text-center d-flex align-items-center justify-content-center"
-              style={{ width: '40px', height: '40px' }}
+              style={{ width: '32px', height: '32px' }}
             >
               <FontAwesomeIcon icon={faUser} className="text-secondary" />
             </div>

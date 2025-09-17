@@ -108,7 +108,100 @@ export default function SearchForm({
 
   return (
     <div className="mb-3">
-      <div className="d-flex gap-2">
+      <div className="row g-2 mb-2" id="filter-groups">
+        {/* 검색창과 검색 버튼 - 모든 화면 크기에서 우선 표시 */}
+        <div className="col-12 col-md-6">
+          <div className="input-group">
+            <input
+              className="form-control"
+              placeholder="이름/이메일 통합검색"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+            />
+            <button
+              type="button"
+              className="btn btn-outline-secondary"
+              onClick={apply}
+              disabled={loading}
+            >
+              검색
+            </button>
+          </div>
+        </div>
+
+        {/* 모바일에서는 두번째 줄, 데스크탑에서는 옆에 표시되는 버튼들 */}
+        <div className="col-12 col-md-6">
+          <div className="d-flex flex-wrap gap-2 h-100 justify-content-md-end align-items-md-center">
+            {/* 필터 버튼 - 항상 표시 */}
+            <button
+              className="btn btn-outline-primary"
+              type="button"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#practiceFilters"
+              aria-controls="practiceFilters"
+            >
+              필터
+            </button>
+
+            {/* 초기화 버튼 - 항상 표시 */}
+            <button
+              type="button"
+              className="btn btn-outline-dark"
+              onClick={onReset}
+              disabled={loading}
+            >
+              초기화
+            </button>
+          </div>
+        </div>
+
+        {/* 상세 필터 버튼들 - 모바일에서는 따로 표시 */}
+        <div className="col-12">
+          <div className="d-flex flex-wrap gap-2">
+            <button
+              className="btn btn-sm btn-outline-primary"
+              type="button"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#of-date"
+            >
+              {dateBtnLabel}
+            </button>
+            <button
+              className="btn btn-sm btn-outline-primary"
+              type="button"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#of-isUse-single"
+            >
+              {isUseBtnLabel}
+            </button>
+            <button
+              className="btn btn-sm btn-outline-primary"
+              type="button"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#of-isVisible-single"
+            >
+              {isVisibleBtnLabel}
+            </button>
+            <button
+              className="btn btn-sm btn-outline-primary"
+              type="button"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#of-sort-single"
+            >
+              {sortBtnLabel}
+            </button>
+            <button
+              className="btn btn-sm btn-outline-primary"
+              type="button"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#of-limit-single"
+            >
+              {limitBtnLabel}
+            </button>
+          </div>
+        </div>
+      </div>
+      <div className="d-flex gap-2 d-none" id="filter-groups">
         <div className="flex-grow-1">
           <input
             className="form-control"

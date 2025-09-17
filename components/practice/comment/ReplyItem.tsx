@@ -9,8 +9,11 @@ import {
   faTrash,
   faSave,
   faTimes,
+  faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import TextareaAutosize from 'react-textarea-autosize';
+import { maskingName, maskingEmail } from '@/lib/util';
+import Image from 'next/image';
 
 interface CommentItemProps {
   comment: ITodosCommentRow;
@@ -39,6 +42,10 @@ const ReplyItem = ({ comment, onEdit, onDelete, onLike }: CommentItemProps) => {
     setIsEditing(false);
     setEditContent(comment.content);
   };
+
+  const staticUrl = process.env.NEXT_PUBLIC_STATIC_URL || '';
+  const profile = comment.user?.profile?.[0];
+  const profileImageUrl = profile?.url ? `${staticUrl}${profile.url}` : null;
 
   return (
     <div className="comment-item p-3 mb-3 border-bottom">
@@ -69,8 +76,32 @@ const ReplyItem = ({ comment, onEdit, onDelete, onLike }: CommentItemProps) => {
       ) : (
         <>
           <div className="d-flex justify-content-between">
-            <div>
-              <strong>{comment.idx}</strong>
+            <div className="d-flex align-items-center gap-2">
+              {profileImageUrl ? (
+                <Image
+                  src={profileImageUrl}
+                  alt={comment.user?.name || ''}
+                  width={32}
+                  height={32}
+                  className="rounded-circle border"
+                />
+              ) : (
+                <div
+                  className="rounded-circle bg-light text-center d-flex align-items-center justify-content-center"
+                  style={{ width: '32px', height: '32px' }}
+                >
+                  <FontAwesomeIcon icon={faUser} className="text-secondary" />
+                </div>
+              )}
+
+              <div className="d-flex gap-1">
+                <span className="fw-semibold">
+                  {maskingName(comment.user?.name ?? '')}
+                </span>
+                <small className="text-muted">
+                  {maskingEmail(comment.user?.email ?? '')}
+                </small>
+              </div>
             </div>
             <small className="text-muted">{comment.createdAt}</small>
           </div>

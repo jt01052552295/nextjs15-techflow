@@ -1,4 +1,4 @@
-import prisma, { captureQueries } from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 import { type Prisma } from '@prisma/client';
 import { b64e, b64d } from '@/lib/util';
 import type {
@@ -37,6 +37,10 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
   } = params;
 
   const safeLimit = Math.min(Math.max(+limit || 20, 1), 100);
+
+  console.log(`검색파라미터 ==================`);
+  console.log(params);
+  console.log(`검색파라미터 ==================`);
 
   // ───────────────────────────────────
   // where (검색/필터)
@@ -105,30 +109,17 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
     ? { AND: [filteredWhere, keysetWhere] }
     : filteredWhere;
 
-  const { result: rows, logs } = await captureQueries(() =>
-    prisma.todos.findMany({
-      where: whereForPage,
-      orderBy,
-      take: safeLimit + 1,
-      include: {
-        _count: {
-          select: { TodosComment: true, TodosFile: true, TodosOption: true },
-        },
-        TodosFile: { orderBy: { createdAt: 'desc' }, take: 1 },
+  const rows = await prisma.todos.findMany({
+    where: whereForPage,
+    orderBy,
+    take: safeLimit + 1,
+    include: {
+      _count: {
+        select: { TodosComment: true, TodosFile: true, TodosOption: true },
       },
-    }),
-  );
-
-  if (process.env.NODE_ENV !== 'production') {
-    for (const { query, params, duration } of logs) {
-      let parsed: unknown = params;
-      try {
-        parsed = JSON.parse(params);
-      } catch {}
-      console.log('[SQL]', query);
-      console.log('      params:', parsed, `(${duration}ms)`);
-    }
-  }
+      TodosFile: { orderBy: { createdAt: 'desc' }, take: 1 },
+    },
+  });
 
   const hasMore = rows.length > safeLimit;
   const items = hasMore ? rows.slice(0, safeLimit) : rows;
