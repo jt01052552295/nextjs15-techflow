@@ -83,7 +83,7 @@ export const OptionForm = () => {
             </div>
 
             <div className="col-md-3">
-              <label className="form-label">나이</label>
+              <label className="form-label">{t('columns.todos.age')}</label>
               <input
                 type="number"
                 className={`form-control form-control-sm ${getInputClass(`todoOption.${index}.age`)}`}

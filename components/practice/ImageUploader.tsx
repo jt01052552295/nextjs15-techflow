@@ -6,7 +6,8 @@ import Image from 'next/image';
 import { imageUploadAction } from '@/actions/upload/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-
+import { useLanguage } from '@/components/context/LanguageContext';
+import { toast } from 'sonner';
 type UploadedImage = {
   preview: string;
   name: string; // ✅ 파일명
@@ -31,6 +32,7 @@ export default function ImageUploader({
   initialImages = [],
   mode = 'create', // 기본값: 작성모드
 }: Props) {
+  const { t } = useLanguage();
   const inputRef = useRef<HTMLInputElement>(null);
   const [images, setImages] = useState<UploadedImage[]>(initialImages);
   const [removedImages, setRemovedImages] = useState<string[]>([]);
@@ -58,7 +60,7 @@ export default function ImageUploader({
   const uploadFiles = async (files: File[]) => {
     // ✅ 현재 업로드된 이미지 + 새로 추가될 이미지 개수 체크
     if (images.length + files.length > MAX_FILES) {
-      alert(`이미지는 최대 ${MAX_FILES}개까지만 업로드할 수 있습니다.`);
+      toast.error(t('common.upload.max_count', { max: MAX_FILES }));
       return;
     }
 
@@ -67,7 +69,9 @@ export default function ImageUploader({
 
     for (const file of files) {
       if (file.size > MAX_FILE_SIZE) {
-        alert(`"${file.name}" 파일은 2MB를 초과했습니다.`);
+        toast.error(
+          t('common.upload.over_size', { name: file.name, max: MAX_FILE_SIZE }),
+        );
         continue; // ✅ 용량 초과 파일 건너뜀
       }
       formData.append('image[]', file); // ✅ 여러 파일을 한번에 추가
@@ -75,7 +79,7 @@ export default function ImageUploader({
     }
 
     if (validFileCount === 0) {
-      alert('유효한 파일이 없습니다.');
+      toast.error(t('common.upload.no_file'));
       return;
     }
 
@@ -111,11 +115,11 @@ export default function ImageUploader({
           return updated;
         });
       } else {
-        alert('업로드 실패: ' + result.message);
+        toast.error(result.message);
       }
     } catch (error) {
       console.error('업로드 에러:', error);
-      alert('업로드 중 오류가 발생했습니다.');
+      toast.error(t('common.upload.error'));
     } finally {
       setIsUploading(false);
     }
@@ -186,7 +190,7 @@ export default function ImageUploader({
             className={styles.thumbnail + ' ' + styles.uploadBox}
             onClick={() => inputRef.current?.click()}
           >
-            +
+            {t('common.upload.label')}
             <input
               type="file"
               accept="image/*"
@@ -198,7 +202,7 @@ export default function ImageUploader({
           </div>
         )}
       </div>
-      {isUploading && <p>업로드 중입니다...</p>}
+      {isUploading && <p>{t('common.upload.uploading')}</p>}
     </div>
   );
 }

@@ -194,6 +194,7 @@
     "name": "이름",
     "email": "이메일",
     "gender": "성별",
+    "age": "나이",
     "img1": "프로필",
     "ipAddress": "IP",
     "sortOrder": "정렬순서",

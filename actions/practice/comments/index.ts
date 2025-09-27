@@ -337,9 +337,10 @@ export async function likeAction(payload: any) {
       return { status: 'error', message: msg };
     }
 
-    const message = rs.liked
-      ? '좋아요를 눌렀습니다.'
-      : '좋아요를 취소했습니다.';
+    const likemsg = await __ts('common.like', {}, language);
+    const unlikemsg = await __ts('common.unlike', {}, language);
+
+    const message = rs.liked ? likemsg : unlikemsg;
 
     return {
       status: 'success',

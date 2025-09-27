@@ -1,13 +1,23 @@
 'use server';
 
 import prisma from '@/lib/prisma';
+import { __ts } from '@/utils/get-dictionary';
+import { ckLocale } from '@/lib/cookie';
 
 export const listSortAction = async (
   uid: string,
   direction: 'up' | 'down' | 'top' | 'bottom',
 ) => {
+  const language = await ckLocale();
+
+  const msgerror = await __ts('common.sortAction.error', {}, language);
+  const msgtoTop = await __ts('common.sortAction.toTop', {}, language);
+  const msgtoBottom = await __ts('common.sortAction.toBottom', {}, language);
+  const msgchange = await __ts('common.sortAction.change', {}, language);
+  const msgnoData = await __ts('common.sortAction.noData', {}, language);
+
   const current = await prisma.todos.findUnique({ where: { uid } });
-  if (!current) return { status: 'error', message: '항목을 찾을 수 없습니다.' };
+  if (!current) return { status: 'error', message: msgerror };
 
   const currentOrder = current.sortOrder;
 
@@ -34,7 +44,7 @@ export const listSortAction = async (
         where: { uid },
         data: { sortOrder: (max._max.sortOrder || 0) + 1 },
       });
-      return { status: 'success', message: '최상단으로 이동했습니다.' };
+      return { status: 'success', message: msgtoTop };
 
     case 'bottom':
       const min = await prisma.todos.aggregate({
@@ -44,7 +54,7 @@ export const listSortAction = async (
         where: { uid },
         data: { sortOrder: (min._min.sortOrder || 0) - 1 },
       });
-      return { status: 'success', message: '최하단으로 이동했습니다.' };
+      return { status: 'success', message: msgtoBottom };
   }
 
   if (target) {
@@ -60,8 +70,8 @@ export const listSortAction = async (
       }),
     ]);
 
-    return { status: 'success', message: '정렬이 변경되었습니다.' };
+    return { status: 'success', message: msgchange };
   }
 
-  return { status: 'error', message: '이동할 대상이 없습니다.' };
+  return { status: 'error', message: msgnoData };
 };

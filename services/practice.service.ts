@@ -38,10 +38,6 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
 
   const safeLimit = Math.min(Math.max(+limit || 20, 1), 100);
 
-  console.log(`검색파라미터 ==================`);
-  console.log(params);
-  console.log(`검색파라미터 ==================`);
-
   // ───────────────────────────────────
   // where (검색/필터)
   // ───────────────────────────────────

@@ -178,13 +178,13 @@ const ListForm = ({ baseParams }: Props) => {
       />
       <div className="d-flex justify-content-between align-items-center mb-2">
         <div>
-          All: {totalAll} / Filtered: {totalFiltered}
+          {t('common.all')}: {totalAll} / {t('common.search')}: {totalFiltered}
         </div>
         <button
           className="btn btn-sm btn-outline-secondary"
           onClick={() => refetch()}
         >
-          새로고침
+          {t('common.refresh')}
         </button>
       </div>
 
@@ -289,8 +289,8 @@ const ListForm = ({ baseParams }: Props) => {
               <th className="text-center">{t('columns.todos.email')}</th>
               <th className="text-center">{t('columns.todos.createdAt')}</th>
               <th className="text-center">{t('columns.todos.updatedAt')}</th>
-              <th className="text-center">Counts</th>
-              <th className="text-center">Actions</th>
+              <th className="text-center">{t('common.counts')}</th>
+              <th className="text-center">{t('common.actions')}</th>
             </tr>
           </thead>
           <tbody>

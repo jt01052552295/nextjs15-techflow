@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { useLanguage } from '@/components/context/LanguageContext';
 import Lightbox from 'yet-another-react-lightbox';
 import Counter from 'yet-another-react-lightbox/plugins/counter';
 import Thumbnails from 'yet-another-react-lightbox/plugins/thumbnails';
@@ -20,10 +21,11 @@ type Props = {
 };
 
 export default function ImageView({ images }: Props) {
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
 
   if (images.length === 0) {
-    return <div className="text-center text-muted">추가 정보가 없습니다.</div>;
+    return <div className="text-center text-muted">{t('common.no_items')}</div>;
   }
 
   const firstImage = images[0];

@@ -113,7 +113,7 @@ export default function ShowForm({ uid }: Props) {
         <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
           <div className="modal-content" style={{ maxHeight: '70vh' }}>
             <div className="modal-header">
-              <h3 className="modal-title fs-5">View</h3>
+              <h3 className="modal-title fs-5">{t('common.view')}</h3>
               <button
                 type="button"
                 className="btn-close"
@@ -307,7 +307,7 @@ export default function ShowForm({ uid }: Props) {
                                 </div>
                                 <div className="mb-2 w-100">
                                   <div className="text-secondary small">
-                                    이름
+                                    {t('columns.todos.name')}
                                   </div>
                                   <div className="fs-4 fw-semibold">
                                     {v.name}
@@ -315,7 +315,7 @@ export default function ShowForm({ uid }: Props) {
                                 </div>
                                 <div className="mb-2 w-100">
                                   <div className="text-secondary small">
-                                    나이
+                                    {t('columns.todos.age')}
                                   </div>
                                   <div className="fs-4 fw-semibold">
                                     {v.age}
@@ -323,7 +323,7 @@ export default function ShowForm({ uid }: Props) {
                                 </div>
                                 <div className="w-100">
                                   <div className="text-secondary small">
-                                    성별
+                                    {t('columns.todos.gender')}
                                   </div>
                                   <div className="fs-4 fw-semibold">
                                     {v.gender}
@@ -334,7 +334,7 @@ export default function ShowForm({ uid }: Props) {
                           ))
                         ) : (
                           <div className="col-12 text-center text-muted">
-                            추가 정보가 없습니다.
+                            {t('common.no_items')}
                           </div>
                         )}
                       </div>

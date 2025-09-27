@@ -270,15 +270,21 @@ export default function ShowForm({ uid }: Props) {
                             </h4>
                           </div>
                           <div className="mb-2 w-100">
-                            <div className="text-secondary small">이름</div>
+                            <div className="text-secondary small">
+                              {t('columns.todos.name')}
+                            </div>
                             <div className="fs-4 fw-semibold">{v.name}</div>
                           </div>
                           <div className="mb-2 w-100">
-                            <div className="text-secondary small">나이</div>
+                            <div className="text-secondary small">
+                              {t('columns.todos.age')}
+                            </div>
                             <div className="fs-4 fw-semibold">{v.age}</div>
                           </div>
                           <div className="w-100">
-                            <div className="text-secondary small">성별</div>
+                            <div className="text-secondary small">
+                              {t('columns.todos.gender')}
+                            </div>
                             <div className="fs-4 fw-semibold">{v.gender}</div>
                           </div>
                         </div>
@@ -286,7 +292,7 @@ export default function ShowForm({ uid }: Props) {
                     ))
                   ) : (
                     <div className="col-12 text-center text-muted">
-                      추가 정보가 없습니다.
+                      {t('common.no_items')}
                     </div>
                   )}
                 </div>

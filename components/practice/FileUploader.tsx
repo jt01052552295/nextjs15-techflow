@@ -5,7 +5,8 @@ import styles from './scss/FileUploader.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { imageUploadAction } from '@/actions/upload/image';
-
+import { useLanguage } from '@/components/context/LanguageContext';
+import { toast } from 'sonner';
 type UploadedFile = {
   name: string; // 서버 저장 파일명
   originalName: string; // 업로드한 원본 이름
@@ -33,6 +34,7 @@ export default function FileUploader({
   initialFiles = [],
   mode = 'create',
 }: Props) {
+  const { t } = useLanguage();
   const inputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<UploadedFile[]>(initialFiles);
   const [removedFiles, setRemovedFiles] = useState<string[]>([]);
@@ -62,7 +64,7 @@ export default function FileUploader({
 
   const uploadFiles = async (selectedFiles: File[]) => {
     if (files.length + selectedFiles.length > MAX_FILES) {
-      alert(`파일은 최대 ${MAX_FILES}개까지만 업로드할 수 있습니다.`);
+      toast.error(t('common.upload.max_count', { max: MAX_FILES }));
       return;
     }
 
@@ -71,7 +73,9 @@ export default function FileUploader({
 
     for (const file of selectedFiles) {
       if (file.size > MAX_FILE_SIZE) {
-        alert(`"${file.name}" 파일은 2MB를 초과했습니다.`);
+        toast.error(
+          t('common.upload.over_size', { name: file.name, max: MAX_FILE_SIZE }),
+        );
         continue;
       }
       formData.append('image[]', file);
@@ -79,7 +83,7 @@ export default function FileUploader({
     }
 
     if (validFileCount === 0) {
-      alert('유효한 파일이 없습니다.');
+      toast.error(t('common.upload.no_file'));
       return;
     }
 
@@ -112,11 +116,11 @@ export default function FileUploader({
           return updated;
         });
       } else {
-        alert('업로드 실패: ' + result.message);
+        toast.error(result.message);
       }
     } catch (error) {
       console.error('업로드 에러:', error);
-      alert('업로드 중 오류가 발생했습니다.');
+      toast.error(t('common.upload.error'));
     } finally {
       setIsUploading(false);
     }
@@ -187,7 +191,7 @@ export default function FileUploader({
           className={styles.uploadBox}
           onClick={() => inputRef.current?.click()}
         >
-          + 파일 업로드
+          {t('common.upload.label')}
           <input
             type="file"
             multiple
@@ -198,7 +202,7 @@ export default function FileUploader({
         </div>
       )}
 
-      {isUploading && <p>업로드 중입니다...</p>}
+      {isUploading && <p>{t('common.upload.uploading')}</p>}
     </div>
   );
 }

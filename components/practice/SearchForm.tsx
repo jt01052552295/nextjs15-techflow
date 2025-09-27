@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState, useId } from 'react';
 import { DEFAULTS, type PracticeBaseParams } from '@/types/practice/search';
+import { useLanguage } from '@/components/context/LanguageContext';
 
 type Props = {
   value: PracticeBaseParams; // 현재 URL에서 온 값
@@ -15,6 +16,8 @@ export default function SearchForm({
   onReset,
   loading,
 }: Props) {
+  const { t } = useLanguage();
+
   const uid = useId(); // SSR/CSR 모두 안전한 유니크 접두어
   const rn = (group: string) => `${uid}-${group}`; // radio name
   const rid = (id: string) => `${uid}-${id}`; // input id
@@ -47,13 +50,13 @@ export default function SearchForm({
   // ───────── 버튼 라벨 (항상 "적용값 value" 기준!) ─────────
   const dateBtnLabel = (() => {
     if (!value.dateType && !value.startDate && !value.endDate)
-      return '날짜·기간';
+      return t('common.period');
     const type =
       value.dateType === 'createdAt'
-        ? '작성일'
+        ? t('columns.todos.createdAt')
         : value.dateType === 'updatedAt'
-          ? '수정일'
-          : '날짜';
+          ? t('columns.todos.updatedAt')
+          : t('common.period');
     const range =
       value.startDate || value.endDate
         ? ` ${value.startDate ?? '..'}~${value.endDate ?? '..'}`
@@ -62,36 +65,40 @@ export default function SearchForm({
   })();
 
   const isUseBtnLabel =
-    value.isUse === undefined ? '사용' : value.isUse ? '사용(ON)' : '미사용';
+    value.isUse === undefined
+      ? t('columns.todos.isUse')
+      : value.isUse
+        ? t('common.usage')
+        : t('common.usageNone');
 
   const isVisibleBtnLabel =
     value.isVisible === undefined
-      ? '노출'
+      ? t('columns.todos.isVisible')
       : value.isVisible
-        ? '노출(ON)'
-        : '비노출';
+        ? t('common.visible')
+        : t('common.visibleNone');
 
   const sortBtnLabel = (() => {
     const map: Record<string, string> = {
-      createdAt: '작성일',
-      updatedAt: '수정일',
-      idx: 'IDX',
-      name: '이름',
-      email: '이메일',
-      sortOrder: '정렬값',
+      createdAt: t('columns.todos.createdAt'),
+      updatedAt: t('columns.todos.updatedAt'),
+      idx: t('columns.todos.idx'),
+      name: t('columns.todos.name'),
+      email: t('columns.todos.email'),
+      sortOrder: t('columns.todos.sortOrder'),
     };
-    const by = map[value.sortBy ?? DEFAULTS.sortBy!] ?? '정렬값';
+    const by =
+      map[value.sortBy ?? DEFAULTS.sortBy!] ?? t('columns.todos.sortOrder');
     const arrow = (value.order ?? DEFAULTS.order) === 'desc' ? '↓' : '↑';
     return `${by} ${arrow}`;
   })();
 
-  const limitBtnLabel = `${value.limit ?? DEFAULTS.limit}개`;
+  const limitBtnLabel = `${value.limit ?? DEFAULTS.limit}`;
 
   // ───────── 각 부분필터 "초기화"(편집값만 리셋; 적용은 확인 버튼에서) ─────────
   const resetDate = () =>
     setF((prev) => ({
       ...prev,
-      dateType: undefined,
       startDate: undefined,
       endDate: undefined,
     }));
@@ -114,7 +121,7 @@ export default function SearchForm({
           <div className="input-group">
             <input
               className="form-control"
-              placeholder="이름/이메일 통합검색"
+              placeholder={t('common.search_all')}
               value={q}
               onChange={(e) => setQ(e.target.value)}
             />
@@ -124,7 +131,7 @@ export default function SearchForm({
               onClick={apply}
               disabled={loading}
             >
-              검색
+              {t('common.search')}
             </button>
           </div>
         </div>
@@ -140,7 +147,7 @@ export default function SearchForm({
               data-bs-target="#practiceFilters"
               aria-controls="practiceFilters"
             >
-              필터
+              {t('common.filter')}
             </button>
 
             {/* 초기화 버튼 - 항상 표시 */}
@@ -150,7 +157,7 @@ export default function SearchForm({
               onClick={onReset}
               disabled={loading}
             >
-              초기화
+              {t('common.reset')}
             </button>
           </div>
         </div>
@@ -205,7 +212,7 @@ export default function SearchForm({
         <div className="flex-grow-1">
           <input
             className="form-control"
-            placeholder="이름/이메일 통합검색"
+            placeholder={t('common.search_all')}
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
@@ -217,7 +224,7 @@ export default function SearchForm({
           onClick={apply}
           disabled={loading}
         >
-          검색
+          {t('common.search')}
         </button>
 
         <button
@@ -227,7 +234,7 @@ export default function SearchForm({
           data-bs-target="#practiceFilters"
           aria-controls="practiceFilters"
         >
-          필터
+          {t('common.filter')}
         </button>
         {/* 각 항목별 Offcanvas 트리거 */}
         <button
@@ -277,7 +284,7 @@ export default function SearchForm({
           onClick={onReset}
           disabled={loading}
         >
-          초기화
+          {t('common.reset')}
         </button>
       </div>
 
@@ -290,7 +297,7 @@ export default function SearchForm({
       >
         <div className="offcanvas-header">
           <h5 id="practiceFiltersLabel" className="offcanvas-title">
-            필터
+            {t('common.filter')}
           </h5>
           <button
             type="button"
@@ -303,23 +310,8 @@ export default function SearchForm({
         <div className="offcanvas-body">
           {/* 날짜 구분 */}
           <div className="mb-3">
-            <label className="form-label">날짜 구분</label>
+            <label className="form-label">{t('common.period')}</label>
             <div className="btn-group" role="group">
-              <input
-                type="radio"
-                className="btn-check"
-                name={rn('dateType-all')}
-                id={rid('dateType-all-any')}
-                checked={!f.dateType}
-                onChange={() => setF({ ...f, dateType: undefined })}
-              />
-              <label
-                className="btn btn-outline-secondary"
-                htmlFor={rid('dateType-all-any')}
-              >
-                전체
-              </label>
-
               <input
                 type="radio"
                 className="btn-check"
@@ -332,7 +324,7 @@ export default function SearchForm({
                 className="btn btn-outline-secondary"
                 htmlFor={rid('dateType-all-created')}
               >
-                작성일
+                {t('columns.todos.createdAt')}
               </label>
 
               <input
@@ -347,7 +339,7 @@ export default function SearchForm({
                 className="btn btn-outline-secondary"
                 htmlFor={rid('dateType-all-updated')}
               >
-                수정일
+                {t('columns.todos.updatedAt')}
               </label>
             </div>
           </div>
@@ -355,7 +347,7 @@ export default function SearchForm({
           {/* 기간 */}
           <div className="row g-2 mb-3">
             <div className="col-6">
-              <label className="form-label">시작일</label>
+              <label className="form-label">{t('common.start_date')}</label>
               <input
                 type="date"
                 className="form-control"
@@ -366,7 +358,7 @@ export default function SearchForm({
               />
             </div>
             <div className="col-6">
-              <label className="form-label">종료일</label>
+              <label className="form-label">{t('common.end_date')}</label>
               <input
                 type="date"
                 className="form-control"
@@ -380,7 +372,7 @@ export default function SearchForm({
 
           {/* isUse */}
           <div className="mb-3">
-            <label className="form-label">사용 여부</label>
+            <label className="form-label">{t('columns.todos.isUse')}</label>
             <div className="btn-group" role="group">
               <input
                 type="radio"
@@ -394,7 +386,7 @@ export default function SearchForm({
                 className="btn btn-outline-secondary"
                 htmlFor={rid('isUse-all-any')}
               >
-                전체
+                {t('common.all')}
               </label>
 
               <input
@@ -409,7 +401,7 @@ export default function SearchForm({
                 className="btn btn-outline-secondary"
                 htmlFor={rid('isUse-all-true')}
               >
-                사용
+                {t('common.usage')}
               </label>
 
               <input
@@ -424,14 +416,14 @@ export default function SearchForm({
                 className="btn btn-outline-secondary"
                 htmlFor={rid('isUse-all-false')}
               >
-                미사용
+                {t('common.usageNone')}
               </label>
             </div>
           </div>
 
           {/* isVisible */}
           <div className="mb-3">
-            <label className="form-label">노출 여부</label>
+            <label className="form-label">{t('columns.todos.isVisible')}</label>
             <div className="btn-group" role="group">
               <input
                 type="radio"
@@ -445,7 +437,7 @@ export default function SearchForm({
                 className="btn btn-outline-secondary"
                 htmlFor={rid('isVisible-all-any')}
               >
-                전체
+                {t('common.all')}
               </label>
 
               <input
@@ -460,7 +452,7 @@ export default function SearchForm({
                 className="btn btn-outline-secondary"
                 htmlFor={rid('isVisible-all-true')}
               >
-                노출
+                {t('common.visible')}
               </label>
 
               <input
@@ -475,14 +467,14 @@ export default function SearchForm({
                 className="btn btn-outline-secondary"
                 htmlFor={rid('isVisible-all-false')}
               >
-                비노출
+                {t('common.visibleNone')}
               </label>
             </div>
           </div>
 
           {/* 정렬 */}
           <div className="mb-3">
-            <label className="form-label">정렬</label>
+            <label className="form-label">{t('common.sort')}</label>
             <div className="row row-cols-2 g-2">
               <div className="col">
                 <select
@@ -492,12 +484,18 @@ export default function SearchForm({
                     setF({ ...f, sortBy: e.target.value as any })
                   }
                 >
-                  <option value="createdAt">작성일</option>
-                  <option value="updatedAt">수정일</option>
-                  <option value="idx">IDX</option>
-                  <option value="name">이름</option>
-                  <option value="email">이메일</option>
-                  <option value="sortOrder">정렬값</option>
+                  <option value="createdAt">
+                    {t('columns.todos.createdAt')}
+                  </option>
+                  <option value="updatedAt">
+                    {t('columns.todos.updatedAt')}
+                  </option>
+                  <option value="idx">{t('columns.todos.idx')}</option>
+                  <option value="name">{t('columns.todos.name')}</option>
+                  <option value="email">{t('columns.todos.email')}</option>
+                  <option value="sortOrder">
+                    {t('columns.todos.sortOrder')}
+                  </option>
                 </select>
               </div>
               <div className="col">
@@ -514,7 +512,7 @@ export default function SearchForm({
                     className="btn btn-outline-secondary"
                     htmlFor={rid(`order-all-desc`)}
                   >
-                    내림차순
+                    {t('common.desc')}
                   </label>
                   <input
                     type="radio"
@@ -528,7 +526,7 @@ export default function SearchForm({
                     className="btn btn-outline-secondary"
                     htmlFor={rid(`order-all-asc`)}
                   >
-                    오름차순
+                    {t('common.asc')}
                   </label>
                 </div>
               </div>
@@ -537,7 +535,7 @@ export default function SearchForm({
 
           {/* limit */}
           <div className="mb-3">
-            <label className="form-label">페이지 크기</label>
+            <label className="form-label">{t('common.limit')}</label>
             <div className="btn-group" role="group">
               {[10, 20, 50, 100].map((n) => (
                 <div key={n}>
@@ -553,7 +551,7 @@ export default function SearchForm({
                     className="btn btn-outline-secondary"
                     htmlFor={rid(`limit-all-${n}`)}
                   >
-                    {n}개
+                    {n}
                   </label>
                 </div>
               ))}
@@ -567,13 +565,13 @@ export default function SearchForm({
               data-bs-dismiss="offcanvas"
               onClick={apply}
             >
-              확인
+              {t('common.confirm')}
             </button>
           </div>
         </div>
       </div>
 
-      {/* ─────────── 날짜·기간(통합) Offcanvas ─────────── */}
+      {/* ─────────── 기간(통합) Offcanvas ─────────── */}
       <div
         className="offcanvas offcanvas-end"
         tabIndex={-1}
@@ -582,7 +580,7 @@ export default function SearchForm({
       >
         <div className="offcanvas-header">
           <h5 id="of-date-label" className="offcanvas-title">
-            날짜·기간
+            {t('common.period')}
           </h5>
           <button
             type="button"
@@ -594,23 +592,8 @@ export default function SearchForm({
         <div className="offcanvas-body">
           {/* 날짜 구분 */}
           <div className="mb-3">
-            <label className="form-label">날짜 구분</label>
+            <label className="form-label">{t('common.period')}</label>
             <div className="btn-group" role="group">
-              <input
-                type="radio"
-                className="btn-check"
-                name={rn('dateType-single')}
-                id={rid('dateType-single-true')}
-                checked={!f.dateType}
-                onChange={() => setF({ ...f, dateType: undefined })}
-              />
-              <label
-                className="btn btn-outline-secondary"
-                htmlFor={rid('dateType-single-true')}
-              >
-                전체
-              </label>
-
               <input
                 type="radio"
                 className="btn-check"
@@ -623,7 +606,7 @@ export default function SearchForm({
                 className="btn btn-outline-secondary"
                 htmlFor={rid('dateType-single-created')}
               >
-                작성일
+                {t('columns.todos.createdAt')}
               </label>
 
               <input
@@ -638,7 +621,7 @@ export default function SearchForm({
                 className="btn btn-outline-secondary"
                 htmlFor={rid('dateType-single-updated')}
               >
-                수정일
+                {t('columns.todos.updatedAt')}
               </label>
             </div>
           </div>
@@ -646,7 +629,7 @@ export default function SearchForm({
           {/* 기간 */}
           <div className="row g-2 mb-3">
             <div className="col-6">
-              <label className="form-label">시작일</label>
+              <label className="form-label">{t('common.start_date')}</label>
               <input
                 type="date"
                 className="form-control"
@@ -657,7 +640,7 @@ export default function SearchForm({
               />
             </div>
             <div className="col-6">
-              <label className="form-label">종료일</label>
+              <label className="form-label">{t('common.end_date')}</label>
               <input
                 type="date"
                 className="form-control"
@@ -675,7 +658,7 @@ export default function SearchForm({
               type="button"
               onClick={resetDate}
             >
-              초기화
+              {t('common.reset')}
             </button>
             <button
               className="btn btn-primary ms-auto"
@@ -683,7 +666,7 @@ export default function SearchForm({
               data-bs-dismiss="offcanvas"
               onClick={apply}
             >
-              확인
+              {t('common.confirm')}
             </button>
           </div>
         </div>
@@ -698,7 +681,7 @@ export default function SearchForm({
       >
         <div className="offcanvas-header">
           <h5 id="of-isUse-single-label" className="offcanvas-title">
-            사용 여부
+            {t('columns.todos.isUse')}
           </h5>
           <button
             type="button"
@@ -721,7 +704,7 @@ export default function SearchForm({
               className="btn btn-outline-secondary"
               htmlFor={rid('isUse-single-any')}
             >
-              전체
+              {t('common.all')}
             </label>
 
             <input
@@ -736,7 +719,7 @@ export default function SearchForm({
               className="btn btn-outline-secondary"
               htmlFor={rid('isUse-single-true')}
             >
-              사용
+              {t('common.usage')}
             </label>
 
             <input
@@ -751,7 +734,7 @@ export default function SearchForm({
               className="btn btn-outline-secondary"
               htmlFor={rid('isUse-single-false')}
             >
-              미사용
+              {t('common.usageNone')}
             </label>
           </div>
 
@@ -761,7 +744,7 @@ export default function SearchForm({
               type="button"
               onClick={resetUse}
             >
-              초기화
+              {t('common.reset')}
             </button>
             <button
               className="btn btn-primary ms-auto"
@@ -769,7 +752,7 @@ export default function SearchForm({
               data-bs-dismiss="offcanvas"
               onClick={apply}
             >
-              확인
+              {t('common.confirm')}
             </button>
           </div>
         </div>
@@ -784,7 +767,7 @@ export default function SearchForm({
       >
         <div className="offcanvas-header">
           <h5 id="of-isVisible-single-label" className="offcanvas-title">
-            노출 여부
+            {t('columns.todos.isVisible')}
           </h5>
           <button
             type="button"
@@ -807,7 +790,7 @@ export default function SearchForm({
               className="btn btn-outline-secondary"
               htmlFor={rid('isVisible-single-any')}
             >
-              전체
+              {t('common.all')}
             </label>
 
             <input
@@ -822,7 +805,7 @@ export default function SearchForm({
               className="btn btn-outline-secondary"
               htmlFor={rid('isVisible-single-true')}
             >
-              노출
+              {t('common.visible')}
             </label>
 
             <input
@@ -837,7 +820,7 @@ export default function SearchForm({
               className="btn btn-outline-secondary"
               htmlFor={rid('isVisible-single-false')}
             >
-              비노출
+              {t('common.visibleNone')}
             </label>
           </div>
 
@@ -847,7 +830,7 @@ export default function SearchForm({
               type="button"
               onClick={resetVisible}
             >
-              초기화
+              {t('common.reset')}
             </button>
             <button
               className="btn btn-primary ms-auto"
@@ -855,7 +838,7 @@ export default function SearchForm({
               data-bs-dismiss="offcanvas"
               onClick={apply}
             >
-              확인
+              {t('common.confirm')}
             </button>
           </div>
         </div>
@@ -870,7 +853,7 @@ export default function SearchForm({
       >
         <div className="offcanvas-header">
           <h5 id="of-sort-single-label" className="offcanvas-title">
-            정렬
+            {t('common.sort')}
           </h5>
           <button
             type="button"
@@ -887,12 +870,18 @@ export default function SearchForm({
                 value={f.sortBy ?? 'sortOrder'}
                 onChange={(e) => setF({ ...f, sortBy: e.target.value as any })}
               >
-                <option value="createdAt">작성일</option>
-                <option value="updatedAt">수정일</option>
-                <option value="idx">IDX</option>
-                <option value="name">이름</option>
-                <option value="email">이메일</option>
-                <option value="sortOrder">정렬값</option>
+                <option value="createdAt">
+                  {t('columns.todos.createdAt')}
+                </option>
+                <option value="updatedAt">
+                  {t('columns.todos.updatedAt')}
+                </option>
+                <option value="idx">{t('columns.todos.idx')}</option>
+                <option value="name">{t('columns.todos.name')}</option>
+                <option value="email">{t('columns.todos.email')}</option>
+                <option value="sortOrder">
+                  {t('columns.todos.sortOrder')}
+                </option>
               </select>
             </div>
             <div className="col">
@@ -909,7 +898,7 @@ export default function SearchForm({
                   className="btn btn-outline-secondary"
                   htmlFor={rid('order-single-desc')}
                 >
-                  내림차순
+                  {t('common.desc')}
                 </label>
                 <input
                   type="radio"
@@ -923,7 +912,7 @@ export default function SearchForm({
                   className="btn btn-outline-secondary"
                   htmlFor={rid('order-single-asc')}
                 >
-                  오름차순
+                  {t('common.asc')}
                 </label>
               </div>
             </div>
@@ -934,7 +923,7 @@ export default function SearchForm({
               type="button"
               onClick={resetSort}
             >
-              초기화
+              {t('common.reset')}
             </button>
             <button
               className="btn btn-primary ms-auto"
@@ -942,7 +931,7 @@ export default function SearchForm({
               data-bs-dismiss="offcanvas"
               onClick={apply}
             >
-              확인
+              {t('common.confirm')}
             </button>
           </div>
         </div>
@@ -956,7 +945,7 @@ export default function SearchForm({
       >
         <div className="offcanvas-header">
           <h5 id="of-limit-single-label" className="offcanvas-title">
-            페이지 크기
+            {t('common.limit')}
           </h5>
           <button
             type="button"
@@ -981,7 +970,7 @@ export default function SearchForm({
                   className="btn btn-outline-secondary"
                   htmlFor={rid(`limit-single-${n}`)}
                 >
-                  {n}개
+                  {n}
                 </label>
               </div>
             ))}
@@ -993,7 +982,7 @@ export default function SearchForm({
               type="button"
               onClick={resetLimit}
             >
-              초기화
+              {t('common.reset')}
             </button>
             <button
               className="btn btn-primary ms-auto"
@@ -1001,7 +990,7 @@ export default function SearchForm({
               data-bs-dismiss="offcanvas"
               onClick={apply}
             >
-              확인
+              {t('common.confirm')}
             </button>
           </div>
         </div>

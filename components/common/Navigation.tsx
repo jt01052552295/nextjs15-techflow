@@ -19,24 +19,36 @@ import {
   faAngleDown,
 } from '@fortawesome/free-solid-svg-icons';
 
+interface SubMenu {
+  id: string;
+  route: string;
+}
+
+interface MainMenu {
+  id: string;
+  icon: typeof faHome; // 또는 IconDefinition
+  route: string | null;
+  subMenus: SubMenu[];
+}
+
 const Navigation = () => {
   const mount = useMount();
   const pathname = usePathname();
   const { dictionary, locale, t } = useLanguage();
 
-  const menuStructure = [
+  const menuStructure: MainMenu[] = [
     {
       id: 'dashboard',
       icon: faHome,
       route: 'main.index', // 대시보드
       subMenus: [],
     },
-    {
-      id: 'Todos',
-      icon: faUser,
-      route: 'todos.index',
-      subMenus: [],
-    },
+    // {
+    //   id: 'Todos',
+    //   icon: faUser,
+    //   route: 'todos.index',
+    //   subMenus: [],
+    // },
     {
       id: 'Practice',
       icon: faUser,
