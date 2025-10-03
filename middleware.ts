@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server';
 import { I18N_CONFIG } from '@/constants/i18n';
 import type { LocaleType } from '@/constants/i18n';
 import { getRouteUrl } from '@/utils/routes';
+import { logUserAgent } from '@/lib/user-agent';
 
 const PUBLIC_PATHS = ['/auth'];
 
@@ -10,6 +11,10 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const pathnameSegments = pathname.split('/').filter(Boolean);
   const firstSegment = pathnameSegments[0] as LocaleType | undefined;
+
+  logUserAgent(request).catch((err) =>
+    console.error('로그 기록 중 오류:', err),
+  );
 
   // 루트 경로('/')로 접근한 경우 기본 언어의 메인 페이지로 리다이렉트
   if (pathname === '/') {
