@@ -262,6 +262,24 @@
       "desc": ""
     }
   },
+  "category": {
+    "index": {
+      "name": "카테고리",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
+      "desc": ""
+    }
+  },
   "management": {
     "index": {
       "name": "분류관리",

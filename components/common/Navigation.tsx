@@ -22,6 +22,8 @@ import {
 interface SubMenu {
   id: string;
   route: string;
+  params?: Record<string, string>;
+  customName?: string; // 개별적인 메뉴 이름을 위한 필드 추가
 }
 
 interface MainMenu {
@@ -43,18 +45,38 @@ const Navigation = () => {
       route: 'main.index', // 대시보드
       subMenus: [],
     },
-    // {
-    //   id: 'Todos',
-    //   icon: faUser,
-    //   route: 'todos.index',
-    //   subMenus: [],
-    // },
     {
-      id: 'Practice',
-      icon: faUser,
-      route: 'practice.index',
-      subMenus: [],
+      id: 'Config',
+      icon: faGears,
+      route: 'config.index',
+      subMenus: [
+        { id: 'config-list', route: 'config.index' },
+        {
+          id: 'config-edit-person',
+          route: 'config.edit',
+          params: { id: 'person' },
+          customName: t('routes.config.edit.person'),
+        },
+        {
+          id: 'config-edit-use',
+          route: 'config.edit',
+          params: { id: 'use' },
+          customName: t('routes.config.edit.agree'),
+        },
+        {
+          id: 'config-edit-email',
+          route: 'config.edit',
+          params: { id: 'email' },
+          customName: t('routes.config.edit.email'),
+        },
+
+        { id: 'agent-list', route: 'agent.index' },
+        { id: 'popup-list', route: 'popup.index' },
+        { id: 'banner-list', route: 'banner.index' },
+        { id: 'category-list', route: 'category.index' },
+      ],
     },
+
     // {
     //   id: 'members',
     //   icon: faUser,
@@ -64,22 +86,12 @@ const Navigation = () => {
     //     { id: 'company-list', route: 'auth.register' }, // 업체 목록
     //   ],
     // },
-    // {
-    //   id: 'devices',
-    //   icon: faServer,
-    //   route: null,
-    //   subMenus: [
-    //     { id: 'device-management', route: 'device.index' }, // 절감장치
-    //   ],
-    // },
-    // {
-    //   id: 'statistics',
-    //   icon: faChartSimple,
-    //   route: null,
-    //   subMenus: [
-    //     { id: 'power-statistics', route: 'estat.index' }, // 전력통계
-    //   ],
-    // },
+    {
+      id: 'Practice',
+      icon: faUser,
+      route: 'practice.index',
+      subMenus: [],
+    },
   ];
 
   const [openMenus, setOpenMenus] = useState<string[]>([]);
@@ -103,7 +115,7 @@ const Navigation = () => {
 
       // 하위 메뉴 확인
       menu.subMenus.forEach((subMenu) => {
-        const url = getRouteUrl(subMenu.route, locale);
+        const url = getRouteUrl(subMenu.route, locale, subMenu.params);
         if (pathname === url) {
           activeMenuId = menu.id;
         }
@@ -128,9 +140,9 @@ const Navigation = () => {
   };
 
   // 현재 메뉴가 활성화되었는지 확인
-  const isActive = (route: string | null) => {
+  const isActive = (route: string | null, params?: Record<string, string>) => {
     if (!route) return false;
-    const url = getRouteUrl(route, locale);
+    const url = getRouteUrl(route, locale, params);
     return pathname === url;
   };
   if (!mount) return null;
@@ -146,7 +158,9 @@ const Navigation = () => {
             : { name: dictionary.menu?.[menu.id] || menu.id };
           const isMenuActive = menu.route
             ? isActive(menu.route)
-            : menu.subMenus.some((subMenu) => isActive(subMenu.route));
+            : menu.subMenus.some((subMenu) =>
+                isActive(subMenu.route, subMenu.params),
+              );
 
           return (
             <li
@@ -186,13 +200,17 @@ const Navigation = () => {
                       dictionary,
                       locale,
                     );
-                    const url = getRouteUrl(subMenu.route, locale);
+                    const url = getRouteUrl(
+                      subMenu.route,
+                      locale,
+                      subMenu.params,
+                    );
 
                     return (
                       <li
                         key={subMenu.id}
                         className={cx('sub-menu-item', {
-                          active: isActive(subMenu.route),
+                          active: isActive(subMenu.route, subMenu.params),
                         })}
                       >
                         <Link href={url} className="sub-menu-link">
@@ -200,7 +218,7 @@ const Navigation = () => {
                             icon={faCaretRight}
                             className="sub-menu-icon"
                           />
-                          {subMenuMetadata.name}
+                          {subMenu.customName || subMenuMetadata.name}
                         </Link>
                       </li>
                     );

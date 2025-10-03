@@ -373,7 +373,7 @@ model Banner {
   img1      String   @default("") @map("img1")
   img2      String   @default("") @map("img2")
   url       String   @default("") @map("url")
-  ord       Int      @default(0) @map("ord")
+  sortOrder    Int            @default(0) @map("sort_order")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   isUse     Boolean  @default(true) @map("is_use")
@@ -392,7 +392,7 @@ model Config {
   CNFvalue_en String? @db.LongText
   CNFvalue_ja String? @db.LongText
   CNFvalue_zh String? @db.LongText
-  ord         Int     @default(0)
+  sortOrder    Int            @default(0) @map("sort_order")
 
   @@map("ec_config")
 }
@@ -429,7 +429,7 @@ model Management {
   value_en  String?  @db.VarChar(255)
   value_ja  String?  @db.VarChar(255)
   value_zh  String?  @db.VarChar(255)
-  ord       Int      @default(0)
+  sortOrder    Int            @default(0) @map("sort_order")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   isUse     Boolean  @default(true) @map("is_use")

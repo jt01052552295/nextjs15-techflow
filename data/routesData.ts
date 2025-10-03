@@ -87,16 +87,17 @@ export const routesData = {
   },
   config: {
     index: '/config',
+    create: '/config/p/create',
     edit: '/config/{id}/edit',
   },
   agent: {
     index: '/agent',
   },
-  management: {
-    index: '/management',
-    create: '/management/p/create',
-    show: '/management/{id}',
-    edit: '/management/{id}/edit',
+  category: {
+    index: '/category',
+    create: '/category/p/create',
+    show: '/category/{id}',
+    edit: '/category/{id}/edit',
   },
   ebill: {
     index: '/ebill',

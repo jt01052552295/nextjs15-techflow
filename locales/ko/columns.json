@@ -220,7 +220,7 @@
     "CNFvalue_en": "English",
     "CNFvalue_ja": "日本語",
     "CNFvalue_zh": "中文",
-    "ord": "정렬순서"
+    "sortOrder": "정렬순서"
   },
   "configEntries": {
     "company_addr": "회사주소",
