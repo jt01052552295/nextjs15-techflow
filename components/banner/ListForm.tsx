@@ -7,7 +7,7 @@ import { getRouteUrl } from '@/utils/routes';
 import { useBannerInfinite } from '@/hooks/react-query/useBanner';
 import ListRowSkeleton from './ListRowSkeleton';
 import ListRow from './ListRow';
-import type { IBanner, IBannerListRow } from '@/types/banner';
+import type { IBanner, IBannerListRow, ListEditCell } from '@/types/banner';
 import ScrollToTopButton from '../common/ScrollToTopButton';
 
 import {
@@ -143,7 +143,7 @@ const ListForm = ({ baseParams }: Props) => {
 
   const handleFieldSave = async (
     uid: string,
-    field: 'gubun' | 'title',
+    field: ListEditCell,
     newValue: string,
     onSuccess: (val: string) => void,
     onError: () => void,

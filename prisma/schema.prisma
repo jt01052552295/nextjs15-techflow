@@ -455,6 +455,23 @@ model Management {
   @@map("ec_management")
 }
 
+
+model Category {
+  idx       Int      @id @default(autoincrement())
+  uid       String   @unique @default(uuid())
+  cid       String   @default(cuid())
+  code      String   @db.VarChar(255)
+  name      String   @db.VarChar(255)
+  desc      String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  isUse     Boolean  @default(true) @map("is_use")
+  isVisible Boolean  @default(true) @map("is_visible")
+
+  @@map("ec_category")
+}
+
+
 model ElectricBill {
   idx                Int       @id @default(autoincrement())
   uid                String    @unique @default(uuid())

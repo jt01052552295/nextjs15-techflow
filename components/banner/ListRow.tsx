@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import type { IBanner, IBannerListRow } from '@/types/banner';
+import type { IBanner, IBannerListRow, ListEditCell } from '@/types/banner';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -23,7 +23,7 @@ type Props = {
   onCheck: (uid: string, checked: boolean) => void;
   onFieldSave: (
     uid: string,
-    field: 'gubun' | 'title',
+    field: ListEditCell,
     newValue: string,
     onSuccess: (val: string) => void,
     onError: () => void,

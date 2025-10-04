@@ -35,6 +35,8 @@ export type ITodosListRow = ITodos & {
   _count: ITodosCounts;
 };
 
+export type ListEditCell = 'name' | 'email';
+
 export interface ITodosComment {
   idx: number;
   uid: string;

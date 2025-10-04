@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import type { ITodos, ITodosListRow, ITodosFilterType } from '@/types/todos';
+import type { ITodos, ITodosListRow, ListEditCell } from '@/types/todos';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -23,7 +23,7 @@ type Props = {
   onCheck: (uid: string, checked: boolean) => void;
   onFieldSave: (
     uid: string,
-    field: 'name' | 'email',
+    field: ListEditCell,
     newValue: string,
     onSuccess: (val: string) => void,
     onError: () => void,

@@ -7,7 +7,7 @@ import { getRouteUrl } from '@/utils/routes';
 import { usePracticeInfinite } from '@/hooks/react-query/usePractice';
 import ListRowSkeleton from './ListRowSkeleton';
 import ListRow from './ListRow';
-import type { ITodos, ITodosListRow } from '@/types/todos';
+import type { ITodos, ITodosListRow, ListEditCell } from '@/types/todos';
 import ScrollToTopButton from '../common/ScrollToTopButton';
 
 import {
@@ -143,7 +143,7 @@ const ListForm = ({ baseParams }: Props) => {
 
   const handleFieldSave = async (
     uid: string,
-    field: 'name' | 'email',
+    field: ListEditCell,
     newValue: string,
     onSuccess: (val: string) => void,
     onError: () => void,

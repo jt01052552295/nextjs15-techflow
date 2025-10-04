@@ -20,6 +20,8 @@ export type IBannerListRow = IBanner & {
   updatedAt: string; // DTO에서 ISO 문자열로 변환
 };
 
+export type ListEditCell = 'gubun' | 'title';
+
 export interface IBannerFile {
   idx: number;
   uid: string;
