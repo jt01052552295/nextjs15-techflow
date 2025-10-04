@@ -177,15 +177,14 @@
     "cid": "CUID",
     "gubun": "구분",
     "title": "제목",
-    "img1": "PC이미지",
-    "img2": "모바일이미지",
     "url": "URL",
-    "ord": "정렬순서",
+    "deviceType": "장치유형",
+    "sortOrder": "정렬순서",
     "createdAt": "생성일",
     "updatedAt": "수정일",
     "isUse": "사용 여부",
     "isVisible": "표시 여부",
-    "isMobile": "모바일 사용 여부"
+    "BannerFile": "파일"
   },
   "todos": {
     "idx": "IDX",

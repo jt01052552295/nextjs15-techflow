@@ -370,17 +370,35 @@ model Banner {
   cid       String   @default(cuid())
   gubun     String   @default("") @map("gubun")
   title     String   @default("") @map("title")
-  img1      String   @default("") @map("img1")
-  img2      String   @default("") @map("img2")
   url       String   @default("") @map("url")
+  deviceType   String   @default("all") //  all | pc | mobile
   sortOrder    Int            @default(0) @map("sort_order")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   isUse     Boolean  @default(true) @map("is_use")
   isVisible Boolean  @default(true) @map("is_visible")
-  isMobile  Boolean  @default(true) @map("is_mobile")
+
+  BannerFile BannerFile[]
 
   @@map("ec_banner")
+}
+
+model BannerFile  {
+  idx          Int      @id @default(autoincrement())
+  uid          String   @unique @default(uuid())
+  bannerId     String
+  name         String
+  url          String   @db.VarChar(255)
+  ext          String   @db.VarChar(10)
+  originalName String
+  size         Int
+  type         String   @db.VarChar(50)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  Banner       Banner   @relation(fields: [bannerId], references: [uid], onDelete: Cascade)
+
+  @@index([bannerId], map: "bannerId_index")
+  @@map("ec_banner_files")
 }
 
 model Config {

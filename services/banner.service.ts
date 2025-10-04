@@ -6,11 +6,10 @@ import type {
   ListResult,
   DeleteInput,
   DeleteResult,
-} from '@/types/practice';
-import { ITodosPart } from '@/types/todos';
-import bcrypt from 'bcryptjs';
-import type { CreateType } from '@/actions/practice/create/schema';
-import type { UpdateType } from '@/actions/practice/update/schema';
+} from '@/types/banner';
+import { IBanner } from '@/types/banner';
+import type { CreateType } from '@/actions/banner/create/schema';
+import type { UpdateType } from '@/actions/banner/update/schema';
 
 /**
  * 목록: 커서 기반(keyset) + 정렬/검색/필터 + 카운트 2종 + 풀컬럼
@@ -21,8 +20,7 @@ import type { UpdateType } from '@/actions/practice/update/schema';
 export async function list(params: ListParams = {}): Promise<ListResult> {
   const {
     q,
-    name,
-    email,
+    gubun,
     dateType,
     startDate,
     endDate,
@@ -41,21 +39,20 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
   // ───────────────────────────────────
   // where (검색/필터)
   // ───────────────────────────────────
-  const baseWhere: Prisma.TodosWhereInput = {
+  const baseWhere: Prisma.BannerWhereInput = {
     isUse: typeof isUse === 'boolean' ? isUse : true,
     isVisible: typeof isVisible === 'boolean' ? isVisible : true,
   };
 
   // 통합 검색(q)이 들어오면 name/email OR 매칭. 없으면 기존 name/email 개별 필드 사용
-  const filteredWhere: Prisma.TodosWhereInput = q
+  const filteredWhere: Prisma.BannerWhereInput = q
     ? {
         ...baseWhere,
-        OR: [{ name: { contains: q } }, { email: { contains: q } }],
+        OR: [{ gubun: { contains: q } }, { title: { contains: q } }],
       }
     : {
         ...baseWhere,
-        ...(name?.trim() ? { name: { contains: name.trim() } } : {}),
-        ...(email?.trim() ? { email: { contains: email.trim() } } : {}),
+        ...(gubun?.trim() ? { gubun: { contains: gubun.trim() } } : {}),
       };
 
   if (dateType && (startDate || endDate)) {
@@ -75,7 +72,7 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
   //   (A > a0) OR (A = a0 AND idx > i0)   // asc
   //   (A < a0) OR (A = a0 AND idx < i0)   // desc
   // ───────────────────────────────────
-  let keysetWhere: Prisma.TodosWhereInput | undefined;
+  let keysetWhere: Prisma.BannerWhereInput | undefined;
   if (cursor) {
     const c = b64d(cursor) as { sortValue: any; idx: number };
     const cmpOp = order === 'asc' ? 'gt' : 'lt';
@@ -96,24 +93,24 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
   // ───────────────────────────────────
   // orderBy
   // ───────────────────────────────────
-  const orderBy: Prisma.TodosOrderByWithRelationInput[] = [
+  const orderBy: Prisma.BannerOrderByWithRelationInput[] = [
     { [sortBy]: order },
     { idx: order }, // tie-breaker도 동일 방향
   ];
 
-  const whereForPage: Prisma.TodosWhereInput = keysetWhere
+  const whereForPage: Prisma.BannerWhereInput = keysetWhere
     ? { AND: [filteredWhere, keysetWhere] }
     : filteredWhere;
 
-  const rows = await prisma.todos.findMany({
+  const rows = await prisma.banner.findMany({
     where: whereForPage,
     orderBy,
     take: safeLimit + 1,
     include: {
       _count: {
-        select: { TodosComment: true, TodosFile: true, TodosOption: true },
+        select: { BannerFile: true },
       },
-      TodosFile: { orderBy: { createdAt: 'desc' }, take: 1 },
+      BannerFile: { orderBy: { createdAt: 'desc' }, take: 1 },
     },
   });
 
@@ -127,29 +124,27 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
   }
 
   const [totalAll, totalFiltered] = await Promise.all([
-    prisma.todos.count({ where: baseWhere }),
-    prisma.todos.count({ where: filteredWhere }),
+    prisma.banner.count({ where: baseWhere }),
+    prisma.banner.count({ where: filteredWhere }),
   ]);
 
   return { items, nextCursor, totalAll, totalFiltered };
 }
 
 /** 보기 */
-export async function show(uid: string): Promise<ITodosPart> {
+export async function show(uid: string): Promise<IBanner> {
   // 먼저 존재 확인 (선택)
-  const exists = await prisma.todos.findUnique({
+  const exists = await prisma.banner.findUnique({
     where: { uid },
     select: { uid: true },
   });
   if (!exists) throw new Error('NOT_FOUND');
 
-  const rs = await prisma.todos.findUnique({
+  const rs = await prisma.banner.findUnique({
     where: { uid },
     include: {
       // 필요 시 조건/정렬 조절
-      TodosComment: { orderBy: { createdAt: 'desc' } },
-      TodosFile: { orderBy: { createdAt: 'desc' } },
-      TodosOption: true,
+      BannerFile: { orderBy: { createdAt: 'desc' } },
     },
   });
 
@@ -161,50 +156,40 @@ export async function show(uid: string): Promise<ITodosPart> {
 export async function create(input: CreateType) {
   const {
     uid,
-    name,
-    email,
-    content = null,
-    content2 = null,
-    gender = null,
-    ipAddress = null,
+    gubun,
+    title,
+    deviceType = null,
+    url = null,
     isUse = true,
     isVisible = true,
-    todoFile = [],
-    todoOption = [],
+    bannerFile = [],
   } = input;
 
-  const exists = await prisma.todos.findUnique({
+  const exists = await prisma.banner.findUnique({
     where: { uid },
     select: { uid: true },
   });
   if (exists) throw new Error(`UID_ALREADY_USED:${uid}`);
 
-  const passwordHash = await bcrypt.hash('1111', 10);
-
   const result = await prisma.$transaction(async (trx) => {
     const createData: any = {
       data: {
         uid,
-        name,
-        email,
-        gender,
-        content,
-        content2,
-        ipAddress,
-        password: passwordHash,
+        gubun,
+        title,
+        url,
+        deviceType,
         isUse,
         isVisible,
       },
       include: {
-        TodosComment: true,
-        TodosFile: true,
-        TodosOption: true,
+        BannerFile: true,
       },
     };
 
     // 파일
-    if (todoFile && todoFile.length > 0) {
-      const fileRecords = todoFile.map((f) => ({
+    if (bannerFile && bannerFile.length > 0) {
+      const fileRecords = bannerFile.map((f) => ({
         name: f.name ?? '',
         originalName: f.originalName,
         url: f.url,
@@ -212,34 +197,22 @@ export async function create(input: CreateType) {
         ext: f.ext,
         type: f.type,
       }));
-      createData.data.TodosFile = { create: fileRecords };
+      createData.data.BannerFile = { create: fileRecords };
     }
 
-    // 옵션
-    if (todoOption && todoOption.length > 0) {
-      const optionRecords = todoOption.map((o) => ({
-        name: o.name,
-        age: o.age,
-        gender: o.gender,
-      }));
-      createData.data.TodosOption = { create: optionRecords };
-    }
-
-    const created = await trx.todos.create(createData);
+    const created = await trx.banner.create(createData);
 
     // 정렬 기본값: sortOrder = idx
-    await trx.todos.update({
+    await trx.banner.update({
       where: { idx: created.idx },
       data: { sortOrder: created.idx },
     });
 
     // 관계 포함 최종 반환
-    const withRelations = await trx.todos.findUnique({
+    const withRelations = await trx.banner.findUnique({
       where: { uid: created.uid },
       include: {
-        TodosComment: true,
-        TodosFile: true,
-        TodosOption: true,
+        BannerFile: true,
       },
     });
 
@@ -254,65 +227,52 @@ export async function update(input: UpdateType) {
   const {
     uid,
     cid,
-    name,
-    email,
-    content,
-    content2,
-    gender,
-    ipAddress,
+    gubun,
+    title,
+    url,
+    deviceType,
     isUse,
     isVisible,
-    todoFile,
-    todoOption,
-    deleteOptionUids,
+    bannerFile,
     deleteFileUrls,
   } = input;
 
-  const exist = await prisma.todos.findUnique({
+  const exist = await prisma.banner.findUnique({
     where: { uid, cid },
     select: { uid: true, cid: true },
   });
   if (!exist) throw new Error('NOT_FOUND');
 
   const rs = await prisma.$transaction(async (tx) => {
-    // 1) 옵션 삭제
-    if (deleteOptionUids && deleteOptionUids.length > 0) {
-      await tx.todosOption.deleteMany({
-        where: { uid: { in: deleteOptionUids } },
-      });
-    }
-
     // 2) 파일 삭제 (프론트에서 제거한 URL만)
     if (deleteFileUrls && deleteFileUrls.length > 0) {
-      await tx.todosFile.deleteMany({
-        where: { todoId: uid, url: { in: deleteFileUrls } },
+      await tx.bannerFile.deleteMany({
+        where: { bannerId: uid, url: { in: deleteFileUrls } },
       });
     }
 
     // 3) 본문 업데이트 + 관계 include
     const data: any = {
-      name,
-      email,
-      gender,
-      content,
-      content2,
-      ipAddress,
+      gubun,
+      title,
+      url,
+      deviceType,
       isUse,
       isVisible,
     };
 
     // 3-1) 새 파일 추가 (기존과 중복 URL 제외)
-    if (todoFile && todoFile.length > 0) {
-      const existing = await tx.todosFile.findMany({
-        where: { todoId: uid },
+    if (bannerFile && bannerFile.length > 0) {
+      const existing = await tx.bannerFile.findMany({
+        where: { bannerId: uid },
         select: { url: true },
       });
       const existingUrls = new Set(existing.map((f) => f.url));
-      const newFiles = todoFile.filter(
+      const newFiles = bannerFile.filter(
         (f) => f.url && !existingUrls.has(f.url),
       );
       if (newFiles.length > 0) {
-        data.TodosFile = {
+        data.BannerFile = {
           create: newFiles.map((f) => ({
             name: f.name ?? '',
             originalName: f.originalName,
@@ -325,41 +285,11 @@ export async function update(input: UpdateType) {
       }
     }
 
-    // 3-2) 옵션 create/update 분기
-    if (todoOption && todoOption.length > 0) {
-      const updateOptionRecords = todoOption
-        .filter(
-          (
-            o,
-          ): o is { uid: string; name: string; age: number; gender: string } =>
-            !!o.uid,
-        )
-        .map((o) => ({
-          where: { uid: o.uid },
-          data: { name: o.name, age: o.age, gender: o.gender },
-        }));
-
-      const createOptionRecords = todoOption
-        .filter((o) => !o.uid)
-        .map((o) => ({ name: o.name, age: o.age, gender: o.gender }));
-
-      data.TodosOption = {
-        ...(updateOptionRecords.length > 0
-          ? { update: updateOptionRecords }
-          : {}),
-        ...(createOptionRecords.length > 0
-          ? { create: createOptionRecords }
-          : {}),
-      };
-    }
-
-    const updated = await tx.todos.update({
+    const updated = await tx.banner.update({
       where: { uid },
       data,
       include: {
-        TodosComment: true,
-        TodosFile: true,
-        TodosOption: true,
+        BannerFile: true,
       },
     });
 
@@ -382,15 +312,13 @@ export async function remove(input: DeleteInput): Promise<DeleteResult> {
   if (uids && uids.length > 0) {
     return await prisma.$transaction(async (tx) => {
       // 관련 자식들 정리(파일/댓글/옵션) - FK가 uid(todoId)면 in으로
-      await tx.todosFile.deleteMany({ where: { todoId: { in: uids } } });
-      await tx.todosComment.deleteMany({ where: { todoId: { in: uids } } });
-      await tx.todosOption.deleteMany({ where: { todoId: { in: uids } } });
+      await tx.bannerFile.deleteMany({ where: { bannerId: { in: uids } } });
 
       if (hard) {
-        const rs = await tx.todos.deleteMany({ where: { uid: { in: uids } } });
+        const rs = await tx.banner.deleteMany({ where: { uid: { in: uids } } });
         return { mode: 'bulk', affected: rs.count };
       } else {
-        const rs = await tx.todos.updateMany({
+        const rs = await tx.banner.updateMany({
           where: { uid: { in: uids } },
           data: { isUse: false, isVisible: false },
         });
@@ -400,22 +328,20 @@ export async function remove(input: DeleteInput): Promise<DeleteResult> {
   }
 
   // Single
-  const todo = await prisma.todos.findUnique({
+  const exist = await prisma.banner.findUnique({
     where: { uid: uid! },
     select: { uid: true },
   });
-  if (!todo) throw new Error('NOT_FOUND');
+  if (!exist) throw new Error('NOT_FOUND');
 
   return await prisma.$transaction(async (tx) => {
-    await tx.todosFile.deleteMany({ where: { todoId: uid! } });
-    await tx.todosComment.deleteMany({ where: { todoId: uid! } });
-    await tx.todosOption.deleteMany({ where: { todoId: uid! } });
+    await tx.bannerFile.deleteMany({ where: { bannerId: uid! } });
 
     if (hard) {
-      const rs = await tx.todos.delete({ where: { uid: uid! } });
+      const rs = await tx.banner.delete({ where: { uid: uid! } });
       return { mode: 'single', affected: rs ? 1 : 0 };
     } else {
-      const rs = await tx.todos.update({
+      const rs = await tx.banner.update({
         where: { uid: uid! },
         data: { isUse: false, isVisible: false },
       });

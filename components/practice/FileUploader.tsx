@@ -3,7 +3,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import styles from './scss/FileUploader.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faFileAlt, faTimes, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { imageUploadAction } from '@/actions/upload/image';
 import { useLanguage } from '@/components/context/LanguageContext';
 import { toast } from 'sonner';
@@ -191,7 +191,7 @@ export default function FileUploader({
           className={styles.uploadBox}
           onClick={() => inputRef.current?.click()}
         >
-          {t('common.upload.label')}
+          <FontAwesomeIcon icon={faPlus} /> {t('common.upload.label')}
           <input
             type="file"
             multiple

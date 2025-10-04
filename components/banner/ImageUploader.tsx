@@ -5,7 +5,7 @@ import styles from './scss/ImageUploader.module.scss';
 import Image from 'next/image';
 import { imageUploadAction } from '@/actions/upload/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useLanguage } from '@/components/context/LanguageContext';
 import { toast } from 'sonner';
 type UploadedImage = {
@@ -22,7 +22,7 @@ type Props = {
   mode?: 'create' | 'edit'; // ✅ 작성/수정 모드 구분
 };
 
-const MAX_FILES = 4; // ✅ 최대 업로드 개수
+const MAX_FILES = 1; // ✅ 최대 업로드 개수
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // ✅ 2MB 제한
 
 export default function ImageUploader({

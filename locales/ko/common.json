@@ -136,7 +136,7 @@
   "carbon": "탄소",
   "footer": "Copyright &copy; 2025 <strong>Footer</strong> All rights reserved.",
   "upload": {
-    "label": "+ 파일 업로드",
+    "label": "파일 업로드",
     "uploading": "업로드중...",
     "upload_btn": "파일선택",
     "preview": "미리보기",
