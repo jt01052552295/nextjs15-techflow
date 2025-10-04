@@ -168,8 +168,7 @@
     "createdAt": "생성일",
     "updatedAt": "수정일",
     "isUse": "사용 여부",
-    "isVisible": "표시 여부",
-    "isMobile": "모바일 사용 여부"
+    "isVisible": "표시 여부"
   },
   "banner": {
     "idx": "IDX",

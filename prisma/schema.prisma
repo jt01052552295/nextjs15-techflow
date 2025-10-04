@@ -359,7 +359,6 @@ model Popup {
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   isUse     Boolean  @default(true) @map("is_use")
   isVisible Boolean  @default(true) @map("is_visible")
-  isMobile  Boolean  @default(true) @map("is_mobile")
 
   @@map("ec_popup")
 }
