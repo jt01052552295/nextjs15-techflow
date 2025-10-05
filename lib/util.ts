@@ -296,3 +296,18 @@ export function fmtDateTimeD(input: DateInput, opts: DateTimeOpts = {}) {
   const timePart = hour12 ? d.format('A h:mm:ss') : d.format('HH:mm:ss');
   return `${datePart} ${timePart}`;
 }
+
+// 이미지 확장자 체크 함수
+export const isImageFile = (url: string): boolean => {
+  const imageExtensions = [
+    '.jpg',
+    '.jpeg',
+    '.png',
+    '.gif',
+    '.bmp',
+    '.webp',
+    '.svg',
+  ];
+  const extension = url.toLowerCase().substring(url.lastIndexOf('.'));
+  return imageExtensions.includes(extension);
+};

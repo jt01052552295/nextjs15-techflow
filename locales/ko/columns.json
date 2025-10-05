@@ -276,6 +276,18 @@
     "isUse": "사용 여부",
     "isVisible": "공개 여부"
   },
+  "category": {
+    "idx": "IDX",
+    "uid": "UUID",
+    "cid": "CUID",
+    "code": "분류코드",
+    "name": "이름",
+    "desc": "설명",
+    "createdAt": "생성일",
+    "updatedAt": "수정일",
+    "isUse": "사용 여부",
+    "isVisible": "공개 여부"
+  },
   "ebill": {
     "idx": "IDX",
     "uid": "UID",

@@ -273,6 +273,18 @@
     "isUse": "In Use",
     "isVisible": "Public"
   },
+  "category": {
+    "idx": "IDX",
+    "uid": "UUID",
+    "cid": "CUID",
+    "code": "Code",
+    "name": "Name",
+    "desc": "Desc",
+    "createdAt": "Created Date",
+    "updatedAt": "Updated Date",
+    "isUse": "In Use",
+    "isVisible": "Public"
+  },
   "ebill": {
     "idx": "IDX",
     "uid": "UID",

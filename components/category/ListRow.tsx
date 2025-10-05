@@ -1,25 +1,33 @@
 'use client';
 
-import React from 'react';
-import type { IBanner, IBannerListRow, ListEditCell } from '@/types/banner';
+import React, { useEffect, useState } from 'react';
+import type {
+  ICategory,
+  ICategoryListRow,
+  ListEditCell,
+} from '@/types/category';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faEye,
+  faPlus,
   faPen,
   faTrash,
   faSquareCheck,
+  faMinus,
+  faAngleRight,
+  faAnglesRight,
 } from '@fortawesome/free-solid-svg-icons';
 import { faSquare } from '@fortawesome/free-regular-svg-icons';
 import EditableCell from './EditableCell';
 import { useLanguage } from '@/components/context/LanguageContext';
 import { getRouteUrl } from '@/utils/routes';
 import { useSearchParams } from 'next/navigation';
-import ThumbnailWidget from '../common/ThumbnailWidget';
+import { getCategoryLevel } from '@/lib/category-utils';
 
 type Props = {
-  row: IBannerListRow;
-  setSelectedRow: (row: IBanner) => void;
+  row: ICategoryListRow;
+  setSelectedRow: (row: ICategory) => void;
+  setModalType: (type: 'single') => void;
   isChecked: boolean;
   onCheck: (uid: string, checked: boolean) => void;
   onFieldSave: (
@@ -34,6 +42,7 @@ type Props = {
 const ListRow = ({
   row,
   setSelectedRow,
+  setModalType,
   isChecked,
   onCheck,
   onFieldSave,
@@ -43,13 +52,48 @@ const ListRow = ({
   const searchParams = useSearchParams();
   const queryString = searchParams.toString();
 
-  const showUrl = getRouteUrl('banner.show', locale, { id: row.uid });
-  const editUrl = getRouteUrl('banner.edit', locale, { id: row.uid });
+  const [categoryLevel, setCategoryLevel] = useState<number>(0);
+
+  // row.code가 변경될 때마다 레벨 계산
+  useEffect(() => {
+    const level = getCategoryLevel(row.code);
+    setCategoryLevel(level);
+  }, [row.code]);
+
+  const getSubMenuIcon = (level: number) => {
+    switch (level) {
+      case 1:
+        return faMinus;
+      case 2:
+        return faAngleRight;
+      case 3:
+        return faAnglesRight;
+      default:
+        return faMinus;
+    }
+  };
+
+  const editUrl = getRouteUrl('category.edit', locale, { id: row.uid });
+
+  // console.log(showUrl);
 
   //  listMemory.save({ scrollY: window.scrollY, page, filters, items }); // ✅ 일괄 저장
   const handleNavigate = (href: string) => {
     if (!href || typeof href !== 'string') return; // 방어
     router.push(href, { scroll: false });
+  };
+
+  const handleCreate = (code: string) => {
+    const baseUrl = getRouteUrl('category.create', locale);
+
+    const params = new URLSearchParams(queryString);
+
+    if (params.has('code')) {
+      params.delete('code');
+    }
+    params.set('code', code);
+    const url = `${baseUrl}?${params.toString()}`;
+    router.push(url, { scroll: false });
   };
 
   return (
@@ -70,43 +114,48 @@ const ListRow = ({
         </label>
       </th>
       <td className="text-center">
-        <span className="badge text-bg-secondary">{row.uid}</span>&nbsp;
-        {row.BannerFile[0]?.url && (
-          <ThumbnailWidget url={row.BannerFile[0]?.url} />
-        )}
+        <span className="badge text-bg-secondary">{row.uid}</span>
+      </td>
+      <td className="text-start">
+        <div
+          style={{
+            paddingLeft: `${(categoryLevel - 1) * 5}px`,
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          {categoryLevel > 1 && (
+            <FontAwesomeIcon
+              icon={getSubMenuIcon(categoryLevel)}
+              style={{ marginRight: '5px' }}
+            />
+          )}
+          <span className="badge text-bg-primary">{row.code}</span>
+        </div>
       </td>
       <td className="text-center">
         <EditableCell
-          value={row.gubun}
+          value={row.name}
           onSave={(newVal, onSuccess, onError) =>
-            onFieldSave(row.uid, 'gubun', newVal, onSuccess, onError)
+            onFieldSave(row.uid, 'name', newVal, onSuccess, onError)
           }
         />
       </td>
-      <td className="text-center">
-        <EditableCell
-          value={row.title}
-          onSave={(newVal, onSuccess, onError) =>
-            onFieldSave(row.uid, 'title', newVal, onSuccess, onError)
-          }
-        />
-      </td>
+
       <td className="text-center">{row.createdAt}</td>
       <td className="text-center">{row.updatedAt}</td>
 
       <td className="text-center">
         <div className="d-flex justify-content-center gap-1">
-          <button
-            type="button"
-            className="btn btn-secondary btn-sm"
-            onClick={() =>
-              handleNavigate(
-                `${showUrl}${queryString ? `?${queryString}` : ''}`,
-              )
-            }
-          >
-            <FontAwesomeIcon icon={faEye} />
-          </button>
+          {categoryLevel < 3 && (
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={() => handleCreate(row.code)}
+            >
+              <FontAwesomeIcon icon={faPlus} />
+            </button>
+          )}
 
           <button
             type="button"
@@ -124,7 +173,10 @@ const ListRow = ({
             className="btn btn-danger btn-sm"
             data-bs-toggle="modal"
             data-bs-target={`#confirmDeleteModal`}
-            onClick={() => setSelectedRow(row)}
+            onClick={() => {
+              setSelectedRow(row);
+              setModalType('single');
+            }}
           >
             <FontAwesomeIcon icon={faTrash} />
           </button>
