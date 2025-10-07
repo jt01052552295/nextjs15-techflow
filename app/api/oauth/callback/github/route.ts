@@ -137,7 +137,7 @@ export async function GET(request: NextRequest) {
       const alreadyConnected = await prisma.account.findFirst({
         where: {
           provider: 'github',
-          providerAccountId: id,
+          providerAccountId: id.toString(),
         },
         include: { user: true },
       });
@@ -157,7 +157,7 @@ export async function GET(request: NextRequest) {
         await prisma.account.create({
           data: {
             provider: 'github',
-            providerAccountId: id,
+            providerAccountId: id.toString(),
             type: 'oauth',
             access_token: tokenResponse.access_token,
             refresh_token: tokenResponse.refresh_token || null,

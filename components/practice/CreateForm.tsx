@@ -415,7 +415,7 @@ export default function CreateForm() {
                   </button>
                   <Link
                     className="btn btn-outline-primary btn-sm"
-                    href={`${getRouteUrl('todos.index', locale)}?${searchParams.toString()}`}
+                    href={`${getRouteUrl('practice.index', locale)}?${searchParams.toString()}`}
                   >
                     <FontAwesomeIcon icon={faList} />
                     &nbsp;{t('common.list')}

@@ -21,7 +21,7 @@
     "isUse": "사용여부",
     "isVisible": "표시여부",
     "isSignout": "탈퇴여부",
-    "accounts": "계정",
+    "accounts": "외부계정",
     "sessions": "세션",
     "company": "회사",
     "privacyLabel": "동의/확인"

@@ -10,6 +10,7 @@ import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import { ThemeProvider } from '@/components/context/ThemeProvider';
 import RQProvider from '@/components/util/RQProvider';
+import ConfirmModal from '@/components/common/ConfirmModal';
 
 config.autoAddCss = false;
 
@@ -68,6 +69,7 @@ export default async function RootLayout({
               >
                 <InstallBootstrap />
                 {children}
+                <ConfirmModal />
                 <Toaster
                   closeButton
                   richColors

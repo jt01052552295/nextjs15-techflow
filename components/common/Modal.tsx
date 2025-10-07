@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
+import { useLanguage } from '@/components/context/LanguageContext';
 interface ModalProps {
   children: React.ReactNode;
   title: string;
@@ -12,6 +12,7 @@ interface ModalProps {
 
 export default function Modal({ children, title, returnHref }: ModalProps) {
   const router = useRouter();
+  const { t } = useLanguage();
 
   // ESC 키를 눌렀을 때 모달 닫기
   useEffect(() => {
@@ -55,7 +56,7 @@ export default function Modal({ children, title, returnHref }: ModalProps) {
           {children}
           <div className="modal-footer">
             <Link href={returnHref} className="btn btn-secondary">
-              닫기
+              {t('common.cancel')}
             </Link>
           </div>
         </div>

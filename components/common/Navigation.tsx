@@ -46,6 +46,16 @@ const Navigation = () => {
       subMenus: [],
     },
     {
+      id: 'members',
+      icon: faUser,
+      route: 'user.index',
+      subMenus: [
+        { id: 'user-list', route: 'user.index' },
+        // { id: 'setting-list', route: 'auth.register' },
+        // { id: 'company-list', route: 'auth.register' },
+      ],
+    },
+    {
       id: 'Config',
       icon: faGears,
       route: 'config.index',
@@ -77,15 +87,6 @@ const Navigation = () => {
       ],
     },
 
-    // {
-    //   id: 'members',
-    //   icon: faUser,
-    //   route: null,
-    //   subMenus: [
-    //     { id: 'member-list', route: 'auth.login' }, // 회원 목록
-    //     { id: 'company-list', route: 'auth.register' }, // 업체 목록
-    //   ],
-    // },
     {
       id: 'Practice',
       icon: faUser,
