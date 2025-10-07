@@ -3,6 +3,7 @@
 import type { ListParams, ListResult, IUserListRow } from '@/types/user';
 import { list } from '@/services/user.service';
 import { fmtDateD } from '@/lib/util';
+import { getActiveUsers } from '@/lib/user-utils';
 
 export async function listAction(
   params?: ListParams,
@@ -28,4 +29,8 @@ function toDTO(row: any): IUserListRow {
     createdAt: fmtDateD(row.createdAt),
     updatedAt: fmtDateD(row.updatedAt),
   };
+}
+
+export async function fetchActiveUsersAction() {
+  return await getActiveUsers();
 }
