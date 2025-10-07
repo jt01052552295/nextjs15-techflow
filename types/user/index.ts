@@ -1,4 +1,5 @@
 import { UserRole } from '@prisma/client';
+import { ICompany } from '@/types/company';
 
 export interface IUser {
   idx: number;
@@ -23,6 +24,7 @@ export interface IUser {
   isSignout: boolean;
   profile?: IUserProfile[] | null;
   accounts?: IUserAccount[] | null;
+  companies?: ICompany[] | null;
 }
 
 export type ListEditCell = 'name' | 'nick';

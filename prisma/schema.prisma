@@ -31,7 +31,7 @@ model User {
   accounts           Account[]
   profile            UserProfile[]
   sessions           Session[]
-  company            Company?
+  companies          Company[]   
   setting            Setting?
   devices            ElectricDevice[]
   point              CarbonPoint[]
@@ -61,7 +61,7 @@ model Company {
   idx       Int      @id @default(autoincrement())
   uid       String   @unique @default(uuid())
   cid       String   @default(cuid())
-  userId    String   @unique @map("user_id")
+  userId    String   @map("user_id")
   name      String
   address   String?
   phone     String?

@@ -52,7 +52,7 @@ const Navigation = () => {
       subMenus: [
         { id: 'user-list', route: 'user.index' },
         { id: 'setting-list', route: 'setting.index' },
-        // { id: 'company-list', route: 'company.index' },
+        { id: 'company-list', route: 'company.index' },
       ],
     },
     {
