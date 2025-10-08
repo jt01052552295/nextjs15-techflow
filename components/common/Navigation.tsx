@@ -12,9 +12,7 @@ import {
   faList,
   faCaretRight,
   faUser,
-  faCreditCard,
   faGears,
-  faServer,
   faChartSimple,
   faAngleDown,
 } from '@fortawesome/free-solid-svg-icons';
@@ -53,6 +51,16 @@ const Navigation = () => {
         { id: 'user-list', route: 'user.index' },
         { id: 'setting-list', route: 'setting.index' },
         { id: 'company-list', route: 'company.index' },
+      ],
+    },
+    {
+      id: 'board',
+      icon: faList,
+      route: 'board.index',
+      subMenus: [
+        { id: 'board-list', route: 'board.index' },
+        // { id: 'setting-list', route: 'setting.index' },
+        // { id: 'company-list', route: 'company.index' },
       ],
     },
     {

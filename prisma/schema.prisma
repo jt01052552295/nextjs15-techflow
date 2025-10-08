@@ -42,6 +42,12 @@ model User {
   KepcoStatistics    KepcoStatistics[]
   comments           TodosComment[]       @relation("UserToComments")
 
+  posts              BBS[]
+  bbsComments        BBSComment[]         @relation("UserToBBSComments")
+  bbsLikes           BBSLike[]
+  bbsCommentLike     BBSCommentLike[]
+
+
   @@map("ec_user")
 }
 
@@ -592,6 +598,185 @@ model KepcoStatistics {
   @@index([dispDate], map: "idx_kepco_dispdate")
   @@map("ec_kepco_statistics")
 }
+
+
+model Board {
+  idx          Int            @id @default(autoincrement())
+  uid          String         @unique @default(uuid())
+  cid          String         @default(cuid())
+  bdTable           String    @unique @map("bd_table") @db.VarChar(20)
+  bdName            String    @default("") @map("bd_name") @db.VarChar(255)
+  bdNameEn          String    @default("") @map("bd_name_en") @db.VarChar(255)
+  bdNameJa          String    @default("") @map("bd_name_ja") @db.VarChar(255)
+  bdNameZh          String    @default("") @map("bd_name_zh") @db.VarChar(255)
+  bdSkin            String    @default("") @map("bd_skin") @db.VarChar(255)
+  bdListSize        Int       @default(0) @map("bd_list_size") @db.TinyInt
+  bdFileCount       Int       @default(0) @map("bd_file_count") @db.TinyInt
+  bdNewTime         Int       @default(0) @map("bd_new_time") @db.TinyInt
+  bdSecret          Boolean   @default(false) @map("bd_secret")
+  bdPrivate         Boolean   @default(false) @map("bd_private")
+  bdBusiness        Boolean   @default(false) @map("bd_business")
+  bdUseCategory     Boolean   @default(false) @map("bd_use_category")
+  bdCategoryList    String?   @map("bd_category_list") @db.Text
+  bdFixTitle        String    @default("") @map("bd_fix_title") @db.VarChar(255)
+  bdListLevel       Int       @default(0) @map("bd_list_level") @db.TinyInt
+  bdReadLevel       Int       @default(0) @map("bd_read_level") @db.TinyInt
+  bdWriteLevel      Int       @default(0) @map("bd_write_level") @db.TinyInt
+  bdReplyLevel      Int       @default(0) @map("bd_reply_level") @db.TinyInt
+  bdCommentLevel    Int       @default(0) @map("bd_comment_level") @db.TinyInt
+  bdUploadLevel     Int       @default(0) @map("bd_upload_level") @db.TinyInt
+  bdDownloadLevel   Int       @default(0) @map("bd_download_level") @db.TinyInt
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @default(now()) @updatedAt @map("updated_at")
+  isUse        Boolean        @default(true) @map("is_use")
+  isVisible    Boolean        @default(true) @map("is_visible")
+  sortOrder    Int            @default(0) @map("sort_order")
+
+  
+  posts             BBS[]
+  comments          BBSComment[]
+  files             BBSFile[]
+
+  @@index([uid], map: "uid_index")
+  @@index([cid], map: "cid_index")
+  @@map("ec_board")
+}
+
+
+model BBS {
+  idx          Int            @id @default(autoincrement())
+  uid          String         @unique @default(uuid())
+  cid          String         @default(cuid())
+  bdTable      String         @default("") @map("bd_table") @db.VarChar(20)
+  userId       String?        @map("user_id") @db.VarChar(255)
+  name         String         @db.VarChar(255)
+  password     String         @db.VarChar(255)
+  notice       Boolean        @default(false) @map("notice")
+  secret       Boolean        @default(false) @map("secret")
+  category     String         @default("") @db.VarChar(255)
+  subject      String         @default("") @db.VarChar(255)
+  content      String?        @db.LongText
+  contentA     String?        @map("content_a") @db.LongText
+  ipAddress    String?        @map("ip_address") @db.VarChar(255)
+  hit          Int            @default(0)
+  good         Int            @default(0)
+  bad          Int            @default(0)
+  comment      Int            @default(0)
+  thread       String         @default("") @db.VarChar(10)
+  commentCnt   Int            @default(0) @map("comment_cnt")
+  threadCnt    Int            @default(0) @map("thread_cnt")
+  link1        String         @default("") @map("link_1") @db.VarChar(255)
+  link2        String         @default("") @map("link_2") @db.VarChar(255)
+  
+  sortOrder    Int            @default(0) @map("sort_order")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @default(now()) @updatedAt @map("updated_at")
+  isUse        Boolean        @default(true) @map("is_use")
+  isVisible    Boolean        @default(true) @map("is_visible")
+
+  // 관계 설정
+  board      Board       @relation(fields: [bdTable], references: [bdTable], onDelete: Cascade)
+  user       User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  comments   BBSComment[]
+  files      BBSFile[]
+  likes      BBSLike[]   @relation("BBSToLikes")
+
+  @@index([uid], map: "uid_index")
+  @@index([cid], map: "cid_index")
+  @@index([userId], map: "userId_index")
+  @@index([bdTable], map: "bdTable_index")
+  @@map("ec_bbs")
+}
+
+model BBSLike {
+  idx          Int          @id @default(autoincrement())
+  bdTable      String       @default("") @map("bd_table") @db.VarChar(20)
+  parentIdx    Int
+  userId       String
+  createdAt    DateTime     @default(now())
+  
+  user         User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bbs          BBS?         @relation("BBSToLikes", fields: [parentIdx], references: [idx], onDelete: Cascade,  onUpdate: NoAction)
+
+  @@unique([parentIdx, userId])
+  @@index([parentIdx], map: "parentIdx_index")
+  @@index([userId], map: "userId_index")
+  @@map("ec_bbs_like")
+}
+
+
+
+model BBSComment {
+  idx        Int                @id @default(autoincrement())
+  uid        String             @unique @default(uuid())
+  bdTable    String             @default("") @map("bd_table") @db.VarChar(20)
+  pid        String
+  author     String?            @db.VarChar(255)
+  password   String?            @db.VarChar(255)
+  content    String             @db.Text
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @default(now()) @updatedAt @map("updated_at")
+  isUse      Boolean            @default(true) @map("is_use")
+  isVisible  Boolean            @default(true) @map("is_visible")
+  parentIdx  Int?
+  likeCount  Int                @default(0)
+  replyCount Int                @default(0)
+  isUser     Boolean            @default(true)
+
+  board      Board     @relation(fields: [bdTable], references: [bdTable], onDelete: Cascade)
+  bbs        BBS       @relation(fields: [pid], references: [uid], onDelete: Cascade)
+  user       User?     @relation("UserToBBSComments", fields: [author], references: [id], onDelete: SetNull) @ignore
+  parent     BBSComment?  @relation("CommentToReply", fields: [parentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction)
+  replies    BBSComment[] @relation("CommentToReply")
+  likes      BBSCommentLike[] @relation("CommentToLikes")
+
+  @@index([pid], map: "bbsId_index")
+  @@index([bdTable], map: "bdTable_index")
+  @@index([parentIdx], map: "parentIdx_index")
+  @@index([author], map: "author_index")
+  @@map("ec_bbs_comment")
+}
+
+
+model BBSCommentLike {
+  idx          Int          @id @default(autoincrement())
+  bdTable      String       @default("") @map("bd_table") @db.VarChar(20)
+  parentIdx    Int
+  userId       String
+  createdAt    DateTime     @default(now())
+  
+  user         User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment      BBSComment?  @relation("CommentToLikes", fields: [parentIdx], references: [idx], onDelete: Cascade, onUpdate: NoAction)
+
+
+  @@unique([parentIdx, userId])
+  @@index([parentIdx], map: "parentIdx_index")
+  @@index([userId], map: "userId_index")
+  @@map("ec_bbs_comment_like")
+}
+
+model BBSFile {
+  idx          Int      @id @default(autoincrement())
+  uid          String   @unique @default(uuid())
+  bdTable      String   @default("") @map("bd_table") @db.VarChar(20)
+  pid          String
+  name         String
+  url          String   @db.VarChar(255)
+  ext          String   @db.VarChar(10)
+  originalName String
+  size         Int
+  type         String   @db.VarChar(50)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  board        Board    @relation(fields: [bdTable], references: [bdTable], onDelete: Cascade)
+  bbs          BBS      @relation(fields: [pid], references: [uid], onDelete: Cascade)
+
+  @@index([pid], map: "pid_index")
+  @@index([bdTable], map: "bdTable_index")
+  @@map("ec_bbs_file")
+}
+
 
 enum VerificationPurpose {
   SIGNUP

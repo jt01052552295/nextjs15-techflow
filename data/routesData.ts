@@ -120,4 +120,22 @@ export const routesData = {
     mmSaving: '/estat/stats/saving/month',
     mmCarbonSaving: '/estat/stats/cpsaving/month',
   },
+  board: {
+    index: '/board',
+    create: '/board/p/create',
+    show: '/board/{id}',
+    edit: '/board/{id}/edit',
+  },
+  bbs: {
+    index: '/bbs',
+    create: '/bbs/p/create',
+    show: '/bbs/{id}',
+    edit: '/bbs/{id}/edit',
+  },
+  comment: {
+    index: '/comment',
+    create: '/comment/p/create',
+    show: '/comment/{id}',
+    edit: '/comment/{id}/edit',
+  },
 };
