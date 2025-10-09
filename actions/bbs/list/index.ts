@@ -1,13 +1,12 @@
 'use server';
 
-import type { ListParams, ListResult, IBoardListRow } from '@/types/board';
-import { list } from '@/services/board.service';
+import type { ListParams, ListResult, IBBSListRow } from '@/types/bbs';
+import { list } from '@/services/bbs.service';
 import { fmtDateD } from '@/lib/util';
-import { getActiveBoard } from '@/lib/board-utils';
 
 export async function listAction(
   params?: ListParams,
-): Promise<ListResult<IBoardListRow>> {
+): Promise<ListResult<IBBSListRow>> {
   try {
     const rs = await list(params ?? {});
 
@@ -21,14 +20,16 @@ export async function listAction(
   }
 }
 
-function toDTO(row: any): IBoardListRow {
+function toDTO(row: any): IBBSListRow {
   return {
     ...row,
     createdAt: fmtDateD(row.createdAt),
     updatedAt: fmtDateD(row.updatedAt),
+    // nested 포함 시 필요하면 추가 변환
+    files: row.files?.map((f: any) => ({
+      ...f,
+      createdAt: fmtDateD(f.createdAt),
+      updatedAt: fmtDateD(f.updatedAt),
+    })),
   };
-}
-
-export async function fetchActiveBoardsAction() {
-  return await getActiveBoard();
 }

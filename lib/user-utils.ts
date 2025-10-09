@@ -1,6 +1,6 @@
 import prisma from '@/lib/prisma';
 import type { IUser } from '@/types/user';
-import { UserRole, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 /**
  * 활성화된 사용자 목록을 가져옵니다

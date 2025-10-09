@@ -59,8 +59,8 @@ const Navigation = () => {
       route: 'board.index',
       subMenus: [
         { id: 'board-list', route: 'board.index' },
-        // { id: 'setting-list', route: 'setting.index' },
-        // { id: 'company-list', route: 'company.index' },
+        { id: 'bbs-list', route: 'bbs.index' },
+        // { id: 'comment-list', route: 'comment.index' },
       ],
     },
     {

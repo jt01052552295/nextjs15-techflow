@@ -44,6 +44,7 @@ export type IUserListRow = IUser & {
 export type IUserPart = Partial<IUser>;
 
 export interface IUserMini {
+  id: string;
   name: string;
   email: string;
   profile?: {

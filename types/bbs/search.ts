@@ -1,9 +1,9 @@
-import type { ListParams } from '@/types/practice';
+import type { ListParams } from '@/types/bbs';
 
 // 커서 제외 타입
-export type BoardBaseParams = Omit<ListParams, 'cursor'>;
+export type BbsBaseParams = Omit<ListParams, 'cursor'>;
 
-export const DEFAULTS: BoardBaseParams = {
+export const DEFAULTS: BbsBaseParams = {
   sortBy: 'sortOrder',
   order: 'desc',
   limit: 20,
@@ -11,10 +11,10 @@ export const DEFAULTS: BoardBaseParams = {
 
 const sortBySet = new Set([
   'idx',
-  'bdName',
-  'bdTable',
+  'hit',
+  'good',
   'createdAt',
-  'updatedAt',
+  'commentCnt',
   'sortOrder',
 ]);
 const orderSet = new Set(['asc', 'desc']);
@@ -25,7 +25,7 @@ export function parseBool(v?: string): boolean | undefined {
   return undefined;
 }
 
-export function toBaseParamsFromSearch(sp: URLSearchParams): BoardBaseParams {
+export function toBaseParamsFromSearch(sp: URLSearchParams): BbsBaseParams {
   const sortBy = sp.get('sortBy') ?? DEFAULTS.sortBy!;
   const order = sp.get('order') ?? DEFAULTS.order!;
   const limit = Number(sp.get('limit') ?? DEFAULTS.limit);
@@ -45,7 +45,7 @@ export function toBaseParamsFromSearch(sp: URLSearchParams): BoardBaseParams {
   };
 }
 
-export function toSearchParamsFromBase(p: BoardBaseParams): URLSearchParams {
+export function toSearchParamsFromBase(p: BbsBaseParams): URLSearchParams {
   const sp = new URLSearchParams();
   if (p.q) sp.set('q', p.q);
   // if (p.name) sp.set('name', p.name);
@@ -65,7 +65,7 @@ export function toSearchParamsFromBase(p: BoardBaseParams): URLSearchParams {
 // 빈 문자열/공백을 undefined로 정리(안전용)
 const norm = (v?: string) => (v && v.trim() ? v.trim() : undefined);
 
-export function isSameBaseParams(a: BoardBaseParams, b: BoardBaseParams) {
+export function isSameBaseParams(a: BbsBaseParams, b: BbsBaseParams) {
   return (
     norm(a.q) === norm(b.q) &&
     // norm(a.name) === norm(b.name) &&

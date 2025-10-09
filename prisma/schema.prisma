@@ -676,7 +676,7 @@ model BBS {
 
   // 관계 설정
   board      Board       @relation(fields: [bdTable], references: [bdTable], onDelete: Cascade)
-  user       User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user       User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
   comments   BBSComment[]
   files      BBSFile[]
   likes      BBSLike[]   @relation("BBSToLikes")
@@ -725,7 +725,7 @@ model BBSComment {
 
   board      Board     @relation(fields: [bdTable], references: [bdTable], onDelete: Cascade)
   bbs        BBS       @relation(fields: [pid], references: [uid], onDelete: Cascade)
-  user       User?     @relation("UserToBBSComments", fields: [author], references: [id], onDelete: SetNull) @ignore
+  user       User?     @relation("UserToBBSComments", fields: [author], references: [id], onDelete: Cascade) 
   parent     BBSComment?  @relation("CommentToReply", fields: [parentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction)
   replies    BBSComment[] @relation("CommentToReply")
   likes      BBSCommentLike[] @relation("CommentToLikes")

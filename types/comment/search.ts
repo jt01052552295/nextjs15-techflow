@@ -1,22 +1,15 @@
-import type { ListParams } from '@/types/practice';
+import type { ListParams } from '@/types/comment';
 
 // 커서 제외 타입
-export type BoardBaseParams = Omit<ListParams, 'cursor'>;
+export type CommentBaseParams = Omit<ListParams, 'cursor'>;
 
-export const DEFAULTS: BoardBaseParams = {
-  sortBy: 'sortOrder',
+export const DEFAULTS: CommentBaseParams = {
+  sortBy: 'createdAt',
   order: 'desc',
   limit: 20,
 };
 
-const sortBySet = new Set([
-  'idx',
-  'bdName',
-  'bdTable',
-  'createdAt',
-  'updatedAt',
-  'sortOrder',
-]);
+const sortBySet = new Set(['likeCount', 'replyCount', 'createdAt']);
 const orderSet = new Set(['asc', 'desc']);
 
 export function parseBool(v?: string): boolean | undefined {
@@ -25,7 +18,7 @@ export function parseBool(v?: string): boolean | undefined {
   return undefined;
 }
 
-export function toBaseParamsFromSearch(sp: URLSearchParams): BoardBaseParams {
+export function toBaseParamsFromSearch(sp: URLSearchParams): CommentBaseParams {
   const sortBy = sp.get('sortBy') ?? DEFAULTS.sortBy!;
   const order = sp.get('order') ?? DEFAULTS.order!;
   const limit = Number(sp.get('limit') ?? DEFAULTS.limit);
@@ -45,7 +38,7 @@ export function toBaseParamsFromSearch(sp: URLSearchParams): BoardBaseParams {
   };
 }
 
-export function toSearchParamsFromBase(p: BoardBaseParams): URLSearchParams {
+export function toSearchParamsFromBase(p: CommentBaseParams): URLSearchParams {
   const sp = new URLSearchParams();
   if (p.q) sp.set('q', p.q);
   // if (p.name) sp.set('name', p.name);
@@ -65,7 +58,7 @@ export function toSearchParamsFromBase(p: BoardBaseParams): URLSearchParams {
 // 빈 문자열/공백을 undefined로 정리(안전용)
 const norm = (v?: string) => (v && v.trim() ? v.trim() : undefined);
 
-export function isSameBaseParams(a: BoardBaseParams, b: BoardBaseParams) {
+export function isSameBaseParams(a: CommentBaseParams, b: CommentBaseParams) {
   return (
     norm(a.q) === norm(b.q) &&
     // norm(a.name) === norm(b.name) &&
@@ -75,7 +68,7 @@ export function isSameBaseParams(a: BoardBaseParams, b: BoardBaseParams) {
     norm(a.endDate) === norm(b.endDate) &&
     (a.isUse ?? null) === (b.isUse ?? null) &&
     (a.isVisible ?? null) === (b.isVisible ?? null) &&
-    (a.sortBy ?? 'sortOrder') === (b.sortBy ?? 'sortOrder') &&
+    (a.sortBy ?? 'createdAt') === (b.sortBy ?? 'createdAt') &&
     (a.order ?? 'desc') === (b.order ?? 'desc') &&
     (a.limit ?? 20) === (b.limit ?? 20)
   );

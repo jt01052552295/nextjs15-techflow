@@ -1,0 +1,120 @@
+'use client';
+import { useMemo } from 'react';
+import { useLanguage } from '@/components/context/LanguageContext';
+import { IBBSCommentRow } from '@/types/comment';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { bbsQK } from '@/lib/queryKeys/bbs';
+import { listAction } from '@/actions/bbs/comments';
+import ReplyItem from './ReplyItem';
+
+interface ReplyListProps {
+  pid: string;
+  parentId: number;
+  onEdit: (commentId: string, content: string) => void;
+  onDelete: (comment: IBBSCommentRow) => void;
+  onLike: (commentId: number) => void;
+}
+
+export default function ReplyList({
+  pid,
+  parentId,
+  onEdit,
+  onDelete,
+  onLike,
+}: ReplyListProps) {
+  const { t } = useLanguage();
+
+  const replyBase = {
+    pid,
+    parentIdx: parentId,
+    sortBy: 'createdAt',
+    order: 'asc',
+  } as const;
+
+  // 답글 데이터 가져오기 (무한 스크롤 방식)
+  const {
+    data: repliesData,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: bbsQK.comments(replyBase),
+    queryFn: ({ pageParam }) => {
+      // 명시적으로 타입을 지정하여 호환성 문제 해결
+      const cursor = pageParam as string | null | undefined;
+      return listAction({ ...replyBase, cursor });
+    },
+    initialPageParam: null as string | null,
+    getNextPageParam: (lastPage) => lastPage.nextCursor || undefined,
+  });
+
+  // 답글 데이터 가공
+  const replies: IBBSCommentRow[] = useMemo(() => {
+    const list = repliesData?.pages.flatMap((p) => p.items) ?? [];
+    return [...new Map(list.map((item) => [item.uid, item])).values()];
+  }, [repliesData]);
+
+  // 래핑된 함수로 변경하여 캐시 무효화 추가
+  const handleEdit = (commentId: string, content: string) => {
+    onEdit(commentId, content);
+  };
+
+  const handleDelete = (comment: IBBSCommentRow) => {
+    console.log('ReplyList handleDelete:', comment);
+    onDelete(comment);
+  };
+
+  const handleLike = (commentId: number) => {
+    console.log(commentId);
+    onLike(commentId);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="replies-loading text-center p-3">
+        <div className="spinner-border spinner-border-sm me-2" role="status">
+          <span className="visually-hidden">{t('common.loading')}</span>
+        </div>
+        {t('common.loading')}
+      </div>
+    );
+  }
+
+  if (!replies || replies.length === 0) {
+    return (
+      <div className="no-replies text-muted p-3">{t('common.no_items')}</div>
+    );
+  }
+
+  return (
+    <div className="replies-container mt-3">
+      <div className="replies-list ms-4 border-start border-3">
+        {replies.map((reply) => (
+          <ReplyItem
+            key={reply.uid}
+            comment={reply}
+            onEdit={handleEdit} // 수정된 핸들러 사용
+            onDelete={() => handleDelete(reply)} // 수정된 핸들러 사용
+            onLike={() => handleLike(reply.idx)} // 수정된 핸들러 사용
+          />
+        ))}
+
+        {/* 더보기 버튼 */}
+        {hasNextPage && (
+          <div className="text-center mt-3">
+            <button
+              className="btn btn-outline-secondary btn-sm"
+              onClick={() => fetchNextPage()}
+              disabled={isFetchingNextPage}
+            >
+              {isFetchingNextPage
+                ? t('common.loading')
+                : t('common.load_more_replies')}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

@@ -1,6 +1,6 @@
 import { IUser } from '@/types/user';
 import { IBoard } from '@/types/board';
-import { IBBSComment } from '@/types/comment';
+import { IBBSCommentRow } from '@/types/comment';
 
 export interface IBBS {
   idx: number;
@@ -32,8 +32,8 @@ export interface IBBS {
   isUse: boolean;
   isVisible: boolean;
   board: IBoard;
-  user?: IUser;
-  comments: IBBSComment[];
+  user?: IUser | null;
+  comments: IBBSCommentRow[];
   files: IBBSFile[];
   likes: IBBSLike[];
   isMine?: boolean;
@@ -46,9 +46,12 @@ export type IBBSCounts = {
   likes: number;
 };
 
-export type IBBSListRow = IBBS & {
-  createdAt: string; // DTO에서 ISO 문자열로 변환
-  updatedAt: string; // DTO에서 ISO 문자열로 변환
+export type IBBSListRow = Omit<
+  IBBS,
+  'createdAt' | 'updatedAt' | 'comments' | 'files' | 'likes'
+> & {
+  createdAt: string;
+  updatedAt: string;
   _count: IBBSCounts;
 };
 
@@ -84,22 +87,20 @@ export interface IBBSFileWithPreview extends IBBSFile {
 }
 export type IBBSFilePart = Partial<IBBSFileWithPreview>;
 
-export type ListEditCell = 'bdName';
+export type ListEditCell = 'subject';
 
 export type SortBy =
   | 'idx'
-  | 'bdName'
-  | 'bdTable'
+  | 'hit'
+  | 'good'
   | 'createdAt'
-  | 'updatedAt'
+  | 'commentCnt'
   | 'sortOrder';
 
 export type SortOrder = 'asc' | 'desc';
 
 export type ListParams = {
   q?: string;
-  bdName?: string;
-  bdTable?: string;
   dateType?: 'createdAt' | 'updatedAt';
   startDate?: string;
   endDate?: string;
@@ -136,4 +137,39 @@ export type DeleteInput = {
 export type DeleteResult = {
   mode: 'single' | 'bulk';
   affected: number; // 업데이트(soft) or 삭제(hard)된 개수
+};
+
+/** 정렬 옵션 */
+export type CommentOrder = 'createdAt' | 'likeCount' | 'replyCount';
+
+export type CommentListParams = {
+  pid: string;
+
+  /** 루트 목록이면 null(기본). 답글 목록이면 부모 idx */
+  parentIdx?: number | null;
+
+  /** 정렬: 루트 목록에서만 적용. 기본=등록순(ASC) */
+  sortBy?: CommentOrder;
+  order?: 'asc' | 'desc';
+
+  /** 페이지 */
+  limit?: number;
+  cursor?: string | null; // b64({ sortValue: any, idx: number })
+
+  /** 로그인 사용자 id 전달 시 isMine/isLiked 주입 */
+  currentUserId?: string;
+};
+
+// export type CommentListResult = {
+//   items: ITodosCommentPart[];
+//   nextCursor?: string; // b64
+//   totalAll: number; // baseWhere 기준 총합
+//   totalFiltered: number; // filteredWhere 기준 총합
+// };
+
+export type CommentListResult<T = IBBSCommentRow> = {
+  items: T[];
+  nextCursor?: string;
+  totalAll: number;
+  totalFiltered: number;
 };
