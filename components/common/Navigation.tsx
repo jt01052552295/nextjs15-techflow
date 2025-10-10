@@ -60,7 +60,7 @@ const Navigation = () => {
       subMenus: [
         { id: 'board-list', route: 'board.index' },
         { id: 'bbs-list', route: 'bbs.index' },
-        // { id: 'comment-list', route: 'comment.index' },
+        { id: 'comment-list', route: 'comment.index' },
       ],
     },
     {

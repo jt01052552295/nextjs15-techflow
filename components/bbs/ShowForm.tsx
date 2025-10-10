@@ -327,9 +327,7 @@ export default function ShowForm({ uid }: Props) {
           <div className="col-md-12 mb-2">
             <div className="card">
               <div className="card-header">
-                <h5 className="card-title m-0">
-                  {t('columns.bbs.TodosComment')}
-                </h5>
+                <h5 className="card-title m-0">{t('columns.bbs.comments')}</h5>
               </div>
               <div className="card-body">
                 <CommentSection pid={uid} bdTable={data.bdTable} />

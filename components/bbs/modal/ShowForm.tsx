@@ -368,7 +368,7 @@ export default function ShowForm({ uid }: Props) {
                   <div className="card">
                     <div className="card-header">
                       <h5 className="card-title m-0">
-                        {t('columns.bbs.TodosComment')}
+                        {t('columns.bbs.comments')}
                       </h5>
                     </div>
                     <div className="card-body">

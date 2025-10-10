@@ -23,10 +23,14 @@ export interface IBBSComment {
   parent?: IBBSComment | null;
   replies: IBBSComment[];
   likes: IBBSCommentLike[];
-  user?: IUserMini;
+  user?: IUserMini | null;
   isMine?: boolean;
   isLiked?: boolean;
 }
+
+export type IBBSCommentCounts = {
+  replies: number;
+};
 
 export type IBBSCommentPart = Partial<IBBSComment>;
 
@@ -43,6 +47,7 @@ export type IBBSCommentRow = Omit<
 > & {
   createdAt: string;
   updatedAt: string;
+  _count: IBBSCommentCounts;
 };
 
 export interface IBBSCommentLike {
@@ -62,6 +67,8 @@ export type SortOrder = 'asc' | 'desc';
 
 export type ListParams = {
   q?: string;
+  bdTable?: string;
+  author?: string;
   dateType?: 'createdAt' | 'updatedAt';
   startDate?: string;
   endDate?: string;

@@ -436,7 +436,6 @@
     "hit": "조회수",
     "good": "좋아요",
     "bad": "싫어요",
-    "comment": "댓글수",
     "thread": "쓰레드",
     "commentCnt": "댓글 수",
     "threadCnt": "쓰레드 수",
@@ -446,7 +445,11 @@
     "createdAt": "생성일",
     "updatedAt": "수정일",
     "isUse": "사용 여부",
-    "isVisible": "표시 여부"
+    "isVisible": "표시 여부",
+    "board": "게시판정보",
+    "user": "계정",
+    "comments": "댓글",
+    "files": "파일"
   },
   "bbsLike": {
     "idx": "IDX",

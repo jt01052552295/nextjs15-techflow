@@ -48,7 +48,7 @@ const SortOptions = ({
           onClick={() => onSortChange('createdAt')}
         >
           <FontAwesomeIcon icon={getSortIcon('createdAt')} />{' '}
-          {t('columns.bbs.createdAt')}
+          {t('columns.bbsComment.createdAt')}
         </button>
         <button
           type="button"
@@ -56,7 +56,7 @@ const SortOptions = ({
           onClick={() => onSortChange('replyCount')}
         >
           <FontAwesomeIcon icon={getSortIcon('replyCount')} />{' '}
-          {t('columns.bbs.replyCount')}
+          {t('columns.bbsComment.replyCount')}
         </button>
         <button
           type="button"
@@ -64,7 +64,7 @@ const SortOptions = ({
           onClick={() => onSortChange('likeCount')}
         >
           <FontAwesomeIcon icon={getSortIcon('likeCount')} />{' '}
-          {t('columns.bbs.likeCount')}
+          {t('columns.bbsComment.likeCount')}
         </button>
       </div>
     </div>
