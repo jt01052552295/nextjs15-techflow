@@ -182,11 +182,13 @@ const ListForm = ({ baseParams }: Props) => {
               <th className="text-center">#</th>
               <th className="text-center">{t('columns.bbsComment.uid')}</th>
               <th className="text-center">{t('columns.bbsComment.bdTable')}</th>
-              <th className="text-center">{t('columns.bbsComment.author')}</th>
               <th className="text-center">{t('columns.bbsComment.pid')}</th>
+
+              <th className="text-center">{t('columns.bbsComment.author')}</th>
               <th className="text-center">
                 {t('columns.bbsComment.parentIdx')}
               </th>
+
               <th className="text-center">
                 {t('columns.bbsComment.createdAt')}
               </th>

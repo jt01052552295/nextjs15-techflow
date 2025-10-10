@@ -6,7 +6,12 @@ export const UpdateSchema = (messages: Record<string, any>) =>
       message: messages.required,
     }),
     author: z.string().optional(),
-    parentIdx: z.number().int().nullable().optional(),
+    parentIdx: z.any().transform((val) => {
+      if (val === null || val === undefined || val === '') return null;
+      if (typeof val === 'number' && !isNaN(val)) return val;
+      const parsed = parseInt(String(val), 10);
+      return isNaN(parsed) ? null : parsed;
+    }),
     bdTable: z.string().min(1, {
       message: messages.required,
     }),

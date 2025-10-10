@@ -60,12 +60,18 @@ const ListRow = ({ row, setSelectedRow, isChecked, onCheck }: Props) => {
       <td className="text-center">
         <span className="badge text-bg-secondary">{row.uid}</span>
       </td>
-      <td className="text-center">{row.bdTable}</td>
-      <td className="text-center">{row.author}</td>
+      <td className="text-center">
+        <span className="badge text-bg-primary">{row.bdTable}</span>
+      </td>
       <td className="text-center">{row.pid}</td>
+
+      <td className="text-center">{row.author}</td>
       <td className="text-center">{row.parentIdx}</td>
+
       <td className="text-center">{row.createdAt}</td>
-      <td className="text-center">{row._count?.replies ?? 0}</td>
+      <td className="text-center">
+        {row.replyCount ?? 0} {row.likeCount ?? 0}
+      </td>
       <td className="text-center">
         <div className="d-flex justify-content-center gap-1">
           <button

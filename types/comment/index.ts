@@ -28,10 +28,6 @@ export interface IBBSComment {
   isLiked?: boolean;
 }
 
-export type IBBSCommentCounts = {
-  replies: number;
-};
-
 export type IBBSCommentPart = Partial<IBBSComment>;
 
 export type IBBSCommentRow = Omit<
@@ -47,7 +43,6 @@ export type IBBSCommentRow = Omit<
 > & {
   createdAt: string;
   updatedAt: string;
-  _count: IBBSCommentCounts;
 };
 
 export interface IBBSCommentLike {

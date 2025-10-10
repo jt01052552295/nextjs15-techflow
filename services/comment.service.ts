@@ -27,7 +27,7 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
     isUse,
     isVisible,
 
-    sortBy = 'sortOrder',
+    sortBy = 'createdAt',
     order = 'desc',
 
     limit = 20,
@@ -108,9 +108,6 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
     orderBy,
     take: safeLimit + 1,
     include: {
-      _count: {
-        select: { replies: true },
-      },
       user: {
         select: {
           id: true,
@@ -158,9 +155,6 @@ export async function show(uid: string): Promise<IBBSCommentRow> {
   const rs = await prisma.bBSComment.findUnique({
     where: { uid },
     include: {
-      _count: {
-        select: { replies: true },
-      },
       user: {
         select: {
           id: true,
@@ -235,33 +229,69 @@ export async function remove(input: DeleteInput): Promise<DeleteResult> {
   if (uids && uids.length > 0) {
     const posts = await prisma.bBSComment.findMany({
       where: { uid: { in: uids } },
-      select: { uid: true, bdTable: true, idx: true },
+      select: {
+        uid: true,
+        bdTable: true,
+        idx: true,
+        parentIdx: true,
+        replyCount: true,
+      },
     });
 
+    // 답글이 있는 부모 댓글 필터링 (삭제 불가)
+    const hasReplyPosts = posts.filter(
+      (p) => p.parentIdx === null && p.replyCount > 0,
+    );
+    if (hasReplyPosts.length > 0) {
+      throw new Error('REPLY_EXIST');
+    }
+
+    // 답글인 댓글들 (부모 댓글의 replyCount를 감소시켜야 함)
+    const replyPosts = posts.filter((p) => p.parentIdx !== null);
+    const parentIdxs = replyPosts.map((p) => p.parentIdx);
+
     const postUids = posts.map((p) => p.uid);
-    // const postIdxs = posts.map((p) => p.idx);
-    const bdTables = Array.from(new Set(posts.map((p) => p.bdTable))); // ✅ 오타 수정
+    const postIdxs = posts.map((p) => p.idx);
+    const bdTables = Array.from(new Set(posts.map((p) => p.bdTable)));
 
     return await prisma.$transaction(async (tx) => {
-      const comments = await tx.bBSComment.findMany({
-        where: { bdTable: { in: bdTables }, pid: { in: postUids } },
-        select: { idx: true },
-      });
-      const commentIdxs = comments.map((c) => c.idx);
-      if (commentIdxs.length > 0) {
+      // 답글에 대한 부모 댓글의 replyCount 감소
+      if (replyPosts.length > 0) {
+        // 부모 댓글 별로 감소시킬 수 필요 (중복 처리)
+        const parentCounts = new Map<number, number>();
+        for (const post of replyPosts) {
+          if (post.parentIdx) {
+            parentCounts.set(
+              post.parentIdx,
+              (parentCounts.get(post.parentIdx) || 0) + 1,
+            );
+          }
+        }
+
+        // 각 부모 댓글의 replyCount 감소
+        for (const [parentIdx, count] of parentCounts.entries()) {
+          await tx.bBSComment.update({
+            where: { idx: parentIdx },
+            data: { replyCount: { decrement: count } },
+          });
+        }
+      }
+
+      // 댓글 좋아요 삭제
+      if (postIdxs.length > 0) {
         await tx.bBSCommentLike.deleteMany({
-          where: { bdTable: { in: bdTables }, parentIdx: { in: commentIdxs } },
+          where: { bdTable: { in: bdTables }, parentIdx: { in: postIdxs } },
         });
       }
 
       if (hard) {
         const rs = await tx.bBSComment.deleteMany({
-          where: { bdTable: { in: bdTables }, pid: { in: postUids } },
+          where: { bdTable: { in: bdTables }, uid: { in: postUids } },
         });
         return { mode: 'bulk', affected: rs.count };
       } else {
         const rs = await tx.bBSComment.updateMany({
-          where: { bdTable: { in: bdTables }, pid: { in: postUids } },
+          where: { bdTable: { in: bdTables }, uid: { in: postUids } },
           data: { isUse: false, isVisible: false },
         });
         return { mode: 'bulk', affected: rs.count };
@@ -272,9 +302,20 @@ export async function remove(input: DeleteInput): Promise<DeleteResult> {
   // Single
   const exist = await prisma.bBSComment.findUnique({
     where: { uid: uid! },
-    select: { uid: true, bdTable: true, idx: true },
+    select: {
+      uid: true,
+      bdTable: true,
+      idx: true,
+      parentIdx: true,
+      replyCount: true,
+    },
   });
   if (!exist) throw new Error('NOT_FOUND');
+
+  // 답글이 존재하면 차단
+  if (exist.parentIdx == null && exist.replyCount > 0) {
+    throw new Error('REPLY_EXIST');
+  }
 
   return await prisma.$transaction(async (tx) => {
     const commentIdxs = (
@@ -287,6 +328,13 @@ export async function remove(input: DeleteInput): Promise<DeleteResult> {
     if (commentIdxs.length > 0) {
       await tx.bBSCommentLike.deleteMany({
         where: { bdTable: exist.bdTable, parentIdx: { in: commentIdxs } },
+      });
+    }
+
+    if (exist.parentIdx) {
+      await tx.bBSComment.update({
+        where: { idx: exist.parentIdx },
+        data: { replyCount: { decrement: 1 } },
       });
     }
 

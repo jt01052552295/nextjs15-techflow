@@ -85,7 +85,10 @@ export default function EditForm({ uid }: Props) {
     setValue('bdTable', data.bdTable ?? '', { shouldValidate: true });
     setValue('author', data.author ?? '', { shouldValidate: true });
     setValue('pid', data.pid ?? '', { shouldValidate: true });
-    setValue('parentIdx', (data as any).parentIdx ?? '');
+    setValue(
+      'parentIdx',
+      (data as any).parentIdx !== undefined ? (data as any).parentIdx : null,
+    );
     setValue('content', (data as any).content ?? null);
     setValue('isUse', !!(data as any).isUse);
     setValue('isVisible', !!(data as any).isVisible);
