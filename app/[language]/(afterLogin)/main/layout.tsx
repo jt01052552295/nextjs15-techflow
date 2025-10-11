@@ -3,19 +3,20 @@ import { ReactNode } from 'react';
 type Props = {
   children: ReactNode;
   analytics: ReactNode;
-  team: ReactNode;
-  overview01: ReactNode;
-  overview02: ReactNode;
-  overview03: ReactNode;
-  overview04: ReactNode;
+  filter: ReactNode;
+  cards: ReactNode;
+  charts: ReactNode;
+  tables: ReactNode;
 };
 
-const MainLayout = ({ children, analytics, team }: Props) => {
+const MainLayout = ({ children, filter, cards, charts, tables }: Props) => {
   return (
     <div data-layout="main">
       {children}
-      {analytics}
-      {team}
+      {filter}
+      {cards}
+      {charts}
+      {tables}
     </div>
   );
 };

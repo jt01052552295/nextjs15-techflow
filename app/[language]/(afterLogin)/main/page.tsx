@@ -36,7 +36,7 @@ export default async function Page({ params }: Props) {
   const breadcrumbPaths = [
     {
       name: metadata.name,
-      url: getRouteUrl('main.index', language),
+      url: url,
     },
     // {
     //   name: dictionary.menu?.members || '회원 관리',
