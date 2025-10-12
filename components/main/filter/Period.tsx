@@ -2,8 +2,10 @@
 
 import { usePeriodStore } from '@/store/periodStore';
 import dayjs from 'dayjs';
+import { useLanguage } from '@/components/context/LanguageContext';
 
 const Period = () => {
+  const { t } = useLanguage();
   const { startDate, endDate, preset, setStartDate, setEndDate, setDateRange } =
     usePeriodStore();
 
@@ -41,7 +43,9 @@ const Period = () => {
   return (
     <div className="card mb-4">
       <div className="card-header">
-        <h5 className="card-title mb-0">기간 필터</h5>
+        <h5 className="card-title mb-0">
+          {t('common.dashboard.period.title')}
+        </h5>
       </div>
       <div className="card-body">
         <div className="row g-3 align-items-center">
@@ -51,20 +55,32 @@ const Period = () => {
               className="form-select"
               value={preset}
               onChange={handlePresetChange}
-              aria-label="기간 선택"
+              aria-label={t('common.dashboard.period.selector.label')}
             >
-              <option value="today">오늘</option>
-              <option value="week">최근 1주일</option>
-              <option value="month">최근 1개월</option>
-              <option value="year">최근 1년</option>
-              <option value="custom">직접 지정</option>
+              <option value="today">
+                {t('common.dashboard.period.selector.options.today')}
+              </option>
+              <option value="week">
+                {t('common.dashboard.period.selector.options.week')}
+              </option>
+              <option value="month">
+                {t('common.dashboard.period.selector.options.month')}
+              </option>
+              <option value="year">
+                {t('common.dashboard.period.selector.options.year')}
+              </option>
+              <option value="custom">
+                {t('common.dashboard.period.selector.options.custom')}
+              </option>
             </select>
           </div>
 
           {/* 시작일 선택 */}
           <div className="col-md-3">
             <div className="input-group">
-              <span className="input-group-text">시작일</span>
+              <span className="input-group-text">
+                {t('common.dashboard.period.date.start')}
+              </span>
               <input
                 type="date"
                 className="form-control"
@@ -77,7 +93,9 @@ const Period = () => {
           {/* 종료일 선택 */}
           <div className="col-md-3">
             <div className="input-group">
-              <span className="input-group-text">종료일</span>
+              <span className="input-group-text">
+                {t('common.dashboard.period.date.end')}
+              </span>
               <input
                 type="date"
                 className="form-control"
@@ -94,7 +112,7 @@ const Period = () => {
               className="btn btn-primary w-100"
               onClick={handleApply}
             >
-              적용
+              {t('common.dashboard.period.button.apply')}
             </button>
           </div>
         </div>
@@ -103,8 +121,10 @@ const Period = () => {
         <div className="mt-3">
           <p className="text-muted mb-0">
             <small>
-              선택된 기간: {startDate.format('YYYY년 MM월 DD일')} ~{' '}
-              {endDate.format('YYYY년 MM월 DD일')}
+              {t('common.dashboard.period.info.selected', {
+                startDate: startDate.format('YYYY.MM.DD'),
+                endDate: endDate.format('YYYY.MM.DD'),
+              })}
             </small>
           </p>
         </div>

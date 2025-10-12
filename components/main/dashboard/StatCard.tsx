@@ -1,7 +1,7 @@
 'use client';
 
 import { FC } from 'react';
-
+import { useLanguage } from '@/components/context/LanguageContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faUser,
@@ -49,6 +49,8 @@ const StatCard: FC<StatCardProps> = ({
   change,
   isLoading = false,
 }) => {
+  const { t } = useLanguage();
+
   return (
     <div className="card">
       <div className="card-body">
@@ -76,7 +78,10 @@ const StatCard: FC<StatCardProps> = ({
               className="me-1"
             />
             {Math.abs(change)}%
-            <span className="text-muted"> 지난 기간 대비</span>
+            <span className="text-muted">
+              {' '}
+              {t('common.dashboard.statCard.comparison')}
+            </span>
           </div>
         )}
       </div>

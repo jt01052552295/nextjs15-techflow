@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useLanguage } from '@/components/context/LanguageContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faUser,
+  faUserPlus,
   faUserMinus,
   faFileLines,
   faComment,
@@ -50,6 +51,7 @@ interface ChartData {
 }
 
 const ChartPanel = () => {
+  const { t } = useLanguage();
   const { startDate, endDate } = usePeriodStore();
   const [rawData, setRawData] = useState<ChartData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -82,7 +84,7 @@ const ChartPanel = () => {
     // 선택된 탭에 따라 데이터셋 추가
     if (activeTab === 'all' || activeTab === 'users') {
       datasets.push({
-        label: '가입 회원',
+        label: t('common.dashboard.chart.datasets.users'),
         data: rawData.map((item) => item.users),
         borderColor: '#8884d8',
         backgroundColor:
@@ -94,7 +96,7 @@ const ChartPanel = () => {
 
     if (activeTab === 'all' || activeTab === 'signouts') {
       datasets.push({
-        label: '탈퇴 회원',
+        label: t('common.dashboard.chart.datasets.signouts'),
         data: rawData.map((item) => item.signouts),
         borderColor: '#ff7300',
         backgroundColor:
@@ -106,7 +108,7 @@ const ChartPanel = () => {
 
     if (activeTab === 'all' || activeTab === 'posts') {
       datasets.push({
-        label: '게시글',
+        label: t('common.dashboard.chart.datasets.posts'),
         data: rawData.map((item) => item.posts),
         borderColor: '#0088fe',
         backgroundColor:
@@ -118,7 +120,7 @@ const ChartPanel = () => {
 
     if (activeTab === 'all' || activeTab === 'comments') {
       datasets.push({
-        label: '댓글',
+        label: t('common.dashboard.chart.datasets.comments'),
         data: rawData.map((item) => item.comments),
         borderColor: '#00c49f',
         backgroundColor:
@@ -130,7 +132,7 @@ const ChartPanel = () => {
 
     if (activeTab === 'all' || activeTab === 'visitors') {
       datasets.push({
-        label: '방문자',
+        label: t('common.dashboard.chart.datasets.visitors'),
         data: rawData.map((item) => item.visitors),
         borderColor: '#ff8042',
         backgroundColor:
@@ -171,7 +173,9 @@ const ChartPanel = () => {
     return (
       <div className="d-flex justify-content-center my-5">
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">로딩 중...</span>
+          <span className="visually-hidden">
+            {t('common.dashboard.chart.messages.loading')}
+          </span>
         </div>
       </div>
     );
@@ -185,7 +189,7 @@ const ChartPanel = () => {
     if (!chartData) {
       return (
         <div className="alert alert-info text-center">
-          표시할 데이터가 없습니다.
+          {t('common.dashboard.chart.messages.noData')}
         </div>
       );
     }
@@ -204,126 +208,130 @@ const ChartPanel = () => {
   };
 
   return (
-    <div className="card">
-      <div className="card-header">
-        <div className="d-flex justify-content-between align-items-center">
-          <h5 className="card-title mb-0">
-            <FontAwesomeIcon icon={faChartLine} className="me-2" />
-            통계 그래프
-          </h5>
+    <div className="row">
+      <div className="col-xl mb-4">
+        <div className="card">
+          <div className="card-header">
+            <div className="d-flex justify-content-between align-items-center">
+              <h5 className="card-title mb-0">
+                <FontAwesomeIcon icon={faChartLine} className="me-2" />
+                {t('common.dashboard.chart.title')}
+              </h5>
 
-          <div className="btn-group" role="group">
-            <button
-              type="button"
-              className={`btn btn-sm ${chartType === 'line' ? 'btn-primary' : 'btn-outline-primary'}`}
-              onClick={() => setChartType('line')}
-            >
-              선형
-            </button>
-            <button
-              type="button"
-              className={`btn btn-sm ${chartType === 'bar' ? 'btn-primary' : 'btn-outline-primary'}`}
-              onClick={() => setChartType('bar')}
-            >
-              막대
-            </button>
-            <button
-              type="button"
-              className={`btn btn-sm ${chartType === 'area' ? 'btn-primary' : 'btn-outline-primary'}`}
-              onClick={() => setChartType('area')}
-            >
-              영역
-            </button>
+              <div className="btn-group" role="group">
+                <button
+                  type="button"
+                  className={`btn btn-sm ${chartType === 'line' ? 'btn-primary' : 'btn-outline-primary'}`}
+                  onClick={() => setChartType('line')}
+                >
+                  {t('common.dashboard.chart.chartTypes.line')}
+                </button>
+                <button
+                  type="button"
+                  className={`btn btn-sm ${chartType === 'bar' ? 'btn-primary' : 'btn-outline-primary'}`}
+                  onClick={() => setChartType('bar')}
+                >
+                  {t('common.dashboard.chart.chartTypes.bar')}
+                </button>
+                <button
+                  type="button"
+                  className={`btn btn-sm ${chartType === 'area' ? 'btn-primary' : 'btn-outline-primary'}`}
+                  onClick={() => setChartType('area')}
+                >
+                  {t('common.dashboard.chart.chartTypes.area')}
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div className="card-body">
-        {/* 탭 메뉴 */}
-        <ul className="nav nav-tabs mb-3">
-          <li className="nav-item">
-            <a
-              className={`nav-link ${activeTab === 'all' ? 'active' : ''}`}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveTab('all');
-              }}
-            >
-              <FontAwesomeIcon icon={faChartLine} className="me-1" />
-              모든 통계
-            </a>
-          </li>
-          <li className="nav-item">
-            <a
-              className={`nav-link ${activeTab === 'users' ? 'active' : ''}`}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveTab('users');
-              }}
-            >
-              <FontAwesomeIcon icon={faUser} className="me-1" />
-              회원 가입
-            </a>
-          </li>
-          <li className="nav-item">
-            <a
-              className={`nav-link ${activeTab === 'signouts' ? 'active' : ''}`}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveTab('signouts');
-              }}
-            >
-              <FontAwesomeIcon icon={faUserMinus} className="me-1" />
-              회원 탈퇴
-            </a>
-          </li>
-          <li className="nav-item">
-            <a
-              className={`nav-link ${activeTab === 'posts' ? 'active' : ''}`}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveTab('posts');
-              }}
-            >
-              <FontAwesomeIcon icon={faFileLines} className="me-1" />
-              게시글
-            </a>
-          </li>
-          <li className="nav-item">
-            <a
-              className={`nav-link ${activeTab === 'comments' ? 'active' : ''}`}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveTab('comments');
-              }}
-            >
-              <FontAwesomeIcon icon={faComment} className="me-1" />
-              댓글
-            </a>
-          </li>
-          <li className="nav-item">
-            <a
-              className={`nav-link ${activeTab === 'visitors' ? 'active' : ''}`}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveTab('visitors');
-              }}
-            >
-              <FontAwesomeIcon icon={faEye} className="me-1" />
-              방문자
-            </a>
-          </li>
-        </ul>
+          <div className="card-body">
+            {/* 탭 메뉴 */}
+            <ul className="nav nav-tabs mb-3">
+              <li className="nav-item">
+                <a
+                  className={`nav-link ${activeTab === 'all' ? 'active' : ''}`}
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveTab('all');
+                  }}
+                >
+                  <FontAwesomeIcon icon={faChartLine} className="me-1" />
+                  {t('common.dashboard.chart.tabs.all')}
+                </a>
+              </li>
+              <li className="nav-item">
+                <a
+                  className={`nav-link ${activeTab === 'users' ? 'active' : ''}`}
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveTab('users');
+                  }}
+                >
+                  <FontAwesomeIcon icon={faUserPlus} className="me-1" />
+                  {t('common.dashboard.chart.tabs.users')}
+                </a>
+              </li>
+              <li className="nav-item">
+                <a
+                  className={`nav-link ${activeTab === 'signouts' ? 'active' : ''}`}
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveTab('signouts');
+                  }}
+                >
+                  <FontAwesomeIcon icon={faUserMinus} className="me-1" />
+                  {t('common.dashboard.chart.tabs.signouts')}
+                </a>
+              </li>
+              <li className="nav-item">
+                <a
+                  className={`nav-link ${activeTab === 'posts' ? 'active' : ''}`}
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveTab('posts');
+                  }}
+                >
+                  <FontAwesomeIcon icon={faFileLines} className="me-1" />
+                  {t('common.dashboard.chart.tabs.posts')}
+                </a>
+              </li>
+              <li className="nav-item">
+                <a
+                  className={`nav-link ${activeTab === 'comments' ? 'active' : ''}`}
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveTab('comments');
+                  }}
+                >
+                  <FontAwesomeIcon icon={faComment} className="me-1" />
+                  {t('common.dashboard.chart.tabs.comments')}
+                </a>
+              </li>
+              <li className="nav-item">
+                <a
+                  className={`nav-link ${activeTab === 'visitors' ? 'active' : ''}`}
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveTab('visitors');
+                  }}
+                >
+                  <FontAwesomeIcon icon={faEye} className="me-1" />
+                  {t('common.dashboard.chart.tabs.visitors')}
+                </a>
+              </li>
+            </ul>
 
-        {/* 차트 영역 */}
-        <div className="chart-container" style={{ height: '400px' }}>
-          {renderChart()}
+            {/* 차트 영역 */}
+            <div className="chart-container" style={{ height: '400px' }}>
+              {renderChart()}
+            </div>
+          </div>
         </div>
       </div>
     </div>

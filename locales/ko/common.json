@@ -422,5 +422,102 @@
       "lastUpdated": "최종 업데이트",
       "lastUpdatedDate": "2025년 5월 1일"
     }
+  },
+  "dashboard": {
+    "period": {
+      "title": "기간 필터",
+      "selector": {
+        "label": "기간 선택",
+        "options": {
+          "today": "오늘",
+          "week": "최근 1주일",
+          "month": "최근 1개월",
+          "year": "최근 1년",
+          "custom": "직접 지정"
+        }
+      },
+      "date": {
+        "start": "시작일",
+        "end": "종료일"
+      },
+      "button": {
+        "apply": "적용"
+      },
+      "info": {
+        "selected": "선택된 기간: {startDate} ~ {endDate}"
+      },
+      "format": {
+        "fullDate": "{year}년 {month}월 {day}일"
+      }
+    },
+    "statCard": {
+      "comparison": "지난 기간 대비"
+    },
+    "cards": {
+      "users": "가입 회원",
+      "signouts": "탈퇴 회원",
+      "posts": "게시글",
+      "comments": "댓글",
+      "visitors": "방문자",
+      "errors": {
+        "loadingFailed": "통계 데이터 로딩 실패:"
+      }
+    },
+    "chart": {
+      "title": "통계 그래프",
+      "chartTypes": {
+        "line": "선형",
+        "bar": "막대",
+        "area": "영역"
+      },
+      "tabs": {
+        "all": "모든 통계",
+        "users": "회원 가입",
+        "signouts": "회원 탈퇴",
+        "posts": "게시글",
+        "comments": "댓글",
+        "visitors": "방문자"
+      },
+      "datasets": {
+        "users": "가입 회원",
+        "signouts": "탈퇴 회원",
+        "posts": "게시글",
+        "comments": "댓글",
+        "visitors": "방문자"
+      },
+      "messages": {
+        "noData": "표시할 데이터가 없습니다.",
+        "loading": "로딩 중..."
+      }
+    },
+    "activity": {
+      "title": "최근 활동",
+      "tabs": {
+        "posts": "게시글",
+        "comments": "댓글",
+        "users": "회원 가입",
+        "signouts": "회원 탈퇴",
+        "visitors": "방문자"
+      },
+      "table": {
+        "headers": {
+          "type": "유형",
+          "content": "내용",
+          "user": "사용자",
+          "date": "일시"
+        },
+        "noData": "데이터가 없습니다."
+      },
+      "types": {
+        "posts": "게시글",
+        "comments": "댓글",
+        "users": "가입회원",
+        "signouts": "탈퇴회원",
+        "visitors": "방문자"
+      },
+      "messages": {
+        "loading": "로딩 중..."
+      }
+    }
   }
 }

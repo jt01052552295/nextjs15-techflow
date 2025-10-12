@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useLanguage } from '@/components/context/LanguageContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faUser,
+  faUserPlus,
   faUserMinus,
   faFileLines,
   faComment,
@@ -23,6 +25,7 @@ interface Activity {
 }
 
 const ActivityTable = () => {
+  const { t } = useLanguage();
   const { startDate, endDate } = usePeriodStore();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -57,32 +60,32 @@ const ActivityTable = () => {
   function getTypeByTab(tab: string): string {
     switch (tab) {
       case 'posts':
-        return '게시글';
+        return t('common.dashboard.activity.types.posts');
       case 'comments':
-        return '댓글';
+        return t('common.dashboard.activity.types.comments');
       case 'users':
-        return '가입회원';
+        return t('common.dashboard.activity.types.users');
       case 'signouts':
-        return '탈퇴회원';
+        return t('common.dashboard.activity.types.signouts');
       case 'visitors':
-        return '방문자';
+        return t('common.dashboard.activity.types.visitors');
       default:
-        return '게시글'; // 기본값 설정
+        return t('common.dashboard.activity.types.posts'); // 기본값 설정
     }
   }
 
   // 활동 유형에 따른 아이콘 반환
   function getActivityIcon(type: string) {
     switch (type) {
-      case '게시글':
+      case t('common.dashboard.activity.types.posts'):
         return <FontAwesomeIcon icon={faFileLines} className="text-primary" />;
-      case '댓글':
+      case t('common.dashboard.activity.types.comments'):
         return <FontAwesomeIcon icon={faComment} className="text-info" />;
-      case '가입회원':
+      case t('common.dashboard.activity.types.users'):
         return <FontAwesomeIcon icon={faUser} className="text-success" />;
-      case '탈퇴회원':
+      case t('common.dashboard.activity.types.signouts'):
         return <FontAwesomeIcon icon={faUserMinus} className="text-danger" />;
-      case '방문자':
+      case t('common.dashboard.activity.types.visitors'):
         return <FontAwesomeIcon icon={faEye} className="text-secondary" />;
       default:
         return null;
@@ -94,124 +97,145 @@ const ActivityTable = () => {
     return (
       <div className="d-flex justify-content-center my-5">
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">로딩 중...</span>
+          <span className="visually-hidden">
+            {t('common.dashboard.activity.messages.loading')}
+          </span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="card">
-      <div className="card-header">
-        <h5 className="card-title mb-0">최근 활동</h5>
-      </div>
+    <div className="row">
+      <div className="col-xl mb-4">
+        <div className="card">
+          <div className="card-header">
+            <h5 className="card-title mb-0">
+              {t('common.dashboard.activity.title')}
+            </h5>
+          </div>
 
-      <div className="card-body">
-        {/* 탭 메뉴 */}
-        <ul className="nav nav-tabs mb-3">
-          <li className="nav-item">
-            <a
-              className={`nav-link ${activeTab === 'posts' ? 'active' : ''}`}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveTab('posts');
-              }}
-            >
-              게시글
-            </a>
-          </li>
-          <li className="nav-item">
-            <a
-              className={`nav-link ${activeTab === 'comments' ? 'active' : ''}`}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveTab('comments');
-              }}
-            >
-              댓글
-            </a>
-          </li>
-          <li className="nav-item">
-            <a
-              className={`nav-link ${activeTab === 'users' ? 'active' : ''}`}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveTab('users');
-              }}
-            >
-              회원 가입
-            </a>
-          </li>
-          <li className="nav-item">
-            <a
-              className={`nav-link ${activeTab === 'signouts' ? 'active' : ''}`}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveTab('signouts');
-              }}
-            >
-              회원 탈퇴
-            </a>
-          </li>
-          <li className="nav-item">
-            <a
-              className={`nav-link ${activeTab === 'visitors' ? 'active' : ''}`}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveTab('visitors');
-              }}
-            >
-              방문자
-            </a>
-          </li>
-        </ul>
+          <div className="card-body">
+            {/* 탭 메뉴 */}
+            <ul className="nav nav-tabs mb-3">
+              <li className="nav-item">
+                <a
+                  className={`nav-link ${activeTab === 'posts' ? 'active' : ''}`}
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveTab('posts');
+                  }}
+                >
+                  <FontAwesomeIcon icon={faFileLines} className="me-1" />
+                  {t('common.dashboard.activity.tabs.posts')}
+                </a>
+              </li>
+              <li className="nav-item">
+                <a
+                  className={`nav-link ${activeTab === 'comments' ? 'active' : ''}`}
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveTab('comments');
+                  }}
+                >
+                  <FontAwesomeIcon icon={faComment} className="me-1" />
+                  {t('common.dashboard.activity.tabs.comments')}
+                </a>
+              </li>
+              <li className="nav-item">
+                <a
+                  className={`nav-link ${activeTab === 'users' ? 'active' : ''}`}
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveTab('users');
+                  }}
+                >
+                  <FontAwesomeIcon icon={faUserPlus} className="me-1" />
+                  {t('common.dashboard.activity.tabs.users')}
+                </a>
+              </li>
+              <li className="nav-item">
+                <a
+                  className={`nav-link ${activeTab === 'signouts' ? 'active' : ''}`}
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveTab('signouts');
+                  }}
+                >
+                  <FontAwesomeIcon icon={faUserMinus} className="me-1" />
+                  {t('common.dashboard.activity.tabs.signouts')}
+                </a>
+              </li>
+              <li className="nav-item">
+                <a
+                  className={`nav-link ${activeTab === 'visitors' ? 'active' : ''}`}
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveTab('visitors');
+                  }}
+                >
+                  <FontAwesomeIcon icon={faEye} className="me-1" />
+                  {t('common.dashboard.activity.tabs.visitors')}
+                </a>
+              </li>
+            </ul>
 
-        {/* 테이블 */}
-        <div className="table-responsive">
-          <table className="table table-hover">
-            <thead>
-              <tr>
-                <th style={{ width: '10%' }}>유형</th>
-                <th style={{ width: '40%' }}>내용</th>
-                <th style={{ width: '20%' }}>사용자</th>
-                <th style={{ width: '20%' }}>일시</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredActivities.length > 0 ? (
-                filteredActivities.map((activity) => (
-                  <tr key={activity.id}>
-                    <td>
-                      <span className="d-flex align-items-center">
-                        {getActivityIcon(activity.type)}
-                        <span className="ms-2">{activity.type}</span>
-                      </span>
-                    </td>
-                    <td>{activity.content}</td>
-                    <td>{activity.user}</td>
-                    <td
-                      title={dayjs(activity.createdAt).format(
-                        'YYYY-MM-DD HH:mm:ss',
-                      )}
-                    >
-                      {dayjs(activity.createdAt).format('YY.MM.DD HH:mm')}
-                    </td>
+            {/* 테이블 */}
+            <div className="table-responsive">
+              <table className="table table-hover">
+                <thead>
+                  <tr>
+                    <th style={{ width: '10%' }}>
+                      {t('common.dashboard.activity.table.headers.type')}
+                    </th>
+                    <th style={{ width: '40%' }}>
+                      {t('common.dashboard.activity.table.headers.content')}
+                    </th>
+                    <th style={{ width: '20%' }}>
+                      {t('common.dashboard.activity.table.headers.user')}
+                    </th>
+                    <th style={{ width: '20%' }}>
+                      {t('common.dashboard.activity.table.headers.date')}
+                    </th>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={4} className="text-center py-3">
-                    데이터가 없습니다.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                </thead>
+                <tbody>
+                  {filteredActivities.length > 0 ? (
+                    filteredActivities.map((activity) => (
+                      <tr key={activity.id}>
+                        <td>
+                          <span className="d-flex align-items-center">
+                            {getActivityIcon(activity.type)}
+                            <span className="ms-2">{activity.type}</span>
+                          </span>
+                        </td>
+                        <td>{activity.content}</td>
+                        <td>{activity.user}</td>
+                        <td
+                          title={dayjs(activity.createdAt).format(
+                            'YYYY-MM-DD HH:mm:ss',
+                          )}
+                        >
+                          {dayjs(activity.createdAt).format('YY.MM.DD HH:mm')}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="text-center py-3">
+                        {t('common.dashboard.activity.table.noData')}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>

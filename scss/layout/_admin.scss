@@ -166,7 +166,7 @@ dd {
       cursor: pointer;
       transition: all 0.2s ease;
       text-decoration: none;
-      color: rgba(0, 0, 0, 0.6);
+      color: $list-group-action-color;
 
       &:hover {
         background-color: rgba(0, 0, 0, 0.05);
@@ -175,7 +175,7 @@ dd {
       .menu-icon {
         width: 20px;
         margin-right: 10px;
-        color: rgba(0, 0, 0, 0.6);
+        color: $list-group-action-color;
       }
 
       &.open {
@@ -227,7 +227,7 @@ dd {
         padding: 0.6rem 1rem 0.6rem 3rem;
         transition: all 0.2s ease;
         text-decoration: none;
-        color: rgba(0, 0, 0, 0.6);
+        color: $list-group-action-color;
 
         &:hover {
           background-color: rgba(0, 0, 0, 0.05);
@@ -236,14 +236,14 @@ dd {
         .sub-menu-icon {
           width: 12px;
           margin-right: 8px;
-          color: rgba(0, 0, 0, 0.5);
+          color: $list-group-action-color;
         }
 
         .menu-description {
           display: block;
           margin-top: 0.25rem;
           font-size: 0.75rem;
-          color: rgba(0, 0, 0, 0.5);
+          color: $list-group-action-color;
         }
       }
     }

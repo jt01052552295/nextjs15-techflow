@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import StatCard from './StatCard';
 import { getCardStats } from '@/actions/main/dashboard';
 import { usePeriodStore } from '@/store/periodStore';
+import { useLanguage } from '@/components/context/LanguageContext';
 
 interface StatsData {
   totalUsers: number;
@@ -14,6 +15,7 @@ interface StatsData {
 }
 
 const DashboardCards = () => {
+  const { t } = useLanguage();
   const { startDate, endDate } = usePeriodStore();
   const [stats, setStats] = useState<StatsData | null>(null);
   const [prevStats, setPrevStats] = useState<StatsData | null>(null);
@@ -41,7 +43,7 @@ const DashboardCards = () => {
         setStats(currentStats);
         setPrevStats(previousStats);
       } catch (error) {
-        console.error('통계 데이터 로딩 실패:', error);
+        console.error(error);
       } finally {
         setIsLoading(false);
       }
@@ -60,7 +62,7 @@ const DashboardCards = () => {
     <div className="row">
       <div className="col-sm-6 col-md-4 col-xl mb-4">
         <StatCard
-          title="가입 회원"
+          title={t('common.dashboard.cards.users')}
           value={stats?.totalUsers || 0}
           icon="person"
           color="primary"
@@ -77,7 +79,7 @@ const DashboardCards = () => {
       </div>
       <div className="col-sm-6 col-md-4 col-xl mb-4">
         <StatCard
-          title="탈퇴 회원"
+          title={t('common.dashboard.cards.signouts')}
           value={stats?.signoutUsers || 0}
           icon="person-x"
           color="danger"
@@ -94,7 +96,7 @@ const DashboardCards = () => {
       </div>
       <div className="col-sm-6 col-md-4 col-xl mb-4">
         <StatCard
-          title="게시글"
+          title={t('common.dashboard.cards.posts')}
           value={stats?.totalPosts || 0}
           icon="file-text"
           color="info"
@@ -111,7 +113,7 @@ const DashboardCards = () => {
       </div>
       <div className="col-sm-6 col-md-4 col-xl mb-4">
         <StatCard
-          title="댓글"
+          title={t('common.dashboard.cards.comments')}
           value={stats?.totalComments || 0}
           icon="chat"
           color="warning"
@@ -128,7 +130,7 @@ const DashboardCards = () => {
       </div>
       <div className="col-sm-6 col-md-4 col-xl mb-4">
         <StatCard
-          title="방문자"
+          title={t('common.dashboard.cards.visitors')}
           value={stats?.totalVisitors || 0}
           icon="eye"
           color="success"

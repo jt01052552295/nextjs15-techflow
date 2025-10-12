@@ -15,7 +15,7 @@
       "desc": ""
     },
     "password": {
-      "name": "Find Password",
+      "name": "Reset Password",
       "desc": ""
     },
     "register": {
@@ -24,6 +24,16 @@
     },
     "error": {
       "name": "Error",
+      "desc": ""
+    }
+  },
+  "policy": {
+    "privacy": {
+      "name": "Privacy Policy",
+      "desc": ""
+    },
+    "terms": {
+      "name": "Terms of Service",
       "desc": ""
     }
   },
@@ -43,7 +53,7 @@
   },
   "user": {
     "index": {
-      "name": "User",
+      "name": "Users",
       "desc": ""
     },
     "create": {
@@ -63,7 +73,7 @@
       "desc": ""
     },
     "partner": {
-      "name": "Partner Management",
+      "name": "Partners",
       "desc": ""
     }
   },
@@ -87,7 +97,7 @@
   },
   "company": {
     "index": {
-      "name": "Company",
+      "name": "Companies",
       "desc": ""
     },
     "create": {
@@ -105,7 +115,7 @@
   },
   "device": {
     "index": {
-      "name": "Reduction Device",
+      "name": "Devices",
       "desc": ""
     },
     "create": {
@@ -121,7 +131,7 @@
       "desc": ""
     }
   },
-  "todo1": {
+  "todos": {
     "index": {
       "name": "Todo",
       "desc": "Todo List"
@@ -131,7 +141,7 @@
       "desc": "Create Todo"
     },
     "show": {
-      "name": "View",
+      "name": "Show",
       "desc": "View Todo"
     },
     "edit": {
@@ -139,9 +149,27 @@
       "desc": "Edit Todo"
     }
   },
+  "practice": {
+    "index": {
+      "name": "RQ",
+      "desc": "List"
+    },
+    "create": {
+      "name": "Create",
+      "desc": "Create"
+    },
+    "show": {
+      "name": "Show",
+      "desc": "View"
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": "Edit"
+    }
+  },
   "carbonpoint": {
     "index": {
-      "name": "Carbon Point",
+      "name": "Carbon Points",
       "desc": ""
     },
     "create": {
@@ -159,7 +187,7 @@
   },
   "greencard": {
     "index": {
-      "name": "Card",
+      "name": "Cards",
       "desc": ""
     },
     "create": {
@@ -176,11 +204,11 @@
     }
   },
   "gear": {
-    "name": "Environment Settings"
+    "name": "Configuration"
   },
   "popup": {
     "index": {
-      "name": "Popup",
+      "name": "Popups",
       "desc": ""
     },
     "create": {
@@ -198,7 +226,7 @@
   },
   "banner": {
     "index": {
-      "name": "Banner",
+      "name": "Banners",
       "desc": ""
     },
     "create": {
@@ -220,22 +248,40 @@
       "desc": ""
     },
     "edit": {
-      "name": "Terms Info",
+      "name": "Policy Info",
       "agree": "Terms of Use",
       "person": "Privacy Policy",
-      "email": "Email Collection Policy",
+      "email": "Email Protection",
       "desc": ""
     }
   },
   "agent": {
     "index": {
-      "name": "Access Statistics",
+      "name": "Access Stats",
+      "desc": ""
+    }
+  },
+  "category": {
+    "index": {
+      "name": "Categories",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
       "desc": ""
     }
   },
   "management": {
     "index": {
-      "name": "Category Management",
+      "name": "Classifications",
       "desc": ""
     },
     "create": {
@@ -253,7 +299,7 @@
   },
   "ebill": {
     "index": {
-      "name": "Monthly Bill",
+      "name": "Monthly Bills",
       "desc": ""
     },
     "create": {
@@ -271,7 +317,7 @@
   },
   "eiot": {
     "index": {
-      "name": "Cumulative Power",
+      "name": "Power Usage",
       "desc": ""
     },
     "create": {
@@ -289,7 +335,7 @@
   },
   "estat": {
     "index": {
-      "name": "Power Statistics",
+      "name": "Power Stats",
       "desc": ""
     },
     "show": {
@@ -317,11 +363,65 @@
       "desc": ""
     },
     "mmSaving": {
-      "name": "Electricity Saving Rate (Monthly)",
+      "name": "Power Savings (Month)",
       "desc": ""
     },
     "mmCarbonSaving": {
-      "name": "Carbon Saving Rate (Monthly)",
+      "name": "Carbon Savings (Month)",
+      "desc": ""
+    }
+  },
+  "board": {
+    "index": {
+      "name": "Board Management",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "bbs": {
+    "index": {
+      "name": "Boards",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "comment": {
+    "index": {
+      "name": "Comments",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
       "desc": ""
     }
   }
