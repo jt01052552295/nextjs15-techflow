@@ -47,6 +47,22 @@ model User {
   bbsLikes           BBSLike[]
   bbsCommentLike     BBSCommentLike[]
 
+  reportsFiled       Report[] @relation("ReportReporter")   // 사용자가 제출한 신고 목록
+  reportsAgainst Report[] @relation("ReportTargetAuthor")   // 신고당한(대상인
+
+  fcmTokens          FcmToken[]
+  fcmMessages        FcmMessage[]     @relation("FcmMessageToUser")
+  fcmAlarms          FcmAlarm[]       @relation("FcmAlarmToUser")
+
+  badges            UserBadge[]
+
+  followersRelation     UserFollow[]    @relation("FollowerToUser")     // 나를 팔로우하는 사람들 관계
+  followingRelation     UserFollow[]    @relation("FollowingToUser")    // 내가 팔로우하는 사람들 관계
+  blockerRelation       UserBlock[]     @relation("BlockerToUser")      // 내가 차단한 사람들 관계
+  blockedRelation       UserBlock[]     @relation("BlockedToUser")      // 나를 차단한 사람들 관계
+
+  points              Point[] 
+
 
   @@map("ec_user")
 }
@@ -305,6 +321,7 @@ model TodosComment {
   @@index([todoId, parentIdx, createdAt])
   @@index([todoId, parentIdx, likeCount, createdAt])
   @@index([todoId, parentIdx, replyCount, createdAt])
+  @@index([author], map: "author_index")
   @@map("ec_todosComments")
 }
 
@@ -775,6 +792,259 @@ model BBSFile {
   @@index([pid], map: "pid_index")
   @@index([bdTable], map: "bdTable_index")
   @@map("ec_bbs_file")
+}
+
+model Report {
+  idx          Int             @id @default(autoincrement())             
+  uid          String          @unique @default(uuid())                 
+  reporterId   Int?                                                    // 신고자(User.idx) (익명 신고이면 null)
+  reporter     User?           @relation("ReportReporter", fields: [reporterId], references: [idx]) // 신고자(User)
+  targetAuthorId Int?            // 신고 대상 리소스의 작성자(User.idx) — 누가 신고당했는지 추적
+  targetAuthor   User?           @relation("ReportTargetAuthor", fields: [targetAuthorId], references: [idx]) // 신고 대상 작성자(User)
+  targetType   ReportTargetType                                   // 신고 대상 타입 (예: BBS, BBS_COMMENT)
+  targetId     Int             // 신고 대상 PK (예: BBS.idx 또는 BBSComment.idx)
+  reason       ReportReason    // 신고 사유 코드
+  description  String?         // 상세 설명
+  comment      String?         // 운영자 메모 / 처리 코멘트 (관리용)
+  status       ReportStatus    @default(OPEN)                      // OPEN / REVIEWING / RESOLVED / DISMISSED
+  createdAt    DateTime        @default(now())                     // 생성일시
+  updatedAt    DateTime        @updatedAt                          // 최종 수정일시 (자동)
+  resolvedAt   DateTime?       // 처리 완료일시 (처리되면 설정)
+
+  @@index([targetType, targetId])
+  @@index([targetAuthorId])
+  @@index([reporterId])
+  @@index([status])
+  @@map("ec_report")
+}
+
+model FcmToken {
+  idx        Int         @id @default(autoincrement())
+  uid        String      @unique @default(uuid())
+  userId     String      @map("user_id")
+  token      String      @unique @db.VarChar(512)
+  platform   FcmPlatform @default(android)
+  deviceId   String?     @map("device_id") @db.VarChar(128)
+  appVersion String?     @map("app_version") @db.VarChar(32)
+  deviceInfo String?     @map("device_info") @db.Text
+  badgeCount Int         @default(0) @map("badge_count")
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @default(now()) @updatedAt @map("updated_at")
+  isUse      Boolean     @default(true) @map("is_use")
+  isVisible  Boolean     @default(true) @map("is_visible")
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("ec_fcm_tokens")
+}
+
+model FcmTemplate {
+  idx           Int      @id @default(autoincrement())
+  uid           String   @unique @default(uuid())
+  type          String   @db.VarChar(50) // 템플릿 코드 (예: qa_input, review 등)
+  activity      String   @db.VarChar(45)
+  title         String?  @db.VarChar(255) // FCM 제목 템플릿
+  body          String?  @db.Text // FCM 본문 템플릿
+  message       String?  @db.Text
+  titleEn       String?  @map("title_en") @db.VarChar(255)
+  bodyEn        String?  @map("body_en") @db.Text
+  messageEn     String?  @map("message_en") @db.Text
+  targetLink    String   @default("") @map("target_link") @db.VarChar(500)
+  webTargetLink String   @default("") @map("web_target_link") @db.VarChar(500)
+  img1          String   @default("") @map("img1") @db.VarChar(255)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+  isUse         Boolean  @default(true) @map("is_use")
+  isVisible     Boolean  @default(true) @map("is_visible")
+
+  fcmMessages   FcmMessage[]
+  fcmAlarms     FcmAlarm[]
+
+  @@map("ec_fcm_templates")
+}
+
+
+model FcmMessage {
+  idx        Int         @id @default(autoincrement())
+  uid        String      @unique @default(uuid())
+  platform   String      @default("app") @db.VarChar(255) // app, desktop, mobile
+  templateId Int?        @map("template") // FcmTemplate 참조
+  userId     String      @map("user_id") 
+  fcmToken   String?     @map("fcm_token") @db.VarChar(255)
+  otCode     String?     @map("ot_code") @db.VarChar(255) // 주문코드
+  title      String?     @db.VarChar(255)
+  body       String?     @db.VarChar(255)
+  url        String?     @db.VarChar(500)
+  res        String?     @db.LongText // 전송결과 전체
+  resStatus  String?     @map("res_status") @db.VarChar(45)
+  resMsg     String?     @map("res_msg") @db.VarChar(255)
+  sortOrder  Int         @default(0) @map("rt_order")
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @default(now()) @updatedAt @map("updated_at")
+  template   FcmTemplate? @relation(fields: [templateId], references: [idx])
+  user       User?       @relation("FcmMessageToUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([body], map: "mt_id")
+  @@index([userId])
+  @@index([templateId])
+  @@map("ec_fcm")
+}
+
+model FcmAlarm {
+  idx        Int         @id @default(autoincrement())
+  uid        String      @unique @default(uuid())
+  userId     String      @map("user_id")
+  templateId Int?        @map("template") // FcmTemplate.idx 참조
+  message    String      @db.Text // 화면에 표시될 알림 메시지
+  url        String?     @db.VarChar(500) // 클릭 시 이동할 URL
+  isRead     Boolean     @default(false) @map("is_read") // Y/N -> Boolean으로 변환
+  createdAt  DateTime    @default(now()) @map("created_at")
+  user       User        @relation("FcmAlarmToUser", fields: [userId], references: [id], onDelete: Cascade)
+  template   FcmTemplate? @relation(fields: [templateId], references: [idx])
+
+  @@index([userId])
+  @@index([templateId])
+  @@map("ec_fcm_alarm")
+}
+
+
+// 뱃지 마스터 정의 테이블
+model BadgeMaster {
+  idx          Int         @id @default(autoincrement())
+  uid          String      @unique @default(uuid())
+  bmType       String?     @map("bm_type") @db.VarChar(20) // 뱃지 유형 (예: review, item, variety, country 등)
+  bmCategory   String?     @map("bm_category") @db.VarChar(100) // 뱃지 카테고리
+  bmLevel      String?     @map("bm_level") @db.VarChar(20) // 단계명 (예: Rookie, King)
+  bmThreshold  Int?        @map("bm_threshold") // 획득 조건 (리뷰 수 등)
+  bmName       String?     @map("bm_name") @db.VarChar(100) // 뱃지 이름
+  img1         String?     @db.VarChar(255) // 뱃지 아이콘
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @default(now()) @updatedAt @map("updated_at")
+  isUse        Boolean     @default(true) @map("is_use")
+  isVisible    Boolean     @default(true) @map("is_visible")
+  
+  // 회원 뱃지와의 관계
+  memberBadges UserBadge[]
+
+  @@map("ec_badge_master")
+}
+
+// 회원이 획득한 뱃지 정보 테이블 
+model UserBadge {
+  idx          Int         @id @default(autoincrement())
+  userId       String      @map("user_id")
+  badgeId      Int         @map("badge_id")
+  createdAt    DateTime    @default(now()) @map("created_at")
+  
+  // 관계 설정
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge        BadgeMaster @relation(fields: [badgeId], references: [idx], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([badgeId])
+  @@map("ec_user_badge")
+}
+
+
+// 회원 팔로잉/팔로워 관계 테이블
+model UserFollow {
+  idx          Int           @id @default(autoincrement())
+  followerIdx  Int           @map("follower_idx") // 팔로우 요청한 회원 idx
+  followingIdx Int           @map("following_idx") // 팔로우 대상 회원 idx
+  followDate   DateTime      @default(now()) @map("follow_date") // 팔로우 요청일시
+  status       FollowStatus  @default(WAITING) @map("status") // 승인상태
+  confirmDate  DateTime?     @map("confirm_date") // 승인 또는 거절 처리일시
+  
+  // 관계 설정
+  follower     User          @relation("FollowerToUser", fields: [followerIdx], references: [idx], onDelete: Cascade)
+  following    User          @relation("FollowingToUser", fields: [followingIdx], references: [idx], onDelete: Cascade)
+
+  @@unique([followerIdx, followingIdx], name: "unique_follow")
+  @@index([followerIdx])
+  @@index([followingIdx])
+  @@index([status])
+  @@map("ec_user_follow")
+}
+
+// 회원 차단 테이블
+model UserBlock {
+  idx         Int      @id @default(autoincrement())
+  blockerIdx  Int      @map("blocker_idx") // 차단한 회원 idx
+  blockedIdx  Int      @map("blocked_idx") // 차단 대상 회원 idx
+  blockDate   DateTime @default(now()) @map("block_date") // 차단일시
+  
+  // 관계 설정
+  blocker     User     @relation("BlockerToUser", fields: [blockerIdx], references: [idx], onDelete: Cascade)
+  blocked     User     @relation("BlockedToUser", fields: [blockedIdx], references: [idx], onDelete: Cascade)
+
+  @@unique([blockerIdx, blockedIdx])
+  @@index([blockerIdx])
+  @@index([blockedIdx])
+  @@map("ec_user_block")
+}
+
+
+// 회원 포인트(캐시) 내역 저장 테이블
+model Point {
+  idx         Int       @id @default(autoincrement())
+  userId      String    @map("user_id") // 사용자 ID (User.id 참조)
+  point       Int       @default(0) // 충전된 포인트
+  usePoint    Int       @default(0) @map("use_point") // 사용된 포인트
+  createdAt   DateTime  @default(now()) @map("created_at") // 등록일 (포인트 적립/사용 날짜)
+  status      String    @default("") @db.VarChar(45) // 포인트 상태 (add: 적립, remove: 사용, remove_expired: 기간 만료 차감)
+  expired     Boolean   @default(false) // 만료 여부 (false: 유효, true: 만료됨)
+  expiredAt   DateTime? @map("expired_at") // 포인트 만료일
+  otGubun     String    @default("") @map("ot_gubun") @db.VarChar(45) // ot_code 구분 : cash, service
+  otCode      String    @default("") @map("ot_code") @db.VarChar(255) // add:캐시구매코드, remove:서비스구매코드(차감처리)
+  message     String    @default("") @db.VarChar(255) // 기타 메시지
+  
+  // 관계 설정
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "idx_user_id")
+  @@map("ec_point")
+}
+
+
+// 팔로우 상태를 위한 enum 추가
+enum FollowStatus {
+  WAITING   @map("W") // 대기
+  APPROVED  @map("Y") // 승인
+  REJECTED  @map("N") // 거절
+}
+
+enum FcmPlatform {
+  android
+  ios
+  web
+}
+
+
+
+enum ReportTargetType {
+  BBS
+  BBS_COMMENT
+  
+}
+
+enum ReportReason {
+  SPAM            // 스팸성 게시물/댓글
+  ABUSE           // 욕설/모욕/폭력적 표현
+  HARASSMENT      // 괴롭힘/따돌림
+  COPYRIGHT       // 저작권 침해
+  ILLEGAL_CONTENT // 불법 정보/거래
+  OTHER           // 기타
+}
+
+/// - OPEN: 신고 초기
+/// - REVIEWING: 검토
+/// - RESOLVED: 조치 완료
+/// - DISMISSED: 판정 기각
+enum ReportStatus {
+  OPEN
+  REVIEWING
+  RESOLVED
+  DISMISSED
 }
 
 
