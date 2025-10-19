@@ -1648,7 +1648,7 @@ model ShopReview {
   @@index([userIdx])
   @@index([userId])
   @@index([score])
-  @@map("ec_ecommerce_review")
+  @@map("ec_shop_review")
 }
 
 
