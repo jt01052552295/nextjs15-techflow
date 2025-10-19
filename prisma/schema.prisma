@@ -28,8 +28,10 @@ model User {
   isUse              Boolean              @default(true) @map("is_use")
   isVisible          Boolean              @default(true) @map("is_visible")
   isSignout          Boolean              @default(false) @map("is_signout")
+
   accounts           Account[]
   profile            UserProfile[]
+  paymentMethods     UserPayment[]
   sessions           Session[]
   companies          Company[]   
   setting            Setting?
@@ -62,6 +64,16 @@ model User {
   blockedRelation       UserBlock[]     @relation("BlockedToUser")      // 나를 차단한 사람들 관계
 
   points              Point[] 
+  ShopCart           ShopCart[]  
+  ShopOrders         ShopOrder[]
+  ShopSubscription   ShopSubscription[]
+
+  PortoneBillingPayment PortoneBillingPayment[]
+
+  ShopReview ShopReview[]
+
+  coupons       CouponMember[]
+  couponUseLogs CouponUseLog[]
 
 
   @@map("ec_user")
@@ -77,6 +89,40 @@ model UserProfile {
 
   @@index([userId], map: "userId_index")
   @@map("ec_user_profile")
+}
+
+// 회원 결제 수단(카드) 정보 테이블
+model UserPayment {
+  idx          Int       @id @default(autoincrement())
+  uid          String    @unique @default(uuid()) // 다른 모델과의 일관성을 위해 추가
+  userIdx      Int       @default(0) @map("user") // 회원 번호 (User.idx)
+  userId       String?   @map("user_id") // 다른 테이블 패턴과 일관성을 위해 추가
+  customerUid  String    @default("") @map("customer_uid") @db.VarChar(255) // PG사 고객 고유 UID
+  billingKey   String    @default("") @map("billing_key") @db.VarChar(255) // PG사 빌링키
+  method       String    @default("card") @db.VarChar(255) // 결제 수단 (예: card, vbank)
+  name         String    @default("") @db.VarChar(255) // 결제 수단 명칭 또는 카드 소유자명
+  cardName     String    @default("") @map("card_name") @db.VarChar(255) // 카드사명
+  cardNumber1  String    @default("") @map("card_number1") @db.VarChar(255) // 카드번호 1번째 블럭
+  cardNumber2  String    @default("") @map("card_number2") @db.VarChar(255) // 카드번호 2번째 블럭
+  cardNumber3  String    @default("") @map("card_number3") @db.VarChar(255) // 카드번호 3번째 블럭
+  cardNumber4  String    @default("") @map("card_number4") @db.VarChar(255) // 카드번호 4번째 블럭
+  cardMM       String    @default("") @map("card_mm") @db.VarChar(2) // 유효기간 월 (MM)
+  cardYY       String    @default("") @map("card_yy") @db.VarChar(4) // 유효기간 연도 (YYYY)
+  cardPwd      String    @default("") @map("card_pwd") @db.VarChar(255) // 카드 비밀번호 앞 2자리
+  cardCvc      String    @default("") @map("card_cvc") @db.VarChar(255) // CVC 코드
+  juminOrCorp  String    @default("") @map("juminOrCorp") @db.VarChar(45) // 주민번호 또는 사업자등록번호 앞자리
+  isRepresent  Boolean   @default(false) @map("represent") // 대표 결제카드 여부(y/n)
+  createdAt    DateTime? @default(now()) @map("regdate") // 등록일시
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") // 수정일시 추가
+  isUse        Boolean   @default(true) @map("use") // 사용여부(y/n)
+  isVisible    Boolean   @default(true) @map("visible") // 노출여부(y/n)
+  
+  // 관계 설정
+  user         User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userIdx])
+  @@map("ec_user_payment")
 }
 
 model Company {
@@ -878,7 +924,7 @@ model FcmMessage {
   res        String?     @db.LongText // 전송결과 전체
   resStatus  String?     @map("res_status") @db.VarChar(45)
   resMsg     String?     @map("res_msg") @db.VarChar(255)
-  sortOrder  Int         @default(0) @map("rt_order")
+  sortOrder  Int         @default(0) @map("sort_order")
   createdAt  DateTime    @default(now()) @map("created_at")
   updatedAt  DateTime    @default(now()) @updatedAt @map("updated_at")
   template   FcmTemplate? @relation(fields: [templateId], references: [idx])
@@ -1004,6 +1050,785 @@ model Point {
   @@index([userId], map: "idx_user_id")
   @@map("ec_point")
 }
+
+
+model ShopCategory {
+  idx       Int      @id @default(autoincrement())
+  uid       String   @unique @default(uuid())
+  cid       String   @default(cuid())
+  code      String   @db.VarChar(255)
+  name      String   @db.VarChar(255)
+  desc      String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  isUse     Boolean  @default(true) @map("is_use")
+  isVisible Boolean  @default(true) @map("is_visible")
+
+  items     ShopItem[] 
+
+  @@map("ec_shop_category")
+}
+
+// 상품 기본 정보 테이블
+model ShopItem {
+  idx                Int              @id @default(autoincrement())
+  uid                String           @unique @default(uuid())
+  cid                String           @default(cuid())
+  shopId             Int              @default(0) @map("shop")
+  code               String           @default("") @db.VarChar(255)
+  categoryId         Int              @default(0) @map("category")
+  categoryCode       String           @default("") @map("category_code") @db.VarChar(45)
+  name               String           @default("") @db.VarChar(255)
+  nameEn             String           @default("") @map("name_en") @db.VarChar(255)
+  desc1              String           @default("") @db.VarChar(255)
+  basicPrice         Int              @default(0) @map("basic_price")
+  basicPriceDc       Int              @default(0) @map("basic_price_dc")
+  salePrice          Int              @default(0) @map("sale_price")
+  basicDesc          String?          @map("basic_desc") @db.LongText
+  etcDesc            String?          @map("etc_desc") @db.MediumText
+  useBasicPeople     Int              @default(0) @map("use_basic_people")
+  useAccount         Int              @default(0) @map("use_account")
+  useMaxPeople       Int              @default(0) @map("use_max_people")
+  useMaxSign         Int              @default(0) @map("use_max_sign")
+  useMaxUpload       Int              @default(0) @map("use_max_upload")
+  useDuration        Int              @default(0) @map("use_duration")
+  rSend              Boolean          @default(false) @map("is_send") // 'n' -> false
+  stock              Int              @default(0)
+  ymd                String           @default("") @db.VarChar(255)
+  his                String           @default("") @db.VarChar(255)
+  createdAt          DateTime?        @default(now()) @map("created_at") 
+  updatedAt          DateTime         @default(now()) @updatedAt @map("updated_at")
+  isUse              Boolean          @default(true) @map("is_use") // 필드명 일관성 유지
+  isVisible          Boolean          @default(true) @map("is_visible") // 필드명 일관성 유지
+  isNft              Boolean          @default(true) @map("is_nft")
+  isSoldout          Boolean          @default(false) @map("soldout")
+  orderMinimumCnt    Int              @default(0) @map("order_minimum_cnt")
+  orderMaximumCnt    Int              @default(0) @map("order_maximum_cnt")
+  sortOrder          Int              @default(0) @map("sort_order") 
+  
+  // 관계 설정
+  ShopCategory           ShopCategory     @relation(fields: [categoryId], references: [idx]) // 카테고리 관계 추가
+  ShopItemFile           ShopItemFile[]   
+  ShopItemOption         ShopItemOption[] // 상품 옵션 관계
+  ShopItemSupply         ShopItemSupply[] // 추가 상품 관계
+
+  ShopCart           ShopCart[]  
+  ShopOrderItems     ShopOrderItem[]
+  ShopSubscription   ShopSubscription[]
+  ShopReview ShopReview[]
+
+  @@index([categoryId], map: "categoryId_index")
+  @@map("ec_shop_item")
+}
+
+model ShopItemFile {
+  idx          Int      @id @default(autoincrement())
+  uid          String   @unique @default(uuid())
+  pid          String
+  name         String
+  url          String   @db.VarChar(255)
+  ext          String   @db.VarChar(10)
+  originalName String
+  size         Int
+  type         String   @db.VarChar(50)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  ShopItem        ShopItem    @relation(fields: [pid], references: [uid], onDelete: Cascade)
+
+  @@index([pid], map: "pid_index")
+  @@map("ec_shop_item_files")
+}
+
+
+// 상품 옵션 테이블
+model ShopItemOption {
+  idx         Int           @id @default(autoincrement())
+  uid         String        @unique @default(uuid())
+  itemId      Int           @map("item")
+  gubun       String        @default("") @db.VarChar(45)
+  parentId    Int           @default(0) @map("pid") // 부모 옵션 ID
+  choiceType  String        @default("") @map("choice_type") @db.VarChar(255)
+  name        String        @default("") @db.VarChar(255)
+  price       Int           @default(0)
+  stock       Int           @default(0)
+  buyMin      Int           @default(0) @map("buy_min")
+  buyMax      Int           @default(0) @map("buy_max")
+  isUse       Boolean       @default(true) @map("is_use") // 필드명 일관성 유지
+  isVisible   Boolean       @default(true) @map("is_visible") // 필드명 일관성 유지
+  isSoldout   Boolean       @default(false) @map("soldout")
+  createdAt   DateTime      @default(now()) @map("created_at") // 날짜 필드 추가
+  updatedAt   DateTime      @default(now()) @updatedAt @map("updated_at") // 날짜 필드 추가
+  
+  // 관계 설정
+  ShopItem    ShopItem      @relation(fields: [itemId], references: [idx], onDelete: Cascade)
+  parent      ShopItemOption? @relation("OptionHierarchy", fields: [parentId], references: [idx], onUpdate: NoAction, onDelete: NoAction)
+  children    ShopItemOption[] @relation("OptionHierarchy")
+
+  ShopCartOption     ShopCartOption[]
+  ShopOrderOption    ShopOrderOption[]
+
+  @@index([itemId])
+  @@index([parentId])
+  @@map("ec_shop_item_option")
+}
+
+// 상품 추가 구성 테이블
+model ShopItemSupply {
+  idx         Int            @id @default(autoincrement())
+  uid         String         @unique @default(uuid())
+  itemId      Int            @map("item")
+  gubun       String         @default("") @db.VarChar(45)
+  parentId    Int            @default(0) @map("pid") // 부모 구성 ID
+  choiceType  String         @default("") @map("choice_type") @db.VarChar(255)
+  name        String         @default("") @db.VarChar(255)
+  price       Int            @default(0)
+  stock       Int            @default(0)
+  isUse       Boolean        @default(true) @map("is_use") 
+  isVisible   Boolean        @default(true) @map("is_visible") 
+  isSoldout   Boolean        @default(false) @map("soldout")
+  createdAt   DateTime       @default(now()) @map("created_at") 
+  updatedAt   DateTime       @default(now()) @updatedAt @map("updated_at")
+  
+  // 관계 설정
+  ShopItem    ShopItem       @relation(fields: [itemId], references: [idx], onDelete: Cascade)
+  parent      ShopItemSupply? @relation("SupplyHierarchy", fields: [parentId], references: [idx], onUpdate: NoAction, onDelete: NoAction)
+  children    ShopItemSupply[] @relation("SupplyHierarchy")
+  ShopCartSupply ShopCartSupply[]
+  ShopOrderSupply     ShopOrderSupply[] 
+
+  @@index([itemId])
+  @@index([parentId])
+  @@map("ec_shop_item_supply")
+}
+
+
+model ShopCart {
+  idx         Int       @id @default(autoincrement())
+  uid         String    @unique @default(uuid())
+  cid         String    @default(cuid())
+  gubun       String    @default("") @db.VarChar(45) // 구분(상품, 패키지 등)
+  isDirect    Boolean   @default(false) @map("is_direct") // 바로구매 여부
+  shopId      Int       @default(0) @map("shop") // 쇼핑몰 ID
+  sellerId    Int       @default(0) @map("seller") // 판매자 ID
+  userId      String    @map("user_id") // 회원 ID (비회원은 세션ID 저장)
+  itemId      Int       @map("item") // 상품 ID
+  quantity    Int       @default(0) @map("cnt") // 수량
+  salePrice   Int       @default(0) @map("sale_price") // 기본 판매가
+  optionPrice Int       @default(0) @map("option_price") // 옵션 추가금액
+  supplyPrice Int       @default(0) @map("supply_price") // 추가상품 금액
+  totalPrice  Int       @default(0) @map("total_price") // 총 결제예정금액
+  cartNo      String    @default("") @map("cart_no") @db.VarChar(255) // 장바구니 고유코드
+  ordNo       String?   @map("ord_no") @db.VarChar(255) // 주문번호 (주문완료시)
+  ipAddress   String    @default("") @map("ip") @db.VarChar(45) // 사용자 IP 주소
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  // 관계 설정
+  options     ShopCartOption[] // 장바구니에 담긴 옵션 정보
+  supplies    ShopCartSupply[] // 장바구니에 담긴 추가상품 정보
+  ShopItem    ShopItem         @relation(fields: [itemId], references: [idx])
+  User        User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([itemId])
+  @@index([cartNo])
+  @@index([ordNo])
+  @@map("ec_shop_cart")
+}
+
+
+model ShopCartOption {
+  idx          Int       @id @default(autoincrement())
+  uid          String    @unique @default(uuid())
+  cartId       Int       @map("cart_id") // 장바구니 ID (ShopCart.idx)
+  optionId     Int       @map("option_id") // 상품 옵션 ID (ShopItemOption.idx)
+  name         String    @default("") @db.VarChar(255) // 옵션명
+  price        Int       @default(0) // 옵션 가격
+  quantity     Int       @default(1) @map("cnt") // 옵션 수량
+  createdAt    DateTime  @default(now()) @map("created_at")
+  
+  // 관계 설정
+  ShopCart         ShopCart  @relation(fields: [cartId], references: [idx], onDelete: Cascade)
+  ShopItemOption       ShopItemOption @relation(fields: [optionId], references: [idx])
+
+  @@index([cartId])
+  @@index([optionId])
+  @@map("ec_shop_cart_option")
+}
+
+// 장바구니 추가상품 테이블 (선택한 추가상품들)
+model ShopCartSupply {
+  idx          Int       @id @default(autoincrement())
+  uid          String    @unique @default(uuid())
+  cartId       Int       @map("cart_id") // 장바구니 ID (ShopCart.idx)
+  supplyId     Int       @map("supply_id") // 추가상품 ID (ShopItemSupply.idx)
+  name         String    @default("") @db.VarChar(255) // 추가상품명
+  price        Int       @default(0) // 추가상품 가격
+  quantity     Int       @default(1) @map("cnt") // 추가상품 수량
+  createdAt    DateTime  @default(now()) @map("created_at")
+  
+  // 관계 설정
+  ShopCart         ShopCart  @relation(fields: [cartId], references: [idx], onDelete: Cascade)
+  ShopItemSupply   ShopItemSupply @relation(fields: [supplyId], references: [idx])
+
+  @@index([cartId])
+  @@index([supplyId])
+  @@map("ec_shop_cart_supply")
+}
+
+
+// 주문 메인 테이블
+model ShopOrder {
+  idx             Int       @id @default(autoincrement())
+  uid             String    @unique @default(uuid())
+  ordNo           String    @map("ord_no") @db.VarChar(255) // 주문번호
+  shopId          Int       @default(0) @map("shop") // 쇼핑몰 ID
+  sellerId        Int       @default(0) @map("seller_id") // 판매자 ID
+  userId          String?   @map("user_id") // 회원 ID (비회원은 세션ID 저장)
+  userIdx         Int       @default(0) @map("user") // 회원 번호
+  gubun           String    @default("") @map("gubun") @db.VarChar(45) // 구분(일반/단체/정기 등)
+  basicPrice      Int       @default(0) @map("basic_price") // 기본 상품 금액 합계
+  optionPrice     Int       @default(0) @map("option_price") // 옵션 추가 금액 합계
+  deliveryPrice   Int       @default(0) @map("delivery_price") // 배송비
+  boxDc           Int       @default(0) @map("box_dc") // 포장/박스 할인
+  payPrice        Int       @default(0) @map("pay_price") // 총 결제 금액
+  stock           Int       @default(0) // 재고 반영 여부
+  memo            String?   @db.MediumText // 주문 메모
+  orderPaid       String    @default("") @map("order_paid") @db.VarChar(255) // 결제 여부 상태
+  orderStatus     String    @default("") @map("order_status") @db.VarChar(255) // 주문 상태
+  cancelStatus    String    @default("") @map("cancel_status") @db.VarChar(255) // 취소 상태
+  paymethod       String    @default("") @map("paymethod") @db.VarChar(45) // 결제 수단
+  
+  // 주문자 정보
+  name            String    @default("") @db.VarChar(255) // 주문자명
+  email           String    @default("") @db.VarChar(255) // 주문자 이메일
+  hp              String    @default("") @db.VarChar(45) // 주문자 휴대폰
+  zipcode         String    @default("") @db.VarChar(45) // 주문자 우편번호
+  jibunAddr1      String    @default("") @map("jibunAddr1") @db.VarChar(255) // 지번 주소1
+  jibunAddr2      String    @default("") @map("jibunAddr2") @db.VarChar(255) // 지번 주소2
+  roadAddr1       String    @default("") @map("roadAddr1") @db.VarChar(255) // 도로명 주소1
+  roadAddr2       String    @default("") @map("roadAddr2") @db.VarChar(255) // 도로명 주소2
+  
+  // 수령자 정보
+  rcvStore        String    @default("") @map("rcv_store") @db.VarChar(255) // 수령 매장명
+  rcvName         String    @default("") @map("rcv_name") @db.VarChar(255) // 수령자명
+  rcvHp           String    @default("") @map("rcv_hp") @db.VarChar(45) // 수령자 연락처
+  rcvEmail        String    @default("") @map("rcv_email") @db.VarChar(255) // 수령자 이메일
+  rcvDate         DateTime? @map("rcv_date") // 희망 수령일
+  rcvAddr1        String    @default("") @map("rcv_addr1") @db.VarChar(255) // 수령 주소1
+  rcvAddr2        String    @default("") @map("rcv_addr2") @db.VarChar(255) // 수령 주소2
+  rcvZipcode      String    @default("") @map("rcv_zipcode") @db.VarChar(255) // 수령자 우편번호
+  
+  // 결제 관련 정보
+  bankAccount     Int       @default(0) @map("bank_account") // 무통장입금 계좌 ID
+  bankDepositName String    @default("") @map("bank_deposit_name") @db.VarChar(255) // 입금자명
+  payEmail        String    @default("") @map("pay_email") @db.VarChar(100) // 결제자 이메일
+  payRepresent    Int       @default(0) @map("pay_represent") // 대표 결제 여부
+  payDay          String    @default("") @map("pay_day") @db.VarChar(45) // 결제일
+  payYear         Boolean   @default(false) @map("pay_year") // 연결제 여부(y/n)
+  payPeople       Int       @default(0) @map("pay_people") // 사용 인원
+  
+  ipAddress       String    @default("") @map("ip") @db.VarChar(45) // IP 주소
+  merchantData    String?   @map("merchantData") @db.LongText // PG사 연동용 원본 데이터
+  createdAt       DateTime  @default(now()) @map("regdate")
+  isUse           Boolean   @default(true) @map("use")
+  isVisible       Boolean   @default(true) @map("visible")
+
+  // 관계 설정
+  items           ShopOrderItem[]
+  payments        ShopOrderPayment[]
+  User            User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  ShopSubscription ShopSubscription[]
+  PortoneSchedulePayment PortoneSchedulePayment[]
+
+  ShopReview ShopReview[]
+
+  @@index([userId])
+  @@index([ordNo])
+  @@index([orderStatus])
+  @@index([cancelStatus])
+  @@index([orderPaid])
+  @@map("ec_shop_order")
+}
+
+// 주문 상품 테이블
+model ShopOrderItem {
+  idx          Int       @id @default(autoincrement())
+  uid          String    @unique @default(uuid())
+  orderId      Int       @map("order_id") // ShopOrder.idx 참조
+  itemId       Int       @map("item_id") // ShopItem.idx 참조
+  itemName     String    @map("item_name") @db.VarChar(255) // 상품명
+  quantity     Int       @default(0) @map("cnt") // 수량
+  salePrice    Int       @default(0) @map("sale_price") // 기본 판매가
+  optionPrice  Int       @default(0) @map("option_price") // 옵션 추가금액
+  supplyPrice  Int       @default(0) @map("supply_price") // 추가상품 금액
+  totalPrice   Int       @default(0) @map("total_price") // 총 결제예정금액
+  cartNo       String?   @map("cart_no") @db.VarChar(255) // 장바구니 고유코드 (장바구니에서 주문 시)
+  statusCode   String    @default("") @map("status_code") @db.VarChar(45) // 상품별 상태코드
+  createdAt    DateTime  @default(now()) @map("created_at")
+  
+  // 관계 설정
+  ShopOrder         ShopOrder @relation(fields: [orderId], references: [idx], onDelete: Cascade)
+  ShopItem          ShopItem  @relation(fields: [itemId], references: [idx])
+  ShopOrderOption   ShopOrderOption[] // 주문 상품별 옵션
+  ShopOrderSupply   ShopOrderSupply[] // 주문 상품별 추가상품
+
+  @@index([orderId])
+  @@index([itemId])
+  @@index([cartNo])
+  @@map("ec_shop_order_item")
+}
+
+// 주문 상품별 옵션 테이블
+model ShopOrderOption {
+  idx          Int       @id @default(autoincrement())
+  uid          String    @unique @default(uuid())
+  orderItemId  Int       @map("order_item_id") // ShopOrderItem.idx 참조
+  optionId     Int       @map("option_id") // ShopItemOption.idx 참조
+  name         String    @default("") @db.VarChar(255) // 옵션명
+  price        Int       @default(0) // 옵션 가격
+  quantity     Int       @default(1) @map("cnt") // 옵션 수량
+  createdAt    DateTime  @default(now()) @map("created_at")
+  
+  // 관계 설정
+  ShopOrderItem    ShopOrderItem @relation(fields: [orderItemId], references: [idx], onDelete: Cascade)
+  ShopItemOption   ShopItemOption @relation(fields: [optionId], references: [idx])
+
+  @@index([orderItemId])
+  @@index([optionId])
+  @@map("ec_shop_order_option")
+}
+
+// 주문 상품별 추가상품 테이블
+model ShopOrderSupply {
+  idx          Int       @id @default(autoincrement())
+  uid          String    @unique @default(uuid())
+  orderItemId  Int       @map("order_item_id") // ShopOrderItem.idx 참조
+  supplyId     Int       @map("supply_id") // ShopItemSupply.idx 참조
+  name         String    @default("") @db.VarChar(255) // 추가상품명
+  price        Int       @default(0) // 추가상품 가격
+  quantity     Int       @default(1) @map("cnt") // 추가상품 수량
+  createdAt    DateTime  @default(now()) @map("created_at")
+  
+  // 관계 설정
+  ShopOrderItem    ShopOrderItem @relation(fields: [orderItemId], references: [idx], onDelete: Cascade)
+  ShopItemSupply   ShopItemSupply @relation(fields: [supplyId], references: [idx])
+
+  @@index([orderItemId])
+  @@index([supplyId])
+  @@map("ec_shop_order_supply")
+}
+
+// 주문 결제 정보 테이블
+model ShopOrderPayment {
+  idx           Int       @id @default(autoincrement())
+  uid           String    @unique @default(uuid())
+  orderId       Int       @map("order_id") // ShopOrder.idx 참조
+  gubun         String    @default("shop") @db.VarChar(45) // 구분값 (예: shop, subs 등)
+  applyNum      String    @default("") @map("apply_num") @db.VarChar(255) // PG 승인번호
+  amount        Int       @default(0) // 결제 요청 금액
+  cancelAmount  Int       @default(0) @map("cancel_amount") // 취소된 금액
+  buyerAddr     String    @default("") @map("buyer_addr") @db.VarChar(500) // 구매자 주소
+  buyerEmail    String    @default("") @map("buyer_email") @db.VarChar(45) // 구매자 이메일
+  buyerName     String    @default("") @map("buyer_name") @db.VarChar(45) // 구매자 이름
+  buyerPostcode String    @default("") @map("buyer_postcode") @db.VarChar(255) // 구매자 우편번호
+  buyerTel      String    @default("") @map("buyer_tel") @db.VarChar(255) // 구매자 연락처
+  cardName      String    @default("0") @map("card_name") @db.VarChar(255) // 카드사명
+  cardNumber    String    @default("0") @map("card_number") @db.VarChar(255) // 카드 번호 (마스킹)
+  cardQuota     Int       @default(0) @map("card_quota") // 할부 개월 수
+  customData    String?   @map("custom_data") @db.MediumText // 사용자 정의 데이터
+  impUid        String    @default("") @map("imp_uid") @db.VarChar(255) // 아임포트 거래 고유번호
+  merchantUid   String    @default("") @map("merchant_uid") @db.VarChar(255) // 주문 고유번호 (내부)
+  name          String    @default("") @db.VarChar(45) // 결제 상품명
+  paidAmount    Int       @default(0) @map("paid_amount") // 실결제 금액
+  paidAt        Int       @default(0) @map("paid_at") // 결제 완료 시각 (timestamp)
+  cancelledAt   Int       @default(0) @map("cancelled_at") // 결제 취소 시각 (timestamp)
+  payMethod     String    @default("") @map("pay_method") @db.VarChar(45) // 결제 수단 (card, vbank 등)
+  pgProvider    String    @default("") @map("pg_provider") @db.VarChar(45) // PG사 이름 (html5_inicis 등)
+  pgTid         String    @default("") @map("pg_tid") @db.VarChar(45) // PG 거래번호
+  pgType        String    @default("") @map("pg_type") @db.VarChar(45) // 결제 PG 타입
+  receiptUrl    String    @default("") @map("receipt_url") @db.VarChar(255) // 영수증 URL
+  status        String    @default("") @db.VarChar(45) // 결제 상태 (paid, cancelled 등)
+  orderData     String?   @map("order_data") @db.MediumText // 주문 데이터 백업
+  device        String    @default("") @db.VarChar(45) // 접속 기기정보
+  shopId        Int       @default(0) @map("shop") // 쇼핑몰 ID
+  sellerId      Int       @default(0) @map("seller") // 판매자 ID
+  createdAt     DateTime  @default(now()) @map("regdate")
+  isUse         Boolean   @default(true) @map("use")
+  isVisible     Boolean   @default(true) @map("visible")
+  
+  // 관계 설정
+  ShopOrder     ShopOrder @relation(fields: [orderId], references: [idx], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([merchantUid])
+  @@index([impUid])
+  @@index([status])
+  @@map("ec_shop_order_payment")
+}
+
+// 구독 정보 테이블
+model ShopSubscription {
+  idx         Int       @id @default(autoincrement())
+  uid         String    @unique @default(uuid())
+  paymentId   String    @default("") @map("payment_id") @db.VarChar(255) // 결제 고유 ID (PG사 기준)
+  ordNo       String    @map("ord_no") @db.VarChar(255) // 주문번호
+  orderId     Int       @default(0) @map("order") // 주문 마스터 ID
+  userId      String?   @map("user_id") // 회원 ID (String으로 변경, 다른 테이블과 일관성 유지)
+  userIdx     Int       @default(0) @map("user") // 회원 번호
+  itemId      Int       @default(0) @map("item") // 구독 상품 ID
+  shopId      Int       @default(0) @map("shop") // 쇼핑몰 ID
+  gubun       String    @default("") @db.VarChar(20) // 구분
+  payDay      String    @default("") @map("pay_day") @db.VarChar(45) // 결제일
+  useMaxPeople Int      @default(0) @map("use_max_people") // 최대 사용 인원
+  startDate   DateTime? @map("start_date") // 구독 시작일
+  endDate     DateTime? @map("end_date") // 구독 종료일
+  status      String    @default("") @db.VarChar(45) // 구독 상태
+  isUse       Boolean   @default(true) @map("use") // 사용여부(y사용,n삭제) -> Boolean으로 변환
+  usage       Int       @default(0) // 현재 사용량
+  usageQuota  Int       @default(0) @map("usage_quota") // 총 허용 사용량
+  createdAt   DateTime  @default(now()) @map("created_at") // 생성일 추가 (다른 테이블과 일관성)
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") // 수정일 추가
+  
+  // 관계 설정
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  shopOrder   ShopOrder @relation(fields: [orderId], references: [idx], onDelete: Restrict)
+  shopItem    ShopItem  @relation(fields: [itemId], references: [idx], onDelete: Restrict)
+  
+  @@index([userId])
+  @@index([orderId])
+  @@index([itemId])
+  @@index([ordNo])
+  @@index([status])
+  @@map("ec_shop_order_subscription")
+}
+
+
+// 포트원 결제 정보 테이블
+model PortonePayment {
+  idx           Int       @id @default(autoincrement())
+  uid           String    @unique @default(uuid()) // 다른 모델과의 일관성을 위해 추가
+  gubun         String    @default("shop") @db.VarChar(45) // 구분값 (예: shop, subs)
+  applyNum      String    @default("") @map("apply_num") @db.VarChar(255) // PG 승인번호
+  amount        Int       @default(0) // 결제 요청 금액
+  cancelAmount  Int       @default(0) @map("cancel_amount") // 취소 금액
+  buyerAddr     String    @default("") @map("buyer_addr") @db.VarChar(500) // 구매자 주소
+  buyerEmail    String    @default("") @map("buyer_email") @db.VarChar(45) // 구매자 이메일
+  buyerName     String    @default("") @map("buyer_name") @db.VarChar(45) // 구매자 이름
+  buyerPostcode String    @default("") @map("buyer_postcode") @db.VarChar(255) // 구매자 우편번호
+  buyerTel      String    @default("") @map("buyer_tel") @db.VarChar(255) // 구매자 연락처
+  cardName      String    @default("0") @map("card_name") @db.VarChar(255) // 카드사명
+  cardNumber    String    @default("0") @map("card_number") @db.VarChar(255) // 카드번호(마스킹)
+  cardQuota     Int       @default(0) @map("card_quota") // 할부 개월 수
+  customData    String?   @map("custom_data") @db.MediumText // 사용자 정의 데이터(JSON)
+  impUid        String    @default("") @map("imp_uid") @db.VarChar(255) // 아임포트 결제 고유 ID
+  merchantUid   String    @default("") @map("merchant_uid") @db.VarChar(255) // 주문 고유 번호
+  name          String    @default("") @db.VarChar(45) // 상품명
+  paidAmount    Int       @default(0) @map("paid_amount") // 실제 결제된 금액
+  paidAt        Int       @default(0) @map("paid_at") // 결제 완료 시간 (timestamp)
+  cancelledAt   Int       @default(0) @map("cancelled_at") // 취소 처리 시간 (timestamp)
+  payMethod     String    @default("") @map("pay_method") @db.VarChar(45) // 결제 수단 (card, vbank 등)
+  pgProvider    String    @default("") @map("pg_provider") @db.VarChar(45) // PG사 이름 (inicis, kcp 등)
+  pgTid         String    @default("") @map("pg_tid") @db.VarChar(45) // PG 거래번호
+  pgType        String    @default("") @map("pg_type") @db.VarChar(45) // PG 결제 방식 (html5 등)
+  receiptUrl    String    @default("") @map("receipt_url") @db.VarChar(255) // 영수증 URL
+  status        String    @default("") @db.VarChar(45) // 결제 상태 (paid, ready, cancelled 등)
+  orderData     String?   @map("order_data") @db.MediumText // 주문 원본 데이터(JSON)
+  device        String    @default("") @db.VarChar(45) // 결제 기기 정보
+  shopId        Int       @default(0) @map("shop") // 쇼핑몰 ID
+  sellerId      Int       @default(0) @map("seller") // 판매자 ID
+  createdAt     DateTime? @default(now()) @map("regdate") // 등록일시
+  isUse         Boolean   @default(true) @map("use") // 사용여부
+  isVisible     Boolean   @default(true) @map("visible") // 노출여부
+
+  @@index([merchantUid])
+  @@index([impUid])
+  @@index([status])
+  @@map("ec_portone_payment")
+}
+
+// 포트원 빌링키 결제 정보 테이블
+model PortoneBillingPayment {
+  idx             Int       @id @default(autoincrement())
+  uid             String    @unique @default(uuid()) // 다른 모델과의 일관성을 위해 추가
+  gubun           String    @default("shop") @db.VarChar(45) // 결제 구분
+  userIdx         Int       @default(0) @map("user") // 회원 ID (User.idx)
+  userId          String?   @map("user_id") // 다른 테이블 패턴과 일관성을 위해 추가
+  status          String    @default("") @db.VarChar(255) // 결제 상태 (paid, cancelled 등)
+  id              String    @default("") @db.VarChar(255) // 내부 결제 고유 ID
+  transactionId   String    @default("") @db.VarChar(255) // 포트원 거래 ID (tx_id)
+  merchantId      String    @default("") @db.VarChar(255) // 상점 주문번호 (merchant_uid)
+  storeId         String    @default("") @db.VarChar(255) // 프로젝트 구분용 상점 ID
+  customerUid     String    @default("") @map("customer_uid") @db.VarChar(255) // 빌링키 customer_uid
+  billingKey      String    @default("") @map("billing_key") @db.VarChar(255) // PG 발급 빌링키
+  cardName        String    @default("0") @map("card_name") @db.VarChar(255) // 카드사명
+  cardNumber      String    @default("0") @map("card_number") @db.VarChar(255) // 카드번호(마스킹)
+  orderData       String?   @map("order_data") @db.MediumText // 주문 원본 데이터(JSON)
+  orderName       String    @default("") @db.VarChar(255) // 결제 상품명
+  amount          Int       @default(0) // 결제 요청 금액
+  cancelAmount    Int       @default(0) @map("cancel_amount") // 취소된 금액
+  productsId      String    @default("") @map("products_id") @db.VarChar(255) // 상품 ID 목록(쉼표 구분)
+  productsName    String    @default("") @map("products_name") @db.VarChar(255) // 상품명 목록(쉼표 구분)
+  productsAmount  Int       @default(0) @map("products_amount") // 상품 총액
+  productsQuantity Int      @default(0) @map("products_quantity") // 상품 총 수량
+  pgTxId          String    @map("pgTxId") @db.VarChar(255) // PG 거래번호 (PG사 기준)
+  pgResponse      String?   @map("pgResponse") @db.MediumText // PG 응답 데이터(JSON)
+  webhook         String?   @db.LongText // 포트원 웹훅 원문(JSON)
+  receiptUrl      String    @default("") @map("receiptUrl") @db.VarChar(500) // 영수증 URL
+  paidAmount      Int       @default(0) @map("paid_amount") // 최종 결제된 금액
+  paidAt          DateTime? @map("paid_at") // 결제 완료 시각
+  cancelReason    String    @default("") @map("cancel_reason") @db.VarChar(255) // 취소 사유
+  cancelInput     String    @default("") @map("cancel_input") @db.VarChar(255) // 취소 입력값(관리자)
+  cancelledAt     DateTime? @map("cancelled_at") // 결제 취소 시각
+  createdAt       DateTime? @default(now()) @map("regdate") // 등록일시
+  isUse           Boolean   @default(true) @map("use") // 사용여부
+  isVisible       Boolean   @default(true) @map("visible") // 노출여부
+  device          String    @default("") @db.VarChar(255) // 결제 기기 정보
+  shopId          Int       @default(0) @map("shop") // 쇼핑몰 ID
+  
+  // 관계 설정
+  User            User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userIdx])
+  @@index([userId])
+  @@index([status])
+  @@index([merchantId])
+  @@map("ec_portone_billing_payment")
+}
+
+// 포트원 예약결제 정보 테이블
+model PortoneSchedulePayment {
+  idx          Int       @id @default(autoincrement())
+  uid          String    @unique @default(uuid()) // 다른 모델과의 일관성을 위해 추가
+  orderId      Int?       @default(0) @map("order") // 예약 결제 대상 주문 ID
+  paymentId    String    @default("") @map("payment_id") @db.VarChar(255) // 결제 관리 ID (내부 식별용)
+  scheduleId   String    @default("") @map("schedule_id") @db.VarChar(255) // 포트원 예약결제 고유 ID
+  param        String?   @db.MediumText // 포트원 스케줄 등록 파라미터(JSON)
+  createdAt    DateTime? @default(now()) @map("regdate") // 등록일시
+  reservDate   DateTime? @map("reserv_date") // 예약 결제 실행 예정일
+  isPayment    Boolean   @default(false) @map("payment") // 결제 성공 여부(y/n)
+  isUse        Boolean   @default(true) @map("use") // 사용여부
+  
+  // 관계 설정
+  ShopOrder    ShopOrder? @relation(fields: [orderId], references: [idx], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([scheduleId])
+  @@map("ec_portone_schedule_payment")
+}
+
+// 상품 리뷰 정보 테이블
+model ShopReview {
+  idx          Int       @id @default(autoincrement())
+  uid          String    @unique @default(uuid()) // 다른 모델과의 일관성을 위해 추가
+  orderId      Int       @default(0) @map("order") // 주문 마스터 ID
+  itemId       Int       @default(0) @map("item") // 리뷰 대상 상품 ID
+  userIdx      Int       @default(0) @map("user") // 작성자 회원 ID (User.idx)
+  userId       String?   @map("user_id") // 다른 테이블 패턴과 일관성을 위해 추가
+  subject      String    @default("") @db.VarChar(255) // 리뷰 제목
+  content      String?   @db.LongText // 리뷰 내용
+  createdAt    DateTime? @default(now()) @map("regdate") // 등록일시
+  score        Int       @default(0) // 평점 (1~5점)
+  hit          Int       @default(0) // 조회수
+  good         Int       @default(0) // 추천 수
+  bad          Int       @default(0) // 비추천 수
+  isUse        Boolean   @default(true) @map("use") // 사용여부(y사용,n삭제)
+  isVisible    Boolean   @default(true) @map("visible") // 노출여부(y노출,n숨김)
+  isSecret     Boolean   @default(false) @map("secret") // 비공개 여부(y/n)
+  ipAddress    String    @default("") @map("ip") @db.VarChar(20) // 작성자 IP
+  
+  // 관계 설정
+  ShopOrder    ShopOrder  @relation(fields: [orderId], references: [idx], onDelete: Cascade)
+  ShopItem     ShopItem   @relation(fields: [itemId], references: [idx], onDelete: Cascade)
+  User         User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([itemId])
+  @@index([userIdx])
+  @@index([userId])
+  @@index([score])
+  @@map("ec_ecommerce_review")
+}
+
+
+
+// 쿠폰 관련 enum 정의
+enum CouponServiceType {
+  PRODUCT @map("PRODUCT") // 상품결제
+  CASH    @map("CASH")    // 캐시충전
+}
+
+enum CouponMethod {
+  ITEM     @map("ITEM")     // 개별상품
+  CATEGORY @map("CATEGORY") // 카테고리
+  ORDER    @map("ORDER")    // 주문금액
+  SHIPPING @map("SHIPPING") // 배송비
+}
+
+enum CouponScope {
+  ALL      @map("ALL")      // 전체
+  CATEGORY @map("CATEGORY") // 카테고리
+  SELLER   @map("SELLER")   // 판매자
+  PRODUCT  @map("PRODUCT")  // 상품
+}
+
+enum CouponClass {
+  available @map("available") // 바로사용
+  download  @map("download")  // 다운로드 후 사용
+}
+
+enum CouponPeriodType {
+  FIXED    @map("1") // 고정기간
+  RELATIVE @map("2") // 발급일 기준
+}
+
+enum CouponDiscountType {
+  AMOUNT   @map("1") // 정액
+  PERCENT  @map("2") // 정율
+}
+
+enum CouponStatus {
+  ACTIVE   @map("ACTIVE") // 진행중
+  PAUSED   @map("PAUSED") // 중지
+  ENDED    @map("ENDED")  // 종료
+}
+
+enum CouponCodeState {
+  NEW      @map("NEW")      // 신규
+  ASSIGNED @map("ASSIGNED") // 할당됨
+  USED     @map("USED")     // 사용됨
+  EXPIRED  @map("EXPIRED")  // 만료됨
+}
+
+enum CouponMemberState {
+  ISSUED    @map("ISSUED")    // 발급됨
+  USED      @map("USED")      // 사용됨
+  EXPIRED   @map("EXPIRED")   // 만료됨
+  CANCELLED @map("CANCELLED") // 취소됨
+}
+
+enum CouponUseSource {
+  AUTO     @map("AUTO")     // 자동적용
+  CODE     @map("CODE")     // 코드형
+  DOWNLOAD @map("DOWNLOAD") // 다운로드형
+}
+
+// 쿠폰 캠페인
+model CouponCampaign {
+  idx            Int              @id @default(autoincrement()) // 쿠폰 캠페인 고유번호
+  uid            String           @unique @default(uuid()) // 고유 ID
+  serviceType    CouponServiceType @default(PRODUCT) @map("service_type") // 쿠폰 적용 서비스
+  title          String           @db.VarChar(255) // 쿠폰명
+  subtitle       String?          @db.VarChar(255) // 쿠폰 부제목/설명
+  gubun          String           @default("NORMAL") @db.VarChar(20) // 쿠폰 구분(NORMAL, NEW, BIRTHDAY 등)
+  method         CouponMethod     // 쿠폰 적용 방식
+  scope          CouponScope      @default(ALL) // 쿠폰 적용 범위
+  targetJson     String?          @map("target_json") @db.LongText // 적용 대상 JSON 배열
+  memberRule     String?          @map("member_rule") @db.LongText // 적용 회원 조건 JSON 배열
+  class          CouponClass      @default(available) // 쿠폰 발급 방식
+  type1          CouponPeriodType @default(FIXED) @map("type1") // 유효기간 유형
+  startDate      DateTime?        @map("sdate") // 고정기간 시작일
+  endDate        DateTime?        @map("edate") // 고정기간 종료일
+  days           Int              @default(0) // 발급일 기준 유효기간(일)
+  type2          CouponDiscountType @default(AMOUNT) @map("type2") // 할인방식
+  truncUnit      Int              @default(0) @map("trunc_unit") // 절삭단위
+  price          Float            @default(0) // 할인금액 또는 할인율
+  storePrice     Float            @default(0) @map("store_price") // 판매자 부담금액
+  minimum        Float            @default(0) // 최소 주문금액
+  maximum        Float            @default(0) // 최대 할인금액
+  cpImage1       String           @default("") @map("cp_image1") @db.VarChar(255) // 쿠폰이미지1
+  cpImage2       String           @default("") @map("cp_image2") @db.VarChar(255) // 쿠폰이미지2
+  cpImage3       String           @default("") @map("cp_image3") @db.VarChar(255) // 쿠폰이미지3
+  cpImage4       String           @default("") @map("cp_image4") @db.VarChar(255) // 쿠폰이미지4
+  cpImage5       String           @default("") @map("cp_image5") @db.VarChar(255) // 쿠폰이미지5
+  isVisible      Boolean          @default(true) @map("show_yn") // 노출 여부
+  isDownloadable Boolean          @default(true) @map("download_yn") // 다운로드 노출 여부
+  status         CouponStatus     @default(ACTIVE) // 상태
+  createdAt      DateTime         @default(now()) @map("created_at") // 등록일시
+  updatedAt      DateTime?        @updatedAt @map("updated_at") // 수정일시
+
+  // 관계 설정
+  codes     CouponCode[]      // 쿠폰 코드 관계
+  members   CouponMember[]    // 회원 발급 쿠폰 관계
+  useLogs   CouponUseLog[]    // 쿠폰 사용 로그 관계
+
+  @@index([scope])
+  @@index([method])
+  @@index([status])
+  @@map("ec_coupon_campaign")
+}
+
+// 쿠폰 코드 풀
+model CouponCode {
+  idx             Int              @id @default(autoincrement()) // 쿠폰 코드 고유번호
+  uid             String           @unique @default(uuid()) // 고유 ID
+  campaignId      Int              @map("campaign_idx") // 쿠폰 캠페인 번호(FK)
+  code            String           @unique @db.VarChar(50) // 쿠폰 코드값(1회용)
+  assignedMtIdx   Int?             @map("assigned_mt_idx") // 할당된 회원번호
+  assignedAt      DateTime?        @map("assigned_at") // 쿠폰 코드 할당일시
+  usedOtCode      String?          @map("used_ot_code") @db.VarChar(255) // 사용된 주문번호
+  usedAt          DateTime?        @map("used_at") // 쿠폰 사용일시
+  state           CouponCodeState  @default(NEW) // 쿠폰 상태
+  createdAt       DateTime         @default(now()) @map("created_at") // 등록일시
+
+  // 관계 설정
+  campaign        CouponCampaign   @relation(fields: [campaignId], references: [idx])
+  members         CouponMember[]   // 회원 발급 쿠폰 관계
+
+  @@index([campaignId])
+  @@map("ec_coupon_code")
+}
+
+// 회원 발급 쿠폰
+model CouponMember {
+  idx           Int               @id @default(autoincrement()) // 회원 발급 쿠폰 고유번호
+  uid           String            @unique @default(uuid()) // 고유 ID
+  campaignId    Int               @map("campaign_idx") // 쿠폰 캠페인 번호(FK)
+  mtIdx         Int               @map("mt_idx") // 회원번호
+  userId        String?           @map("user_id") // 회원 ID (다른 테이블과 일관성)
+  issuedAt      DateTime          @default(now()) @map("issued_at") // 쿠폰 발급일시
+  expiresAt     DateTime?         @map("expires_at") // 쿠폰 만료일시
+  usedOtCode    String?           @map("used_ot_code") @db.VarChar(255) // 사용된 주문번호
+  usedAt        DateTime?         @map("used_at") // 쿠폰 사용일시
+  state         CouponMemberState @default(ISSUED) // 쿠폰 상태
+  codeId        Int?              @map("code_idx") // coupon_code_t 참조(코드형일 때만)
+
+  // 관계 설정
+  campaign      CouponCampaign    @relation(fields: [campaignId], references: [idx])
+  code          CouponCode?       @relation(fields: [codeId], references: [idx])
+  user          User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([campaignId])
+  @@index([mtIdx])
+  @@index([userId])
+  @@index([codeId])
+  @@map("ec_coupon_member")
+}
+
+// 쿠폰 사용 로그
+model CouponUseLog {
+  idx           Int              @id @default(autoincrement()) // 쿠폰 사용 로그 고유번호
+  uid           String           @unique @default(uuid()) // 고유 ID
+  campaignId    Int              @map("campaign_idx") // 쿠폰 캠페인 번호(FK)
+  mtIdx         Int              @map("mt_idx") // 회원번호
+  userId        String?          @map("user_id") // 회원 ID (다른 테이블과 일관성)
+  otCode        String           @map("ot_code") @db.VarChar(255) // 주문번호
+  amount        Float            @default(0) // 실제 할인 적용 금액
+  usedSource    CouponUseSource  // 쿠폰 사용 경로
+  createdAt     DateTime         @default(now()) @map("created_at") // 사용일시
+
+  // 관계 설정
+  campaign      CouponCampaign   @relation(fields: [campaignId], references: [idx])
+  user          User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([campaignId])
+  @@index([mtIdx])
+  @@index([userId])
+  @@map("ec_coupon_use_log")
+}
+
+
 
 
 // 팔로우 상태를 위한 enum 추가
