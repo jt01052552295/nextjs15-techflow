@@ -72,7 +72,7 @@ export async function addPoint(params: AddPointParams) {
 /**
  * 포인트 사용
  */
-export async function usePoint(params: UsePointParams) {
+export async function deductPoint(params: UsePointParams) {
   const { userId, point, otGubun = '', otCode = '', message = '' } = params;
 
   if (!userId || !point || point <= 0) {

@@ -144,4 +144,10 @@ export const routesData = {
     show: '/badge/{id}',
     edit: '/badge/{id}/edit',
   },
+  point: {
+    index: '/point',
+    create: '/point/p/create',
+    show: '/point/{id}',
+    edit: '/point/{id}/edit',
+  },
 };

@@ -515,5 +515,18 @@
     "userId": "회원 ID",
     "badgeId": "뱃지 ID",
     "createdAt": "획득일"
+  },
+  "point": {
+    "idx": "인덱스",
+    "userId": "회원 ID",
+    "point": "포인트",
+    "usePoint": "사용 포인트",
+    "createdAt": "등록일",
+    "status": "상태",
+    "expired": "만료 여부",
+    "expiredAt": "만료일",
+    "otGubun": "구분",
+    "otCode": "코드",
+    "message": "메시지"
   }
 }
