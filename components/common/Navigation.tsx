@@ -13,7 +13,6 @@ import {
   faCaretRight,
   faUser,
   faGears,
-  faChartSimple,
   faAngleDown,
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -92,6 +91,7 @@ const Navigation = () => {
         { id: 'popup-list', route: 'popup.index' },
         { id: 'banner-list', route: 'banner.index' },
         { id: 'category-list', route: 'category.index' },
+        { id: 'badge-master-list', route: 'badge.index' },
       ],
     },
 

@@ -138,4 +138,10 @@ export const routesData = {
     show: '/comment/{id}',
     edit: '/comment/{id}/edit',
   },
+  badge: {
+    index: '/badge',
+    create: '/badge/p/create',
+    show: '/badge/{id}',
+    edit: '/badge/{id}/edit',
+  },
 };

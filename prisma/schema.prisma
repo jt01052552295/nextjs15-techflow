@@ -28,6 +28,8 @@ model User {
   isUse              Boolean              @default(true) @map("is_use")
   isVisible          Boolean              @default(true) @map("is_visible")
   isSignout          Boolean              @default(false) @map("is_signout")
+  followingCnt       Int @default(0) @map("following_cnt")  // 내가 팔로우하는 수
+  followerCnt        Int @default(0) @map("follower_cnt")   // 나를 팔로우하는 수
 
   accounts           Account[]
   profile            UserProfile[]
@@ -958,11 +960,11 @@ model FcmAlarm {
 model BadgeMaster {
   idx          Int         @id @default(autoincrement())
   uid          String      @unique @default(uuid())
-  bmType       String?     @map("bm_type") @db.VarChar(20) // 뱃지 유형 (예: review, item, variety, country 등)
-  bmCategory   String?     @map("bm_category") @db.VarChar(100) // 뱃지 카테고리
-  bmLevel      String?     @map("bm_level") @db.VarChar(20) // 단계명 (예: Rookie, King)
-  bmThreshold  Int?        @map("bm_threshold") // 획득 조건 (리뷰 수 등)
-  bmName       String?     @map("bm_name") @db.VarChar(100) // 뱃지 이름
+  bmType       String      @map("bm_type") @db.VarChar(20) // 뱃지 유형 (예: review, item, variety, country 등)
+  bmCategory   String      @map("bm_category") @db.VarChar(100) // 뱃지 카테고리
+  bmLevel      String      @map("bm_level") @db.VarChar(20) // 단계명 (예: Rookie, King)
+  bmThreshold  Int         @map("bm_threshold") // 획득 조건 (리뷰 수 등) 
+  bmName       String      @map("bm_name") @db.VarChar(100) // 뱃지 이름 
   img1         String?     @db.VarChar(255) // 뱃지 아이콘
   createdAt    DateTime    @default(now()) @map("created_at")
   updatedAt    DateTime    @default(now()) @updatedAt @map("updated_at")
@@ -970,8 +972,9 @@ model BadgeMaster {
   isVisible    Boolean     @default(true) @map("is_visible")
   
   // 회원 뱃지와의 관계
-  memberBadges UserBadge[]
+  UserBadge UserBadge[]
 
+  @@index([bmType])
   @@map("ec_badge_master")
 }
 
@@ -979,13 +982,14 @@ model BadgeMaster {
 model UserBadge {
   idx          Int         @id @default(autoincrement())
   userId       String      @map("user_id")
-  badgeId      Int         @map("badge_id")
+  badgeId      String      @map("badge_id")
   createdAt    DateTime    @default(now()) @map("created_at")
   
   // 관계 설정
-  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  badge        BadgeMaster @relation(fields: [badgeId], references: [idx], onDelete: Cascade)
+  User         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  BadgeMaster  BadgeMaster @relation(fields: [badgeId], references: [uid], onDelete: Cascade)
 
+  @@unique([userId, badgeId]) // 중복 획득 방지
   @@index([userId])
   @@index([badgeId])
   @@map("ec_user_badge")
