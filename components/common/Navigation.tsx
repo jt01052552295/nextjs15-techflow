@@ -28,6 +28,7 @@ interface MainMenu {
   icon: typeof faHome; // 또는 IconDefinition
   route: string | null;
   subMenus: SubMenu[];
+  customName?: string; // 개별적인 메뉴 이름을 위한 필드 추가
 }
 
 const Navigation = () => {
@@ -49,6 +50,7 @@ const Navigation = () => {
       subMenus: [
         { id: 'user-list', route: 'user.index' },
         { id: 'setting-list', route: 'setting.index' },
+        { id: 'address-list', route: 'address.index' },
         { id: 'company-list', route: 'company.index' },
         { id: 'point-list', route: 'point.index' },
       ],
@@ -68,7 +70,12 @@ const Navigation = () => {
       icon: faGears,
       route: 'config.index',
       subMenus: [
-        { id: 'config-list', route: 'config.index' },
+        {
+          id: 'config-list',
+          route: 'config.index',
+          customName: t('routes.config.index.navName'),
+        },
+        { id: 'setup-list', route: 'setup.index' },
         {
           id: 'config-edit-person',
           route: 'config.edit',
@@ -87,7 +94,6 @@ const Navigation = () => {
           params: { id: 'email' },
           customName: t('routes.config.edit.email'),
         },
-
         { id: 'agent-list', route: 'agent.index' },
         { id: 'popup-list', route: 'popup.index' },
         { id: 'banner-list', route: 'banner.index' },

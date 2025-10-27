@@ -43,6 +43,12 @@ export const routesData = {
     pwd: '/user/{id}/pwd',
     partner: '/user/{id}/partner',
   },
+  address: {
+    index: '/address',
+    create: '/address/p/create',
+    show: '/address/{id}',
+    edit: '/address/{id}/edit',
+  },
   setting: {
     index: '/setting',
     create: '/setting/p/create',
@@ -89,6 +95,11 @@ export const routesData = {
     index: '/config',
     create: '/config/p/create',
     edit: '/config/{id}/edit',
+  },
+  setup: {
+    index: '/setup',
+    create: '/setup/p/create',
+    edit: '/setup/{id}/edit',
   },
   agent: {
     index: '/agent',

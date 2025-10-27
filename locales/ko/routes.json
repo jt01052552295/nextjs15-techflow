@@ -22,7 +22,6 @@
       "name": "계정가입",
       "desc": ""
     },
-
     "error": {
       "name": "에러",
       "desc": ""
@@ -75,6 +74,24 @@
     },
     "partner": {
       "name": "파트너관리",
+      "desc": ""
+    }
+  },
+  "address": {
+    "index": {
+      "name": "주소록",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
       "desc": ""
     }
   },
@@ -245,7 +262,8 @@
   },
   "config": {
     "index": {
-      "name": "회사정보",
+      "name": "환경설정",
+      "navName": "회사정보",
       "desc": ""
     },
     "edit": {
@@ -253,6 +271,20 @@
       "agree": "이용약관",
       "person": "개인정보보호방침",
       "email": "이메일무단수집",
+      "desc": ""
+    }
+  },
+  "setup": {
+    "index": {
+      "name": "기본설정",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
       "desc": ""
     }
   },

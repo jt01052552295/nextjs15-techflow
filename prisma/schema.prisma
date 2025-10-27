@@ -34,6 +34,7 @@ model User {
   accounts           Account[]
   profile            UserProfile[]
   paymentMethods     UserPayment[]
+  addresses          UserAddress[]   
   sessions           Session[]
   companies          Company[]   
   setting            Setting?
@@ -114,7 +115,7 @@ model UserPayment {
   cardCvc      String    @default("") @map("card_cvc") @db.VarChar(255) // CVC 코드
   juminOrCorp  String    @default("") @map("juminOrCorp") @db.VarChar(45) // 주민번호 또는 사업자등록번호 앞자리
   isRepresent  Boolean   @default(false) @map("represent") // 대표 결제카드 여부(y/n)
-  createdAt    DateTime? @default(now()) @map("regdate") // 등록일시
+  createdAt    DateTime? @default(now()) @map("created_at") // 등록일시
   updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") // 수정일시 추가
   isUse        Boolean   @default(true) @map("use") // 사용여부(y/n)
   isVisible    Boolean   @default(true) @map("visible") // 노출여부(y/n)
@@ -125,6 +126,40 @@ model UserPayment {
   @@index([userId])
   @@index([userIdx])
   @@map("ec_user_payment")
+}
+
+model UserAddress {
+  idx          Int       @id @default(autoincrement())
+  uid          String    @unique @default(uuid())
+  userId       String    @map("user_id")
+  title        String    @default("") @db.VarChar(50) // 배송지명
+  name         String    @default("") @db.VarChar(50) // 수령인명
+  zipcode      String    @default("") @db.VarChar(10) // 우편번호
+  addr1        String    @default("") @db.VarChar(255) // 주소
+  addr2        String    @default("") @db.VarChar(255) // 상세주소
+  addrJibeon   String    @default("") @map("addr_jibeon") @db.VarChar(255) // 지번주소
+  sido         String    @default("") @db.VarChar(255) // 시도
+  gugun        String    @default("") @db.VarChar(255) // 구군
+  dong         String    @default("") @db.VarChar(255) // 동
+  latNum       String?   @map("lat_num") @db.VarChar(255) // 위도
+  lngNum       String?   @map("lng_num") @db.VarChar(255) // 경도
+  hp           String    @default("") @db.VarChar(20) // 휴대폰번호
+  tel          String    @default("") @db.VarChar(20) // 전화번호
+  isDefault    Boolean   @default(false) @map("is_default") // 기본배송지 여부
+  rmemo        String    @default("1") @db.VarChar(255) // 배송 메모 (공동현관 앞, 경비실 등)
+  rmemoTxt     String?   @map("rmemo_txt") @db.VarChar(255) // 배송 메모 직접입력
+  doorPwd      String?   @map("door_pwd") @db.VarChar(255) // 현관 출입번호
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at")
+  isUse        Boolean   @default(true) @map("is_use")
+  isVisible    Boolean   @default(true) @map("is_visible")
+  
+  // 관계 설정
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isDefault])
+  @@map("ec_user_address")
 }
 
 model Company {
@@ -485,6 +520,40 @@ model Config {
   @@map("ec_config")
 }
 
+model Setup {
+  idx            Int      @id @default(autoincrement())
+  uid            String   @unique @default(uuid())
+  isDefault      Boolean  @default(false) @map("is_default") // 기본 설정 여부
+  snsFacebook    String?  @map("sns_facebook") @db.VarChar(255) // 페이스북
+  snsTwitter     String?  @map("sns_twitter") @db.VarChar(255)  // 트위터
+  snsInstagram   String?  @map("sns_instagram") @db.VarChar(255) // 인스타그램
+  snsYoutube     String?  @map("sns_youtube") @db.VarChar(255) // 유튜브
+  snsLinkedin    String?  @map("sns_linkedin") @db.VarChar(255) // 링크드인
+  snsKakao       String?  @map("sns_kakao") @db.VarChar(255)    // 카카오 채널
+  snsNaver       String?  @map("sns_naver") @db.VarChar(255)    // 네이버 블로그
+  idFilter       String?  @map("id_filter") @db.MediumText // 금지 아이디 목록
+  wordFilter     String?  @map("word_filter") @db.MediumText // 단어 필터링
+  possibleIp     String?  @map("possible_ip") @db.MediumText // 접근 가능 IP
+  interceptIp    String?  @map("intercept_ip") @db.MediumText // 접근 차단 IP
+  aosVersion     String?  @map("aos_version") @db.VarChar(45) // 안드로이드 앱 버전
+  aosUpdate      String?  @map("aos_update") @db.VarChar(45) // 앱 업데이트 (1:선택, 2:강제)
+  aosStoreApp    String?  @map("aos_store_app") @db.VarChar(255) // 구글 플레이스토어 링크
+  aosStoreWeb    String?  @map("aos_store_web") @db.VarChar(255) // 안드로이드 웹스토어 링크
+  iosVersion     String?  @map("ios_version") @db.VarChar(45) // iOS 앱 버전
+  iosUpdate      String?  @map("ios_update") @db.VarChar(45) // 앱 업데이트 (1:선택, 2:강제)
+  iosStoreApp    String?  @map("ios_store_app") @db.VarChar(255) // 앱스토어 링크
+  iosStoreWeb    String?  @map("ios_store_web") @db.VarChar(255) // iOS 웹스토어 링크
+  jsCssVer       String?  @map("js_css_ver") @db.VarChar(45) // JS/CSS 버전
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @default(now()) @updatedAt @map("updated_at")
+  isUse          Boolean  @default(true) @map("is_use")
+  isVisible      Boolean  @default(true) @map("is_visible")
+
+  @@index([isDefault])
+  @@map("ec_setup")
+}
+
+
 model AgentLog {
   idx            Int      @id @default(autoincrement())
   uid            String   @unique @default(uuid())
@@ -624,7 +693,7 @@ model ElectricIotData {
   totImportReactive Float?         @default(0) @map("tot_import_reactive") @db.Float
   totExportReactive Float?         @default(0) @map("tot_export_reactive") @db.Float
   totReactive       Float?         @default(0) @map("tot_reactive") @db.Float
-  createdAt         DateTime       @default(now()) @map("regdate")
+  createdAt         DateTime       @default(now()) @map("created_at")
   isUse             String         @default("y") @map("use") @db.VarChar(1)
   isVisible         String         @default("y") @map("visible") @db.VarChar(1)
   ElectricDevice    ElectricDevice @relation(fields: [iotNum], references: [iotNum], onDelete: Cascade)
@@ -1335,7 +1404,7 @@ model ShopOrder {
   
   ipAddress       String    @default("") @map("ip") @db.VarChar(45) // IP 주소
   merchantData    String?   @map("merchantData") @db.LongText // PG사 연동용 원본 데이터
-  createdAt       DateTime  @default(now()) @map("regdate")
+  createdAt       DateTime  @default(now()) @map("created_at")
   isUse           Boolean   @default(true) @map("use")
   isVisible       Boolean   @default(true) @map("visible")
 
@@ -1458,7 +1527,7 @@ model ShopOrderPayment {
   device        String    @default("") @db.VarChar(45) // 접속 기기정보
   shopId        Int       @default(0) @map("shop") // 쇼핑몰 ID
   sellerId      Int       @default(0) @map("seller") // 판매자 ID
-  createdAt     DateTime  @default(now()) @map("regdate")
+  createdAt     DateTime  @default(now()) @map("created_at")
   isUse         Boolean   @default(true) @map("use")
   isVisible     Boolean   @default(true) @map("visible")
   
@@ -1542,7 +1611,7 @@ model PortonePayment {
   device        String    @default("") @db.VarChar(45) // 결제 기기 정보
   shopId        Int       @default(0) @map("shop") // 쇼핑몰 ID
   sellerId      Int       @default(0) @map("seller") // 판매자 ID
-  createdAt     DateTime? @default(now()) @map("regdate") // 등록일시
+  createdAt     DateTime? @default(now()) @map("created_at") // 등록일시
   isUse         Boolean   @default(true) @map("use") // 사용여부
   isVisible     Boolean   @default(true) @map("visible") // 노출여부
 
@@ -1585,7 +1654,7 @@ model PortoneBillingPayment {
   cancelReason    String    @default("") @map("cancel_reason") @db.VarChar(255) // 취소 사유
   cancelInput     String    @default("") @map("cancel_input") @db.VarChar(255) // 취소 입력값(관리자)
   cancelledAt     DateTime? @map("cancelled_at") // 결제 취소 시각
-  createdAt       DateTime? @default(now()) @map("regdate") // 등록일시
+  createdAt       DateTime? @default(now()) @map("created_at") // 등록일시
   isUse           Boolean   @default(true) @map("use") // 사용여부
   isVisible       Boolean   @default(true) @map("visible") // 노출여부
   device          String    @default("") @db.VarChar(255) // 결제 기기 정보
@@ -1609,7 +1678,7 @@ model PortoneSchedulePayment {
   paymentId    String    @default("") @map("payment_id") @db.VarChar(255) // 결제 관리 ID (내부 식별용)
   scheduleId   String    @default("") @map("schedule_id") @db.VarChar(255) // 포트원 예약결제 고유 ID
   param        String?   @db.MediumText // 포트원 스케줄 등록 파라미터(JSON)
-  createdAt    DateTime? @default(now()) @map("regdate") // 등록일시
+  createdAt    DateTime? @default(now()) @map("created_at") // 등록일시
   reservDate   DateTime? @map("reserv_date") // 예약 결제 실행 예정일
   isPayment    Boolean   @default(false) @map("payment") // 결제 성공 여부(y/n)
   isUse        Boolean   @default(true) @map("use") // 사용여부
@@ -1632,7 +1701,7 @@ model ShopReview {
   userId       String?   @map("user_id") // 다른 테이블 패턴과 일관성을 위해 추가
   subject      String    @default("") @db.VarChar(255) // 리뷰 제목
   content      String?   @db.LongText // 리뷰 내용
-  createdAt    DateTime? @default(now()) @map("regdate") // 등록일시
+  createdAt    DateTime? @default(now()) @map("created_at") // 등록일시
   score        Int       @default(0) // 평점 (1~5점)
   hit          Int       @default(0) // 조회수
   good         Int       @default(0) // 추천 수
