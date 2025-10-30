@@ -144,8 +144,8 @@ model UserAddress {
   hp           String    @default("") @db.VarChar(20) // 휴대폰번호
   tel          String    @default("") @db.VarChar(20) // 전화번호
   isDefault    Boolean   @default(false) @map("is_default") // 기본배송지 여부
-  rmemo        String    @default("1") @db.VarChar(255) // 배송 메모 (공동현관 앞, 경비실 등)
-  rmemoTxt     String?   @map("rmemo_txt") @db.VarChar(255) // 배송 메모 직접입력
+  rmemo        DeliveryMemoType @default(CALL_BEFORE) // 배송 메모 타입
+  rmemoTxt     String?   @map("rmemo_txt") @db.VarChar(255) // 배송 메모 직접입력 (rmemo가 CUSTOM일 때 사용)
   doorPwd      String?   @map("door_pwd") @db.VarChar(255) // 현관 출입번호
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at")
@@ -394,7 +394,7 @@ model TodosComment {
   parentIdx  Int?
   likeCount  Int                @default(0)
   replyCount Int                @default(0)
-  user       User               @relation("UserToComments", fields: [author], references: [id])
+  user       User               @relation("UserToComments", fields: [author], references: [id], onDelete: Cascade)
   Todos      Todos              @relation(fields: [todoId], references: [uid], onDelete: Cascade)
   likes      TodosCommentLike[]
 
@@ -1609,9 +1609,10 @@ model PortonePayment {
   device        String    @default("") @db.VarChar(45) // 결제 기기 정보
   shopId        Int       @default(0) @map("shop") // 쇼핑몰 ID
   sellerId      Int       @default(0) @map("seller") // 판매자 ID
-  createdAt     DateTime? @default(now()) @map("created_at") // 등록일시
-  isUse         Boolean   @default(true) @map("use") // 사용여부
-  isVisible     Boolean   @default(true) @map("visible") // 노출여부
+  createdAt     DateTime  @default(now()) @map("created_at")
+  isUse         Boolean   @default(true) @map("use")
+  isVisible     Boolean   @default(true) @map("visible")
+  
 
   @@index([merchantUid])
   @@index([impUid])
@@ -1817,7 +1818,7 @@ model CouponCampaign {
   isDownloadable Boolean          @default(true) @map("download_yn") // 다운로드 노출 여부
   status         CouponStatus     @default(ACTIVE) // 상태
   createdAt      DateTime         @default(now()) @map("created_at") // 등록일시
-  updatedAt      DateTime?        @updatedAt @map("updated_at") // 수정일시
+  updatedAt      DateTime         @default(now()) @updatedAt @map("updated_at") // 수정일시
 
   // 관계 설정
   codes     CouponCode[]      // 쿠폰 코드 관계
@@ -1958,4 +1959,12 @@ enum UserRole {
   EXTRA
   COMPANY
   USER
+}
+
+enum DeliveryMemoType {
+  CALL_BEFORE  @map("CALL_BEFORE")  // 오기 전, 연락주세요
+  DOOR_FRONT        @map("DOOR_FRONT")        // 문 앞에 놓아주세요
+  SECURITY @map("SECURITY") // 경비실에 맡겨주세요
+  DELIVERY_BOX @map("DELIVERY_BOX") // 택배함에 넣어주세요
+  CUSTOM       @map("CUSTOM")       // 직접 입력
 }
