@@ -161,4 +161,10 @@ export const routesData = {
     show: '/point/{id}',
     edit: '/point/{id}/edit',
   },
+  payment: {
+    index: '/payment',
+    create: '/payment/p/create',
+    show: '/payment/{id}',
+    edit: '/payment/{id}/edit',
+  },
 };

@@ -77,6 +77,24 @@
       "desc": ""
     }
   },
+  "payment": {
+    "index": {
+      "name": "결제수단",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
+      "desc": ""
+    }
+  },
   "address": {
     "index": {
       "name": "주소록",

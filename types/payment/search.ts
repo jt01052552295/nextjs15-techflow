@@ -1,9 +1,9 @@
-import type { ListParams } from '@/types/company';
+import type { ListParams } from '@/types/payment';
 
 // 커서 제외 타입
-export type CompanyBaseParams = Omit<ListParams, 'cursor'>;
+export type PaymentBaseParams = Omit<ListParams, 'cursor'>;
 
-export const DEFAULTS: CompanyBaseParams = {
+export const DEFAULTS: PaymentBaseParams = {
   sortBy: 'idx',
   order: 'desc',
   limit: 20,
@@ -18,7 +18,7 @@ export function parseBool(v?: string): boolean | undefined {
   return undefined;
 }
 
-export function toBaseParamsFromSearch(sp: URLSearchParams): CompanyBaseParams {
+export function toBaseParamsFromSearch(sp: URLSearchParams): PaymentBaseParams {
   const sortBy = sp.get('sortBy') ?? DEFAULTS.sortBy!;
   const order = sp.get('order') ?? DEFAULTS.order!;
   const limit = Number(sp.get('limit') ?? DEFAULTS.limit);
@@ -38,7 +38,7 @@ export function toBaseParamsFromSearch(sp: URLSearchParams): CompanyBaseParams {
   };
 }
 
-export function toSearchParamsFromBase(p: CompanyBaseParams): URLSearchParams {
+export function toSearchParamsFromBase(p: PaymentBaseParams): URLSearchParams {
   const sp = new URLSearchParams();
   if (p.q) sp.set('q', p.q);
   // if (p.name) sp.set('name', p.name);
@@ -58,7 +58,7 @@ export function toSearchParamsFromBase(p: CompanyBaseParams): URLSearchParams {
 // 빈 문자열/공백을 undefined로 정리(안전용)
 const norm = (v?: string) => (v && v.trim() ? v.trim() : undefined);
 
-export function isSameBaseParams(a: CompanyBaseParams, b: CompanyBaseParams) {
+export function isSameBaseParams(a: PaymentBaseParams, b: PaymentBaseParams) {
   return (
     norm(a.q) === norm(b.q) &&
     // norm(a.name) === norm(b.name) &&

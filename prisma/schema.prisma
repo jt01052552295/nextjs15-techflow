@@ -98,8 +98,7 @@ model UserProfile {
 model UserPayment {
   idx          Int       @id @default(autoincrement())
   uid          String    @unique @default(uuid()) // 다른 모델과의 일관성을 위해 추가
-  userIdx      Int       @default(0) @map("user") // 회원 번호 (User.idx)
-  userId       String?   @map("user_id") // 다른 테이블 패턴과 일관성을 위해 추가
+  userId       String    @map("user_id")
   customerUid  String    @default("") @map("customer_uid") @db.VarChar(255) // PG사 고객 고유 UID
   billingKey   String    @default("") @map("billing_key") @db.VarChar(255) // PG사 빌링키
   method       String    @default("card") @db.VarChar(255) // 결제 수단 (예: card, vbank)
@@ -114,17 +113,16 @@ model UserPayment {
   cardPwd      String    @default("") @map("card_pwd") @db.VarChar(255) // 카드 비밀번호 앞 2자리
   cardCvc      String    @default("") @map("card_cvc") @db.VarChar(255) // CVC 코드
   juminOrCorp  String    @default("") @map("juminOrCorp") @db.VarChar(45) // 주민번호 또는 사업자등록번호 앞자리
-  isRepresent  Boolean   @default(false) @map("represent") // 대표 결제카드 여부(y/n)
-  createdAt    DateTime? @default(now()) @map("created_at") // 등록일시
+  isRepresent  Boolean   @default(false) @map("is_represent") // 대표 결제카드 여부
+  createdAt    DateTime  @default(now()) @map("created_at") // 등록일시
   updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") // 수정일시 추가
-  isUse        Boolean   @default(true) @map("use") // 사용여부(y/n)
-  isVisible    Boolean   @default(true) @map("visible") // 노출여부(y/n)
+  isUse        Boolean   @default(true) @map("is_use") // 사용여부
+  isVisible    Boolean   @default(true) @map("is_visible") // 노출여부
   
   // 관계 설정
   user         User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@index([userIdx])
   @@map("ec_user_payment")
 }
 
