@@ -24,6 +24,12 @@ import ResultConfirm from '@/components/address/modal/ResultConfirm';
 import { useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import UserSelect from '@/components/common/UserSelect';
+import {
+  getDeliveryMemoOptions,
+  getDeliveryMemoLabel,
+  DeliveryMemoCode,
+} from '@/constants';
+import AddressInput from '@/components/daum/AddressInput';
 
 export default function CreateForm() {
   const { dictionary, locale, t } = useLanguage();
@@ -79,6 +85,8 @@ export default function CreateForm() {
     watch,
     setErrorMessage,
   });
+
+  const options = getDeliveryMemoOptions(locale);
 
   const formAction: SubmitHandler<CreateType> = (data) => {
     startTransition(async () => {
@@ -220,66 +228,54 @@ export default function CreateForm() {
                           </div>
                         )}
                       </div>
-                      <div className="mb-2">
-                        <label className="form-label" htmlFor="zipcode">
-                          {t('columns.address.zipcode')}
-                        </label>
-                        <input
-                          type="text"
-                          className={`form-control ${getInputClass('zipcode')}`}
-                          {...register('zipcode', {
-                            onChange: () => handleInputChange('zipcode'),
-                            onBlur: () => handleInputChange('zipcode'),
-                          })}
-                          readOnly={isPending}
-                          placeholder="우편번호"
+
+                      <div>
+                        <AddressInput
+                          zipcodeValue={watch('zipcode') || ''}
+                          addr1Value={watch('addr1') || ''}
+                          addr2Value={watch('addr2') || ''}
+                          addrJibeonValue={watch('addrJibeon') || ''}
+                          sidoValue={watch('sido') || ''}
+                          gugunValue={watch('gugun') || ''}
+                          dongValue={watch('dong') || ''}
+                          onZipcodeChange={(value) => {
+                            setValue('zipcode', value, {
+                              shouldValidate: true,
+                            });
+                            handleInputChange('zipcode');
+                          }}
+                          onAddr1Change={(value) => {
+                            setValue('addr1', value, { shouldValidate: true });
+                            handleInputChange('addr1');
+                          }}
+                          onAddr2Change={(value) => {
+                            setValue('addr2', value, { shouldValidate: true });
+                            handleInputChange('addr2');
+                          }}
+                          onAddrJibeonChange={(value) => {
+                            setValue('addrJibeon', value);
+                            handleInputChange('addrJibeon');
+                          }}
+                          onSidoChange={(value) => {
+                            setValue('sido', value);
+                            handleInputChange('sido');
+                          }}
+                          onGugunChange={(value) => {
+                            setValue('gugun', value);
+                            handleInputChange('gugun');
+                          }}
+                          onDongChange={(value) => {
+                            setValue('dong', value);
+                            handleInputChange('dong');
+                          }}
+                          disabled={isPending}
+                          zipcodeError={errors.zipcode?.message}
+                          addr1Error={errors.addr1?.message}
+                          addr2Error={errors.addr2?.message}
+                          t={t}
                         />
-                        {errors.zipcode?.message && (
-                          <div className="invalid-feedback">
-                            {errors.zipcode?.message}
-                          </div>
-                        )}
                       </div>
-                      <div className="mb-2">
-                        <label className="form-label" htmlFor="addr1">
-                          {t('columns.address.addr1')}
-                        </label>
-                        <input
-                          type="text"
-                          className={`form-control ${getInputClass('addr1')}`}
-                          {...register('addr1', {
-                            onChange: () => handleInputChange('addr1'),
-                            onBlur: () => handleInputChange('addr1'),
-                          })}
-                          readOnly={isPending}
-                          placeholder="주소"
-                        />
-                        {errors.addr1?.message && (
-                          <div className="invalid-feedback">
-                            {errors.addr1?.message}
-                          </div>
-                        )}
-                      </div>
-                      <div className="mb-2">
-                        <label className="form-label" htmlFor="addr2">
-                          {t('columns.address.addr2')}
-                        </label>
-                        <input
-                          type="text"
-                          className={`form-control ${getInputClass('addr2')}`}
-                          {...register('addr2', {
-                            onChange: () => handleInputChange('addr2'),
-                            onBlur: () => handleInputChange('addr2'),
-                          })}
-                          readOnly={isPending}
-                          placeholder="상세주소"
-                        />
-                        {errors.addr2?.message && (
-                          <div className="invalid-feedback">
-                            {errors.addr2?.message}
-                          </div>
-                        )}
-                      </div>
+
                       <div className="mb-2">
                         <label className="form-label" htmlFor="hp">
                           {t('columns.address.hp')}
@@ -344,14 +340,11 @@ export default function CreateForm() {
                           })}
                           disabled={isPending}
                         >
-                          <option value="CALL_BEFORE">
-                            오기 전, 연락주세요
-                          </option>
-                          <option value="KNOCK">노크해주세요</option>
-                          <option value="MEET_OUTSIDE">
-                            전화주시면 마중 나갈게요
-                          </option>
-                          <option value="CUSTOM">직접 입력</option>
+                          {options.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
                         </select>
                         {errors.rmemo?.message && (
                           <div className="invalid-feedback">
@@ -372,7 +365,6 @@ export default function CreateForm() {
                               onBlur: () => handleInputChange('rmemoTxt'),
                             })}
                             readOnly={isPending}
-                            placeholder="배송 메모를 입력하세요"
                           />
                           {errors.rmemoTxt?.message && (
                             <div className="invalid-feedback">

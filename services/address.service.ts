@@ -10,6 +10,7 @@ import type {
 } from '@/types/address';
 import type { CreateType } from '@/actions/address/create/schema';
 import type { UpdateType } from '@/actions/address/update/schema';
+import { getCoords } from '@/lib/latlng-utils';
 
 /**
  * 목록: 커서 기반(keyset) + 정렬/검색/필터 + 카운트 2종 + 풀컬럼
@@ -192,6 +193,21 @@ export async function create(input: CreateType) {
   });
   if (exists) throw new Error(`UID_ALREADY_USED:${uid}`);
 
+  const coords = await getCoords(addr1);
+
+  const lat_num_str =
+    coords?.lat != null
+      ? coords.lat.toFixed(7)
+      : latNum != null
+        ? String(latNum)
+        : null;
+  const lng_num_str =
+    coords?.lng != null
+      ? coords.lng.toFixed(7)
+      : lngNum != null
+        ? String(lngNum)
+        : null;
+
   const result = await prisma.$transaction(async (tx) => {
     const createData: any = {
       data: {
@@ -206,8 +222,8 @@ export async function create(input: CreateType) {
         sido,
         gugun,
         dong,
-        latNum,
-        lngNum,
+        latNum: lat_num_str,
+        lngNum: lng_num_str,
         hp,
         tel,
         isDefault,
@@ -264,6 +280,21 @@ export async function update(input: UpdateType) {
   });
   if (!exist) throw new Error('NOT_FOUND');
 
+  const coords = await getCoords(addr1);
+
+  const lat_num_str =
+    coords?.lat != null
+      ? coords.lat.toFixed(7)
+      : latNum != null
+        ? String(latNum)
+        : null;
+  const lng_num_str =
+    coords?.lng != null
+      ? coords.lng.toFixed(7)
+      : lngNum != null
+        ? String(lngNum)
+        : null;
+
   const rs = await prisma.$transaction(async (tx) => {
     const data: any = {
       userId,
@@ -276,8 +307,8 @@ export async function update(input: UpdateType) {
       sido,
       gugun,
       dong,
-      latNum,
-      lngNum,
+      latNum: lat_num_str,
+      lngNum: lng_num_str,
       hp,
       tel,
       isDefault,

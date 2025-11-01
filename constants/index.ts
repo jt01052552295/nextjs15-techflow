@@ -1,3 +1,6 @@
+import { LocaleType } from '@/constants/i18n';
+import { DeliveryMemoCode } from '@/types/address';
+
 export type TypeAsMonth =
   | '01'
   | '02'
@@ -354,3 +357,34 @@ export const CPOINT_TABLE = {
 export const CPOINT_TO_WON = {
   paymentAmount: '{carbonPoint} * 2',
 };
+
+export const DELIVERY_MEMO_LABELS: Record<
+  DeliveryMemoCode,
+  { ko: string; en: string }
+> = {
+  CALL_BEFORE: { ko: '오기 전, 연락주세요', en: 'Call me before arrival' },
+  KNOCK: { ko: '노크해주세요', en: 'Please knock' },
+  MEET_OUTSIDE: {
+    ko: '전화주시면 마중 나갈게요',
+    en: 'Call me and I will meet you outside',
+  },
+  CUSTOM: { ko: '직접 입력', en: 'Custom note' },
+};
+
+/** 선택용 옵션 리스트 생성기 */
+export function getDeliveryMemoOptions(locale: LocaleType) {
+  return (Object.keys(DELIVERY_MEMO_LABELS) as DeliveryMemoCode[]).map(
+    (value) => ({
+      value,
+      label: DELIVERY_MEMO_LABELS[value][locale],
+    }),
+  );
+}
+
+/** 단일 코드 → 라벨 */
+export function getDeliveryMemoLabel(
+  code: DeliveryMemoCode,
+  locale: LocaleType,
+) {
+  return DELIVERY_MEMO_LABELS[code]?.[locale] ?? code;
+}

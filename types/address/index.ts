@@ -18,7 +18,7 @@ export interface IAddress {
   hp: string; // 휴대폰번호
   tel: string; // 전화번호
   isDefault: boolean; // 기본배송지 여부
-  rmemo: ENUMMEMO; // 배송 메모 타입
+  rmemo: DeliveryMemoCode; // 배송 메모 타입
   rmemoTxt: string | null; // 배송 메모 직접입력 (rmemo가 CUSTOM일 때 사용)
   doorPwd: string | null; // 현관 출입번호
   createdAt: Date;
@@ -33,7 +33,11 @@ export type IAddressListRow = IAddress & {
   updatedAt: string; // DTO에서 ISO 문자열로 변환
 };
 
-export type ENUMMEMO = 'CALL_BEFORE' | 'KNOCK' | 'MEET_OUTSIDE' | 'CUSTOM';
+export type DeliveryMemoCode =
+  | 'CALL_BEFORE'
+  | 'KNOCK'
+  | 'MEET_OUTSIDE'
+  | 'CUSTOM';
 
 export type ListEditCell = 'title';
 
