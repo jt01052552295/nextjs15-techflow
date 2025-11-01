@@ -76,7 +76,7 @@ const Navigation = () => {
           route: 'config.index',
           customName: t('routes.config.index.navName'),
         },
-        { id: 'setup-list', route: 'setup.index' },
+        { id: 'setup-list', route: 'setup.create' },
         {
           id: 'config-edit-person',
           route: 'config.edit',

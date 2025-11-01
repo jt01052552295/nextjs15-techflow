@@ -105,7 +105,9 @@
     "createdAt": "생성일",
     "updatedAt": "수정일",
     "isUse": "사용",
-    "isVisible": "노출"
+    "isVisible": "노출",
+    "optional": "선택",
+    "force": "필수"
   },
   "setting": {
     "idx": "인덱스",
