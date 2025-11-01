@@ -13,6 +13,7 @@ export interface IPayment {
   cardNumber2: string; // 카드번호 2번째 블럭
   cardNumber3: string; // 카드번호 3번째 블럭
   cardNumber4: string; // 카드번호 4번째 블럭
+  maskedPan: string | null; // 마스킹된 카드번호 전체
   cardMM: string; // 유효기간 월 (MM)
   cardYY: string; // 유효기간 연도 (YYYY)
   cardPwd: string; // 카드 비밀번호 앞 2자리

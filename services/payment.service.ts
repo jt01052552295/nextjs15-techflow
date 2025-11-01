@@ -1,6 +1,7 @@
 import prisma from '@/lib/prisma';
 import { type Prisma } from '@prisma/client';
 import { b64e, b64d } from '@/lib/util';
+import { encryptGCM, decryptGCM } from '@/lib/crypto-utils';
 import type {
   ListParams,
   ListResult,
@@ -123,11 +124,11 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
   });
 
   const hasMore = rows.length > safeLimit;
-  const items = hasMore ? rows.slice(0, safeLimit) : rows;
+  const itemsRaw = hasMore ? rows.slice(0, safeLimit) : rows;
 
   let nextCursor: string | undefined;
   if (hasMore) {
-    const last = items[items.length - 1] as any;
+    const last = itemsRaw[itemsRaw.length - 1] as any;
     nextCursor = b64e({ sortValue: last[sortBy], idx: last.idx });
   }
 
@@ -135,6 +136,14 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
     prisma.userPayment.count({ where: baseWhere }),
     prisma.userPayment.count({ where: filteredWhere }),
   ]);
+
+  const items = itemsRaw.map((row) => {
+    const mid2 = decryptGCM(row.cardNumber2!);
+    const mid3 = decryptGCM(row.cardNumber3!);
+    const masked = `${row.cardNumber1}-${'•'.repeat(4)}-${'•'.repeat(4)}-${row.cardNumber4}`;
+
+    return { ...row, cardNumber2: mid2, cardNumber3: mid3, maskedPan: masked };
+  });
 
   return { items, nextCursor, totalAll, totalFiltered };
 }
@@ -155,9 +164,12 @@ export async function show(uid: string): Promise<IPayment> {
       user: true,
     },
   });
-
   if (!rs) throw new Error('NOT_FOUND');
-  return rs;
+
+  const mid2 = decryptGCM(rs.cardNumber2!);
+  const mid3 = decryptGCM(rs.cardNumber3!);
+  const masked = `${rs.cardNumber1}-${'•'.repeat(4)}-${'•'.repeat(4)}-${rs.cardNumber4}`;
+  return { ...rs, cardNumber2: mid2, cardNumber3: mid3, maskedPan: masked };
 }
 
 /** 작성 */
@@ -190,6 +202,9 @@ export async function create(input: CreateType) {
   });
   if (exists) throw new Error(`UID_ALREADY_USED:${uid}`);
 
+  const enc2 = encryptGCM(cardNumber2);
+  const enc3 = encryptGCM(cardNumber3);
+
   const result = await prisma.$transaction(async (tx) => {
     const createData: any = {
       data: {
@@ -201,8 +216,8 @@ export async function create(input: CreateType) {
         name,
         cardName,
         cardNumber1,
-        cardNumber2,
-        cardNumber3,
+        cardNumber2: enc2,
+        cardNumber3: enc3,
         cardNumber4,
         cardMM,
         cardYY,
@@ -258,6 +273,9 @@ export async function update(input: UpdateType) {
   });
   if (!exist) throw new Error('NOT_FOUND');
 
+  const enc2 = encryptGCM(cardNumber2);
+  const enc3 = encryptGCM(cardNumber3);
+
   const rs = await prisma.$transaction(async (tx) => {
     // 3) 본문 업데이트 + 관계 include
     const data: any = {
@@ -268,8 +286,8 @@ export async function update(input: UpdateType) {
       method,
       cardName,
       cardNumber1,
-      cardNumber2,
-      cardNumber3,
+      cardNumber2: enc2,
+      cardNumber3: enc3,
       cardNumber4,
       cardMM,
       cardYY,

@@ -296,7 +296,6 @@ export default function CreateForm() {
                                 onBlur: () => handleInputChange('cardNumber1'),
                               })}
                               readOnly={isPending}
-                              placeholder="1234"
                               maxLength={4}
                             />
                           </div>
@@ -336,7 +335,6 @@ export default function CreateForm() {
                                 onBlur: () => handleInputChange('cardNumber4'),
                               })}
                               readOnly={isPending}
-                              placeholder="****"
                               maxLength={4}
                             />
                           </div>
@@ -400,7 +398,7 @@ export default function CreateForm() {
                           {t('columns.payment.cardPwd')}
                         </label>
                         <input
-                          type="password"
+                          type="text"
                           className={`form-control ${getInputClass('cardPwd')}`}
                           {...register('cardPwd', {
                             onChange: () => handleInputChange('cardPwd'),
