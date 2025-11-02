@@ -14,6 +14,7 @@ import {
   faUser,
   faGears,
   faAngleDown,
+  faBell,
 } from '@fortawesome/free-solid-svg-icons';
 
 interface SubMenu {
@@ -64,6 +65,17 @@ const Navigation = () => {
         { id: 'board-list', route: 'board.index' },
         { id: 'bbs-list', route: 'bbs.index' },
         { id: 'comment-list', route: 'comment.index' },
+      ],
+    },
+    {
+      id: 'fcm',
+      icon: faBell,
+      route: 'fcmTemplates.index',
+      subMenus: [
+        { id: 'fcmTemplates-list', route: 'fcmTemplates.index' },
+        { id: 'fcmTokens-list', route: 'fcmTokens.index' },
+        { id: 'fcmMessages-list', route: 'fcmMessages.index' },
+        { id: 'fcmAlarms-list', route: 'fcmAlarms.index' },
       ],
     },
     {

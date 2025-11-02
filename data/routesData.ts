@@ -167,4 +167,28 @@ export const routesData = {
     show: '/payment/{id}',
     edit: '/payment/{id}/edit',
   },
+  fcmTemplates: {
+    index: '/fcm/templates',
+    create: '/fcm/templates/p/create',
+    show: '/fcm/templates/{id}',
+    edit: '/fcm/templates/{id}/edit',
+  },
+  fcmTokens: {
+    index: '/fcm/tokens',
+    create: '/fcm/tokens/p/create',
+    show: '/fcm/tokens/{id}',
+    edit: '/fcm/tokens/{id}/edit',
+  },
+  fcmMessages: {
+    index: '/fcm/messages',
+    create: '/fcm/messages/p/create',
+    show: '/fcm/messages/{id}',
+    edit: '/fcm/messages/{id}/edit',
+  },
+  fcmAlarms: {
+    index: '/fcm/alarms',
+    create: '/fcm/alarms/p/create',
+    show: '/fcm/alarms/{id}',
+    edit: '/fcm/alarms/{id}/edit',
+  },
 };

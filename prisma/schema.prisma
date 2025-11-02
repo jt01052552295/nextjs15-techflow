@@ -983,7 +983,7 @@ model FcmMessage {
   idx        Int         @id @default(autoincrement())
   uid        String      @unique @default(uuid())
   platform   String      @default("app") @db.VarChar(255) // app, desktop, mobile
-  templateId Int?        @map("template") // FcmTemplate 참조
+  templateId String?     @map("template") // FcmTemplate 참조
   userId     String      @map("user_id") 
   fcmToken   String?     @map("fcm_token") @db.VarChar(255)
   otCode     String?     @map("ot_code") @db.VarChar(255) // 주문코드
@@ -993,29 +993,28 @@ model FcmMessage {
   res        String?     @db.LongText // 전송결과 전체
   resStatus  String?     @map("res_status") @db.VarChar(45)
   resMsg     String?     @map("res_msg") @db.VarChar(255)
-  sortOrder  Int         @default(0) @map("sort_order")
   createdAt  DateTime    @default(now()) @map("created_at")
   updatedAt  DateTime    @default(now()) @updatedAt @map("updated_at")
-  template   FcmTemplate? @relation(fields: [templateId], references: [idx])
-  user       User?       @relation("FcmMessageToUser", fields: [userId], references: [id], onDelete: Cascade)
+  template   FcmTemplate? @relation(fields: [templateId], references: [uid])
+  user       User        @relation("FcmMessageToUser", fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([body], map: "mt_id")
+
   @@index([userId])
   @@index([templateId])
-  @@map("ec_fcm")
+  @@map("ec_fcm_message")
 }
 
 model FcmAlarm {
   idx        Int         @id @default(autoincrement())
   uid        String      @unique @default(uuid())
   userId     String      @map("user_id")
-  templateId Int?        @map("template") // FcmTemplate.idx 참조
+  templateId String?     @map("template") // FcmTemplate 참조
   message    String      @db.Text // 화면에 표시될 알림 메시지
   url        String?     @db.VarChar(500) // 클릭 시 이동할 URL
   isRead     Boolean     @default(false) @map("is_read") // Y/N -> Boolean으로 변환
   createdAt  DateTime    @default(now()) @map("created_at")
   user       User        @relation("FcmAlarmToUser", fields: [userId], references: [id], onDelete: Cascade)
-  template   FcmTemplate? @relation(fields: [templateId], references: [idx])
+  template   FcmTemplate? @relation(fields: [templateId], references: [uid])
 
   @@index([userId])
   @@index([templateId])

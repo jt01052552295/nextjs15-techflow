@@ -511,5 +511,77 @@
       "name": "수정",
       "desc": ""
     }
+  },
+  "fcmTemplates": {
+    "index": {
+      "name": "FCM템플릿",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
+      "desc": ""
+    }
+  },
+  "fcmTokens": {
+    "index": {
+      "name": "FCM토큰",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
+      "desc": ""
+    }
+  },
+  "fcmMessages": {
+    "index": {
+      "name": "FCM메시지",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
+      "desc": ""
+    }
+  },
+  "fcmAlarms": {
+    "index": {
+      "name": "FCM알림",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
+      "desc": ""
+    }
   }
 }
