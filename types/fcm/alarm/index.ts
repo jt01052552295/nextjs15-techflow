@@ -1,5 +1,5 @@
 import { IUser } from '@/types/user';
-import type { IFcmTemplate } from '@/types/fcm/template';
+import type { IFcmToken } from '@/types/fcm/token';
 
 export interface IFcmAlarm {
   idx: number;
@@ -13,7 +13,7 @@ export interface IFcmAlarm {
 
   // relations
   user: IUser; // required relation
-  template: IFcmTemplate | null;
+  template: IFcmToken | null;
 }
 
 export type IFcmAlarmListRow = IFcmAlarm & {

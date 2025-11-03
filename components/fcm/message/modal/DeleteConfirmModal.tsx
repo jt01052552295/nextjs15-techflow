@@ -1,14 +1,14 @@
 'use client';
 
 import React from 'react';
-import { IFcmTemplate } from '@/types/fcm/template';
-import { deleteAction } from '@/actions/fcm/template/delete';
+import { IFcmMessage } from '@/types/fcm/message';
+import { deleteAction } from '@/actions/fcm/message/delete';
 
 import { toast } from 'sonner';
 import { useLanguage } from '@/components/context/LanguageContext';
 
 type Props = {
-  row: IFcmTemplate | null;
+  row: IFcmMessage | null;
   uids?: string[];
   onDeleted: (deletedUids: string[]) => void;
 };

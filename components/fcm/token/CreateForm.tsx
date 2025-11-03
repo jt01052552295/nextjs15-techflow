@@ -15,12 +15,12 @@ import { getRouteUrl } from '@/utils/routes';
 import { useLanguage } from '@/components/context/LanguageContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faList, faSave, faRefresh } from '@fortawesome/free-solid-svg-icons';
-import { CreateType, CreateSchema } from '@/actions/fcm/template/create/schema';
-import { createAction } from '@/actions/fcm/template/create';
+import { CreateType, CreateSchema } from '@/actions/fcm/token/create/schema';
+import { createAction } from '@/actions/fcm/token/create';
 import { SubmitHandler, useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import useFormUtils from '@/hooks/useFormUtils';
-import ResultConfirm from '@/components/fcm/template/modal/ResultConfirm';
+import ResultConfirm from '@/components/fcm/token/modal/ResultConfirm';
 import { useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -38,16 +38,12 @@ export default function CreateForm() {
     resolver: zodResolver(CreateSchema(dictionary.common.form)),
     defaultValues: {
       uid: uuidv4(),
-      type: '',
-      activity: '',
-      title: '',
-      body: '',
-      message: '',
-      titleEn: '',
-      bodyEn: '',
-      messageEn: '',
-      targetLink: '',
-      webTargetLink: '',
+      userId: '',
+      token: '',
+      platform: 'android',
+      deviceId: '',
+      appVersion: '',
+      deviceInfo: '',
     },
   });
 
@@ -90,7 +86,7 @@ export default function CreateForm() {
           reset();
           setIsResultOpen(true);
 
-          queryClient.invalidateQueries({ queryKey: ['fcmTemplate', 'list'] });
+          queryClient.invalidateQueries({ queryKey: ['fcmToken', 'list'] });
         } else {
           throw new Error(`${response.message}:: ${response.error}`);
         }
@@ -129,48 +125,48 @@ export default function CreateForm() {
                   <div className="row">
                     <div className="col">
                       <div className="mb-2">
-                        <label className="form-label" htmlFor="type">
-                          {t('columns.fcmTemplate.type')}
+                        <label className="form-label" htmlFor="userId">
+                          {t('columns.fcmToken.userId')}
                         </label>
                         <input
                           type="text"
-                          className={`form-control ${getInputClass('type')}`}
-                          {...register('type', {
-                            onChange: () => handleInputChange('type'),
-                            onBlur: () => handleInputChange('type'),
+                          className={`form-control ${getInputClass('userId')}`}
+                          {...register('userId', {
+                            onChange: () => handleInputChange('userId'),
+                            onBlur: () => handleInputChange('userId'),
                           })}
                           readOnly={isPending}
                         />
-                        {errors.type?.message && (
+                        {errors.userId?.message && (
                           <div className="invalid-feedback">
-                            {errors.type?.message}
+                            {errors.userId?.message}
                           </div>
                         )}
-                        {!errors.type && (
+                        {!errors.userId && (
                           <div className="valid-feedback">
                             {t('common.form.valid')}
                           </div>
                         )}
                       </div>
                       <div className="mb-2">
-                        <label className="form-label" htmlFor="activity">
-                          {t('columns.fcmTemplate.activity')}
+                        <label className="form-label" htmlFor="token">
+                          {t('columns.fcmToken.token')}
                         </label>
                         <input
                           type="text"
-                          className={`form-control ${getInputClass('activity')}`}
-                          {...register('activity', {
-                            onChange: () => handleInputChange('activity'),
-                            onBlur: () => handleInputChange('activity'),
+                          className={`form-control ${getInputClass('token')}`}
+                          {...register('token', {
+                            onChange: () => handleInputChange('token'),
+                            onBlur: () => handleInputChange('token'),
                           })}
                           readOnly={isPending}
                         />
-                        {errors.activity?.message && (
+                        {errors.token?.message && (
                           <div className="invalid-feedback">
-                            {errors.activity?.message}
+                            {errors.token?.message}
                           </div>
                         )}
-                        {!errors.activity && (
+                        {!errors.token && (
                           <div className="valid-feedback">
                             {t('common.form.valid')}
                           </div>
@@ -178,59 +174,21 @@ export default function CreateForm() {
                       </div>
 
                       <div className="mb-2">
-                        <label className="form-label" htmlFor="title">
-                          {t('columns.fcmTemplate.title')}
+                        <label className="form-label" htmlFor="platform">
+                          {t('columns.fcmToken.platform')}
                         </label>
                         <input
                           type="text"
-                          className={`form-control ${getInputClass('title')}`}
-                          {...register('title', {
-                            onChange: () => handleInputChange('title'),
-                            onBlur: () => handleInputChange('title'),
+                          className={`form-control ${getInputClass('platform')}`}
+                          {...register('platform', {
+                            onChange: () => handleInputChange('platform'),
+                            onBlur: () => handleInputChange('platform'),
                           })}
                           readOnly={isPending}
                         />
-                        {errors.title?.message && (
+                        {errors.platform?.message && (
                           <div className="invalid-feedback">
-                            {errors.title?.message}
-                          </div>
-                        )}
-                      </div>
-                      <div className="mb-2">
-                        <label className="form-label" htmlFor="body">
-                          {t('columns.fcmTemplate.body')}
-                        </label>
-                        <input
-                          type="text"
-                          className={`form-control ${getInputClass('body')}`}
-                          {...register('body', {
-                            onChange: () => handleInputChange('body'),
-                            onBlur: () => handleInputChange('body'),
-                          })}
-                          readOnly={isPending}
-                        />
-                        {errors.body?.message && (
-                          <div className="invalid-feedback">
-                            {errors.body?.message}
-                          </div>
-                        )}
-                      </div>
-                      <div className="mb-2">
-                        <label className="form-label" htmlFor="message">
-                          {t('columns.fcmTemplate.message')}
-                        </label>
-                        <input
-                          type="text"
-                          className={`form-control ${getInputClass('message')}`}
-                          {...register('message', {
-                            onChange: () => handleInputChange('message'),
-                            onBlur: () => handleInputChange('message'),
-                          })}
-                          readOnly={isPending}
-                        />
-                        {errors.message?.message && (
-                          <div className="invalid-feedback">
-                            {errors.message?.message}
+                            {errors.platform?.message}
                           </div>
                         )}
                       </div>
@@ -248,97 +206,59 @@ export default function CreateForm() {
                   <div className="row">
                     <div className="col">
                       <div className="mb-2">
-                        <label className="form-label" htmlFor="titleEn">
-                          {t('columns.fcmTemplate.titleEn')}
+                        <label className="form-label" htmlFor="deviceId">
+                          {t('columns.fcmToken.deviceId')}
                         </label>
                         <input
                           type="text"
-                          className={`form-control ${getInputClass('titleEn')}`}
-                          {...register('titleEn', {
-                            onChange: () => handleInputChange('titleEn'),
-                            onBlur: () => handleInputChange('titleEn'),
+                          className={`form-control ${getInputClass('deviceId')}`}
+                          {...register('deviceId', {
+                            onChange: () => handleInputChange('deviceId'),
+                            onBlur: () => handleInputChange('deviceId'),
                           })}
                           readOnly={isPending}
                         />
-                        {errors.titleEn?.message && (
+                        {errors.deviceId?.message && (
                           <div className="invalid-feedback">
-                            {errors.titleEn?.message}
+                            {errors.deviceId?.message}
                           </div>
                         )}
                       </div>
                       <div className="mb-2">
-                        <label className="form-label" htmlFor="bodyEn">
-                          {t('columns.fcmTemplate.bodyEn')}
+                        <label className="form-label" htmlFor="appVersion">
+                          {t('columns.fcmToken.appVersion')}
                         </label>
                         <input
                           type="text"
-                          className={`form-control ${getInputClass('bodyEn')}`}
-                          {...register('bodyEn', {
-                            onChange: () => handleInputChange('bodyEn'),
-                            onBlur: () => handleInputChange('bodyEn'),
+                          className={`form-control ${getInputClass('appVersion')}`}
+                          {...register('appVersion', {
+                            onChange: () => handleInputChange('appVersion'),
+                            onBlur: () => handleInputChange('appVersion'),
                           })}
                           readOnly={isPending}
                         />
-                        {errors.bodyEn?.message && (
+                        {errors.appVersion?.message && (
                           <div className="invalid-feedback">
-                            {errors.bodyEn?.message}
+                            {errors.appVersion?.message}
                           </div>
                         )}
                       </div>
                       <div className="mb-2">
-                        <label className="form-label" htmlFor="messageEn">
-                          {t('columns.fcmTemplate.messageEn')}
+                        <label className="form-label" htmlFor="deviceInfo">
+                          {t('columns.fcmToken.deviceInfo')}
                         </label>
                         <input
                           type="text"
-                          className={`form-control ${getInputClass('messageEn')}`}
-                          {...register('messageEn', {
-                            onChange: () => handleInputChange('messageEn'),
-                            onBlur: () => handleInputChange('messageEn'),
+                          className={`form-control ${getInputClass('deviceInfo')}`}
+                          {...register('deviceInfo', {
+                            onChange: () => handleInputChange('deviceInfo'),
+                            onBlur: () => handleInputChange('deviceInfo'),
                           })}
                           readOnly={isPending}
                         />
-                        {errors.messageEn?.message && (
+                        {errors.deviceInfo?.message && (
                           <div className="invalid-feedback">
-                            {errors.messageEn?.message}
-                          </div>
-                        )}
-                      </div>
-                      <div className="mb-2">
-                        <label className="form-label" htmlFor="targetLink">
-                          {t('columns.fcmTemplate.targetLink')}
-                        </label>
-                        <input
-                          type="text"
-                          className={`form-control ${getInputClass('targetLink')}`}
-                          {...register('targetLink', {
-                            onChange: () => handleInputChange('targetLink'),
-                            onBlur: () => handleInputChange('targetLink'),
-                          })}
-                          readOnly={isPending}
-                        />
-                        {errors.targetLink?.message && (
-                          <div className="invalid-feedback">
-                            {errors.targetLink?.message}
-                          </div>
-                        )}
-                      </div>
-                      <div className="mb-2">
-                        <label className="form-label" htmlFor="webTargetLink">
-                          {t('columns.fcmTemplate.webTargetLink')}
-                        </label>
-                        <input
-                          type="text"
-                          className={`form-control ${getInputClass('webTargetLink')}`}
-                          {...register('webTargetLink', {
-                            onChange: () => handleInputChange('webTargetLink'),
-                            onBlur: () => handleInputChange('webTargetLink'),
-                          })}
-                          readOnly={isPending}
-                        />
-                        {errors.webTargetLink?.message && (
-                          <div className="invalid-feedback">
-                            {errors.webTargetLink?.message}
+                            {errors.deviceInfo?.message}
                           </div>
                         )}
                       </div>
@@ -371,7 +291,7 @@ export default function CreateForm() {
                   </button>
                   <Link
                     className="btn btn-outline-primary btn-sm"
-                    href={`${getRouteUrl('fcmTemplates.index', locale)}?${searchParams.toString()}`}
+                    href={`${getRouteUrl('fcmTokens.index', locale)}?${searchParams.toString()}`}
                   >
                     <FontAwesomeIcon icon={faList} />
                     &nbsp;{t('common.list')}

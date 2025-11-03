@@ -512,7 +512,7 @@
       "desc": ""
     }
   },
-  "fcmTemplates": {
+  "fcmTokens": {
     "index": {
       "name": "FCM템플릿",
       "desc": ""

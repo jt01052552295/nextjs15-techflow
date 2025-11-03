@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import type { IFcmTemplate, ListEditCell } from '@/types/fcm/template';
+import type { IFcmMessage } from '@/types/fcm/message';
 import { useRouter } from 'next/navigation';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -11,38 +11,24 @@ import {
   faSquareCheck,
 } from '@fortawesome/free-solid-svg-icons';
 import { faSquare } from '@fortawesome/free-regular-svg-icons';
-import EditableCell from './EditableCell';
 import { useLanguage } from '@/components/context/LanguageContext';
 import { getRouteUrl } from '@/utils/routes';
 import { useSearchParams } from 'next/navigation';
 
 type Props = {
-  row: IFcmTemplate;
-  setSelectedRow: (row: IFcmTemplate) => void;
+  row: IFcmMessage;
+  setSelectedRow: (row: IFcmMessage) => void;
   isChecked: boolean;
   onCheck: (uid: string, checked: boolean) => void;
-  onFieldSave: (
-    uid: string,
-    field: ListEditCell,
-    newValue: string,
-    onSuccess: (val: string) => void,
-    onError: () => void,
-  ) => void;
 };
 
-const ListRow = ({
-  row,
-  setSelectedRow,
-  isChecked,
-  onCheck,
-  onFieldSave,
-}: Props) => {
+const ListRow = ({ row, setSelectedRow, isChecked, onCheck }: Props) => {
   const { locale, t } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryString = searchParams.toString();
 
-  const editUrl = getRouteUrl('fcmTemplates.edit', locale, { id: row.uid });
+  const editUrl = getRouteUrl('fcmMessages.edit', locale, { id: row.uid });
 
   //  listMemory.save({ scrollY: window.scrollY, page, filters, items }); // ✅ 일괄 저장
   const handleNavigate = (href: string) => {
@@ -71,38 +57,16 @@ const ListRow = ({
         <span className="badge text-bg-secondary">{row.uid}</span>
       </td>
       <td className="text-center">
-        <EditableCell
-          value={row.type}
-          onSave={(newVal, onSuccess, onError) =>
-            onFieldSave(row.uid, 'type', newVal, onSuccess, onError)
-          }
-        />
+        <span className="badge text-bg-primary">{row.userId}</span>
       </td>
       <td className="text-center">
-        <EditableCell
-          value={row.activity}
-          onSave={(newVal, onSuccess, onError) =>
-            onFieldSave(row.uid, 'activity', newVal, onSuccess, onError)
-          }
-        />
+        <span className="badge text-bg-primary">{row.platform}</span>
+      </td>
+      <td className="text-center">
+        <span className="badge text-bg-secondary">{row.templateId}</span>
       </td>
       <td className="text-center">
         <span className="badge text-bg-primary">{row.title}</span>
-      </td>
-
-      <td className="text-center">
-        <span
-          className={`badge ${row.isUse ? 'text-bg-primary' : 'text-bg-secondary'}`}
-        >
-          {row.isUse ? t('common.usage') : t('common.usageNone')}
-        </span>
-      </td>
-      <td className="text-center">
-        <span
-          className={`badge ${row.isVisible ? 'text-bg-primary' : 'text-bg-secondary'}`}
-        >
-          {row.isVisible ? t('common.usage') : t('common.usageNone')}
-        </span>
       </td>
 
       <td className="text-center">

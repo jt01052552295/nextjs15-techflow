@@ -168,10 +168,10 @@ export const routesData = {
     edit: '/payment/{id}/edit',
   },
   fcmTemplates: {
-    index: '/fcm/templates',
-    create: '/fcm/templates/p/create',
-    show: '/fcm/templates/{id}',
-    edit: '/fcm/templates/{id}/edit',
+    index: '/fcm/tokens',
+    create: '/fcm/tokens/p/create',
+    show: '/fcm/tokens/{id}',
+    edit: '/fcm/tokens/{id}/edit',
   },
   fcmTokens: {
     index: '/fcm/tokens',

@@ -1,5 +1,5 @@
 import { IUser } from '@/types/user';
-import type { IFcmTemplate } from '@/types/fcm/template';
+import type { IFcmToken } from '@/types/fcm/token';
 
 export type FcmMessagePlatform = 'app' | 'desktop' | 'mobile';
 
@@ -21,7 +21,7 @@ export interface IFcmMessage {
   updatedAt: Date;
 
   // relations
-  template: IFcmTemplate | null;
+  template: IFcmToken | null;
   user: IUser | null; // optional relation
 }
 

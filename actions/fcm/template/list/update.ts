@@ -28,7 +28,7 @@ export const listUpdateAction = async (data: UpdateTodoInput) => {
       throw new Error(await __ts('common.form.invalid', {}, language));
     }
 
-    const updated = await prisma.fcmTemplate.update({
+    const updated = await prisma.fcmToken.update({
       where: { uid },
       data: {
         ...(type !== undefined && { type }),

@@ -627,7 +627,7 @@
     "isUse": "사용 여부",
     "isVisible": "노출 여부"
   },
-  "fcmTemplate": {
+  "fcmToken": {
     "idx": "인덱스",
     "uid": "UID",
     "type": "템플릿 타입",

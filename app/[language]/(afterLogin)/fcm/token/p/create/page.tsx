@@ -21,8 +21,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: metadata.desc,
     alternates: {
       languages: {
-        ko: `/ko/address`,
-        en: `/en/address`,
+        ko: `/ko/fcm/token`,
+        en: `/en/fcm/token`,
       },
     },
   };

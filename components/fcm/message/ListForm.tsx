@@ -4,19 +4,18 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useLanguage } from '@/components/context/LanguageContext';
 import { getRouteUrl } from '@/utils/routes';
-import { usefcmTemplateInfinite } from '@/hooks/react-query/fcm/useTemplate';
+import { usefcmMessageInfinite } from '@/hooks/react-query/fcm/useMessage';
 import ListRowSkeleton from './ListRowSkeleton';
 import ListRow from './ListRow';
-import type { IFcmTemplate, ListEditCell } from '@/types/fcm/template';
+import type { IFcmMessage } from '@/types/fcm/message';
 import ScrollToTopButton from '@/components/common/ScrollToTopButton';
 import {
   DEFAULTS,
   isSameBaseParams,
   toSearchParamsFromBase,
-  type FcmTemplateBaseParams,
-} from '@/types/fcm/template/search';
+  type FcmMessageBaseParams,
+} from '@/types/fcm/message/search';
 import SearchForm from './SearchForm';
-import { listUpdateAction } from '@/actions/fcm/template/list/update';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faSquareCheck,
@@ -27,7 +26,7 @@ import { faSquare } from '@fortawesome/free-regular-svg-icons';
 import { toast } from 'sonner';
 import DeleteConfirmModal from './modal/DeleteConfirmModal';
 
-type Props = { baseParams: FcmTemplateBaseParams };
+type Props = { baseParams: FcmMessageBaseParams };
 
 const ListForm = ({ baseParams }: Props) => {
   const queryClient = useQueryClient();
@@ -36,8 +35,8 @@ const ListForm = ({ baseParams }: Props) => {
   const pathname = usePathname();
 
   // 1) URL → baseParams
-  const [params, setParams] = useState<FcmTemplateBaseParams>(baseParams);
-  const [, setForm] = useState<FcmTemplateBaseParams>(baseParams);
+  const [params, setParams] = useState<FcmMessageBaseParams>(baseParams);
+  const [, setForm] = useState<FcmMessageBaseParams>(baseParams);
 
   const syncedOnceRef = useRef(false);
   useEffect(() => {
@@ -48,14 +47,14 @@ const ListForm = ({ baseParams }: Props) => {
     }
   }, [baseParams]);
 
-  const applyParams = (next: FcmTemplateBaseParams) => {
+  const applyParams = (next: FcmMessageBaseParams) => {
     if (isSameBaseParams(next, params)) return;
     setParams(next);
     const qs = toSearchParamsFromBase(next);
     router.replace(`${pathname}?${qs.toString()}`);
   };
 
-  const handleApply = (next: FcmTemplateBaseParams) => applyParams(next);
+  const handleApply = (next: FcmMessageBaseParams) => applyParams(next);
   const handleReset = () => applyParams(DEFAULTS);
 
   const {
@@ -65,10 +64,10 @@ const ListForm = ({ baseParams }: Props) => {
     hasNextPage,
     fetchNextPage,
     refetch,
-  } = usefcmTemplateInfinite(params);
+  } = usefcmMessageInfinite(params);
 
   // 평탄화 + 중복 제거(커서 경계에서 같은 uid가 들어오는 상황 방지)
-  const items: IFcmTemplate[] = useMemo(() => {
+  const items: IFcmMessage[] = useMemo(() => {
     const list = data?.pages.flatMap((p) => p.items) ?? [];
     const seen = new Set<string>();
     return list.filter((row) =>
@@ -94,7 +93,7 @@ const ListForm = ({ baseParams }: Props) => {
     return () => io.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const [selectedRow, setSelectedRow] = useState<IFcmTemplate | null>(null);
+  const [selectedRow, setSelectedRow] = useState<IFcmMessage | null>(null);
   const [selectedUids, setSelectedUids] = useState<string[]>([]);
   const isSingleSelected = selectedUids.length === 1;
   const [checkAll, setCheckAll] = useState(false);
@@ -115,27 +114,8 @@ const ListForm = ({ baseParams }: Props) => {
     }
   };
 
-  const handleFieldSave = async (
-    uid: string,
-    field: ListEditCell,
-    newValue: string,
-    onSuccess: (val: string) => void,
-    onError: () => void,
-  ) => {
-    const res = await listUpdateAction({ uid, [field]: newValue });
-
-    if (res.status === 'success') {
-      queryClient.invalidateQueries({ queryKey: ['fcmTemplate', params] });
-      toast.success(res.message);
-      onSuccess(newValue);
-    } else {
-      toast.error(res.message);
-      onError();
-    }
-  };
-
   const handleCreate = () => {
-    const baseUrl = getRouteUrl('fcmTemplates.create', locale);
+    const baseUrl = getRouteUrl('fcmMessages.create', locale);
     const qs = new URLSearchParams(baseParams as any).toString();
 
     const url = qs ? `${baseUrl}?${qs}` : baseUrl;
@@ -212,29 +192,28 @@ const ListForm = ({ baseParams }: Props) => {
           <thead>
             <tr>
               <th className="text-center">#</th>
-              <th className="text-center">{t('columns.fcmTemplate.uid')}</th>
-              <th className="text-center">{t('columns.fcmTemplate.type')}</th>
+              <th className="text-center">{t('columns.fcmMessage.uid')}</th>
+              <th className="text-center">{t('columns.fcmMessage.userId')}</th>
               <th className="text-center">
-                {t('columns.fcmTemplate.activity')}
+                {t('columns.fcmMessage.platform')}
               </th>
-              <th className="text-center">{t('columns.fcmTemplate.title')}</th>
-              <th className="text-center">{t('columns.fcmTemplate.isUse')}</th>
               <th className="text-center">
-                {t('columns.fcmTemplate.isVisible')}
+                {t('columns.fcmMessage.templateId')}
               </th>
+              <th className="text-center">{t('columns.fcmMessage.title')}</th>
+
               <th className="text-center">{t('common.actions')}</th>
             </tr>
           </thead>
           <tbody>
             {!isLoading &&
-              items.map((row: IFcmTemplate) => (
+              items.map((row: IFcmMessage) => (
                 <ListRow
                   key={row.idx}
                   row={row}
                   setSelectedRow={setSelectedRow}
                   isChecked={selectedUids.includes(row.uid)}
                   onCheck={handleCheck}
-                  onFieldSave={handleFieldSave}
                 />
               ))}
             {isLoading &&
@@ -267,7 +246,7 @@ const ListForm = ({ baseParams }: Props) => {
         uids={modalType === 'bulk' ? selectedUids : []}
         onDeleted={(deletedUids) => {
           // 1. 먼저 캐시 직접 업데이트
-          queryClient.setQueryData(['fcmTemplate', params], (oldData: any) => {
+          queryClient.setQueryData(['fcmMessage', params], (oldData: any) => {
             if (!oldData) return oldData;
 
             return {
@@ -286,7 +265,7 @@ const ListForm = ({ baseParams }: Props) => {
             };
           });
           // 2. 그 다음 백그라운드에서 데이터 다시 불러오기 (정확한 데이터 갱신)
-          queryClient.invalidateQueries({ queryKey: ['fcmTemplate', params] });
+          queryClient.invalidateQueries({ queryKey: ['fcmMessage', params] });
 
           setSelectedUids([]);
           setSelectedRow(null);

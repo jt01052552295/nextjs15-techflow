@@ -1,14 +1,14 @@
 'use client';
 
 import React from 'react';
-import { IFcmTemplate } from '@/types/fcm/template';
-import { deleteAction } from '@/actions/fcm/template/delete';
+import { IFcmAlarm } from '@/types/fcm/alarm';
+import { deleteAction } from '@/actions/fcm/alarm/delete';
 
 import { toast } from 'sonner';
 import { useLanguage } from '@/components/context/LanguageContext';
 
 type Props = {
-  row: IFcmTemplate | null;
+  row: IFcmAlarm | null;
   uids?: string[];
   onDeleted: (deletedUids: string[]) => void;
 };
@@ -54,7 +54,7 @@ const DeleteConfirmModal = ({ row, uids, onDeleted }: Props) => {
               <p
                 dangerouslySetInnerHTML={{
                   __html: t('common.confirm_delete_single', {
-                    name: row.title,
+                    name: row.idx,
                   }),
                 }}
               />

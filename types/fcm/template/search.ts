@@ -1,4 +1,4 @@
-import type { ListParams } from '@/types/fcm/template';
+import type { ListParams } from '@/types/fcm/token';
 
 // 커서 제외 타입
 export type FcmTemplateBaseParams = Omit<ListParams, 'cursor'>;

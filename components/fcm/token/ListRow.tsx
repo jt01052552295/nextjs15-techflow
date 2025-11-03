@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import type { IFcmTemplate, ListEditCell } from '@/types/fcm/template';
+import type { IFcmToken } from '@/types/fcm/token';
 import { useRouter } from 'next/navigation';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -17,32 +17,19 @@ import { getRouteUrl } from '@/utils/routes';
 import { useSearchParams } from 'next/navigation';
 
 type Props = {
-  row: IFcmTemplate;
-  setSelectedRow: (row: IFcmTemplate) => void;
+  row: IFcmToken;
+  setSelectedRow: (row: IFcmToken) => void;
   isChecked: boolean;
   onCheck: (uid: string, checked: boolean) => void;
-  onFieldSave: (
-    uid: string,
-    field: ListEditCell,
-    newValue: string,
-    onSuccess: (val: string) => void,
-    onError: () => void,
-  ) => void;
 };
 
-const ListRow = ({
-  row,
-  setSelectedRow,
-  isChecked,
-  onCheck,
-  onFieldSave,
-}: Props) => {
+const ListRow = ({ row, setSelectedRow, isChecked, onCheck }: Props) => {
   const { locale, t } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryString = searchParams.toString();
 
-  const editUrl = getRouteUrl('fcmTemplates.edit', locale, { id: row.uid });
+  const editUrl = getRouteUrl('fcmTokens.edit', locale, { id: row.uid });
 
   //  listMemory.save({ scrollY: window.scrollY, page, filters, items }); // ✅ 일괄 저장
   const handleNavigate = (href: string) => {
@@ -71,23 +58,13 @@ const ListRow = ({
         <span className="badge text-bg-secondary">{row.uid}</span>
       </td>
       <td className="text-center">
-        <EditableCell
-          value={row.type}
-          onSave={(newVal, onSuccess, onError) =>
-            onFieldSave(row.uid, 'type', newVal, onSuccess, onError)
-          }
-        />
+        <span className="badge text-bg-primary">{row.userId}</span>
       </td>
       <td className="text-center">
-        <EditableCell
-          value={row.activity}
-          onSave={(newVal, onSuccess, onError) =>
-            onFieldSave(row.uid, 'activity', newVal, onSuccess, onError)
-          }
-        />
+        <span className="badge text-bg-primary">{row.token}</span>
       </td>
       <td className="text-center">
-        <span className="badge text-bg-primary">{row.title}</span>
+        <span className="badge text-bg-secondary">{row.platform}</span>
       </td>
 
       <td className="text-center">

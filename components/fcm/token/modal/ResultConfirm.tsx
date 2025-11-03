@@ -20,7 +20,7 @@ const ResultConfirm = ({ isOpen, setIsOpen }: Props) => {
 
   const goToList = () => {
     const qs = searchParams.toString();
-    const indexUrl = getRouteUrl('fcmTemplates.index', locale);
+    const indexUrl = getRouteUrl('fcmTokens.index', locale);
     router.push(indexUrl + (qs ? '?' + qs : ''));
     // window.location.href = indexUrl + (qs ? '?' + qs : '');
   };

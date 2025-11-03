@@ -1,14 +1,11 @@
 'use client';
 import { useEffect, useState, useId } from 'react';
-import {
-  DEFAULTS,
-  type FcmTemplateBaseParams,
-} from '@/types/fcm/template/search';
+import { DEFAULTS, type FcmAlarmBaseParams } from '@/types/fcm/alarm/search';
 import { useLanguage } from '@/components/context/LanguageContext';
 
 type Props = {
-  value: FcmTemplateBaseParams; // 현재 URL에서 온 값
-  onApply: (next: FcmTemplateBaseParams) => void; // 확인/검색 버튼 클릭 시만 호출
+  value: FcmAlarmBaseParams; // 현재 URL에서 온 값
+  onApply: (next: FcmAlarmBaseParams) => void; // 확인/검색 버튼 클릭 시만 호출
   onReset: () => void; // 초기화
   loading?: boolean;
 };
@@ -27,7 +24,7 @@ export default function SearchForm({
 
   // 로컬 상태(입력값) — onChange는 여기만 반영하고, 최종은 버튼으로만 적용
   const [q, setQ] = useState(value.q ?? '');
-  const [f, setF] = useState<FcmTemplateBaseParams>(value);
+  const [f, setF] = useState<FcmAlarmBaseParams>(value);
 
   // URL 값이 바뀌면 폼 동기화
   useEffect(() => {
@@ -36,7 +33,7 @@ export default function SearchForm({
   }, [value]);
 
   // 기간 정규화(시작>종료면 자동 스왑)
-  const normalizePeriod = (next: FcmTemplateBaseParams) => {
+  const normalizePeriod = (next: FcmAlarmBaseParams) => {
     const s = next.startDate,
       e = next.endDate;
     if (s && e && s > e) {
@@ -54,10 +51,10 @@ export default function SearchForm({
 
   const sortBtnLabel = (() => {
     const map: Record<string, string> = {
-      idx: t('columns.fcmTemplate.idx'),
+      idx: t('columns.fcmAlarm.idx'),
     };
     const by =
-      map[value.sortBy ?? DEFAULTS.sortBy!] ?? t('columns.fcmTemplate.idx');
+      map[value.sortBy ?? DEFAULTS.sortBy!] ?? t('columns.fcmAlarm.idx');
     const arrow = (value.order ?? DEFAULTS.order) === 'desc' ? '↓' : '↑';
     return `${by} ${arrow}`;
   })();
@@ -234,7 +231,7 @@ export default function SearchForm({
                     setF({ ...f, sortBy: e.target.value as any })
                   }
                 >
-                  <option value="idx">{t('columns.fcmTemplate.idx')}</option>
+                  <option value="idx">{t('columns.fcmAlarm.idx')}</option>
                 </select>
               </div>
               <div className="col">
@@ -336,7 +333,7 @@ export default function SearchForm({
                 value={f.sortBy ?? 'idx'}
                 onChange={(e) => setF({ ...f, sortBy: e.target.value as any })}
               >
-                <option value="idx">{t('columns.fcmTemplate.idx')}</option>
+                <option value="idx">{t('columns.fcmAlarm.idx')}</option>
               </select>
             </div>
             <div className="col">

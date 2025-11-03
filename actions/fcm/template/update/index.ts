@@ -3,7 +3,7 @@
 import { UpdateType, UpdateSchema } from './schema';
 import { __ts, getDictionary } from '@/utils/get-dictionary';
 import { ckLocale } from '@/lib/cookie';
-import { update } from '@/services/fcm/template.service';
+import { update } from '@/services/fcm/token.service';
 
 export async function updateAction(data: UpdateType) {
   const language = await ckLocale();

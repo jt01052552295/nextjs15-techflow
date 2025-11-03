@@ -1,15 +1,11 @@
 'use server';
 
-import type {
-  ListParams,
-  ListResult,
-  IFcmTemplate,
-} from '@/types/fcm/template';
-import { list } from '@/services/fcm/template.service';
+import type { ListParams, ListResult, IFcmToken } from '@/types/fcm/token';
+import { list } from '@/services/fcm/token.service';
 
 export async function listAction(
   params?: ListParams,
-): Promise<ListResult<IFcmTemplate>> {
+): Promise<ListResult<IFcmToken>> {
   try {
     const rs = await list(params ?? {});
 
@@ -23,7 +19,7 @@ export async function listAction(
   }
 }
 
-function toDTO(row: any): IFcmTemplate {
+function toDTO(row: any): IFcmToken {
   return {
     ...row,
   };
