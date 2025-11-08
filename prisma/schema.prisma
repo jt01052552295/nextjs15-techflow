@@ -1134,7 +1134,7 @@ model ShopCategory {
   isUse     Boolean  @default(true) @map("is_use")
   isVisible Boolean  @default(true) @map("is_visible")
 
-  items     ShopItem[] 
+  ShopItem     ShopItem[] 
 
   @@map("ec_shop_category")
 }
@@ -1295,8 +1295,8 @@ model ShopCart {
   updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
 
   // 관계 설정
-  options     ShopCartOption[] // 장바구니에 담긴 옵션 정보
-  supplies    ShopCartSupply[] // 장바구니에 담긴 추가상품 정보
+  ShopCartOption     ShopCartOption[] // 장바구니에 담긴 옵션 정보
+  ShopCartSupply    ShopCartSupply[] // 장바구니에 담긴 추가상품 정보
   ShopItem    ShopItem         @relation(fields: [itemId], references: [idx])
   User        User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -1406,8 +1406,8 @@ model ShopOrder {
   isVisible       Boolean   @default(true) @map("visible")
 
   // 관계 설정
-  items           ShopOrderItem[]
-  payments        ShopOrderPayment[]
+  ShopOrderItem           ShopOrderItem[]
+  ShopOrderPayment        ShopOrderPayment[]
   User            User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
   ShopSubscription ShopSubscription[]
   PortoneSchedulePayment PortoneSchedulePayment[]
@@ -1562,9 +1562,9 @@ model ShopSubscription {
   updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") // 수정일 추가
   
   // 관계 설정
-  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
-  shopOrder   ShopOrder @relation(fields: [orderId], references: [idx], onDelete: Restrict)
-  shopItem    ShopItem  @relation(fields: [itemId], references: [idx], onDelete: Restrict)
+  User        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  ShopOrder   ShopOrder @relation(fields: [orderId], references: [idx], onDelete: Restrict)
+  ShopItem    ShopItem  @relation(fields: [itemId], references: [idx], onDelete: Restrict)
   
   @@index([userId])
   @@index([orderId])

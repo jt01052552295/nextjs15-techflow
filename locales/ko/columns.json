@@ -673,5 +673,17 @@
     "url": "링크",
     "isRead": "읽음 여부",
     "createdAt": "등록일"
+  },
+  "shopCategory": {
+    "idx": "인덱스",
+    "uid": "UUID",
+    "cid": "CUID",
+    "code": "카테고리 코드",
+    "name": "이름",
+    "desc": "설명",
+    "createdAt": "생성일",
+    "updatedAt": "수정일",
+    "isUse": "사용",
+    "isVisible": "표시"
   }
 }

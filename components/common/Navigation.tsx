@@ -15,6 +15,7 @@ import {
   faGears,
   faAngleDown,
   faBell,
+  faCartShopping,
 } from '@fortawesome/free-solid-svg-icons';
 
 interface SubMenu {
@@ -77,6 +78,12 @@ const Navigation = () => {
         { id: 'fcmMessages-list', route: 'fcmMessages.index' },
         { id: 'fcmAlarms-list', route: 'fcmAlarms.index' },
       ],
+    },
+    {
+      id: 'shop',
+      icon: faCartShopping,
+      route: 'shopCategory.index',
+      subMenus: [{ id: 'shopCategory-list', route: 'shopCategory.index' }],
     },
     {
       id: 'Config',

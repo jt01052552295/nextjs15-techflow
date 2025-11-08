@@ -191,4 +191,10 @@ export const routesData = {
     show: '/fcm/alarm/{id}',
     edit: '/fcm/alarm/{id}/edit',
   },
+  shopCategory: {
+    index: '/shop/category',
+    create: '/shop/category/p/create',
+    show: '/shop/category/{id}',
+    edit: '/shop/category/{id}/edit',
+  },
 };
