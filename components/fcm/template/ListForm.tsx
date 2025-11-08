@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useLanguage } from '@/components/context/LanguageContext';
 import { getRouteUrl } from '@/utils/routes';
-import { usefcmTemplateInfinite } from '@/hooks/react-query/fcm/useTemplate';
+import { useFcmTemplateInfinite } from '@/hooks/react-query/fcm/useTemplate';
 import ListRowSkeleton from './ListRowSkeleton';
 import ListRow from './ListRow';
 import type { IFcmTemplate, ListEditCell } from '@/types/fcm/template';
@@ -65,7 +65,7 @@ const ListForm = ({ baseParams }: Props) => {
     hasNextPage,
     fetchNextPage,
     refetch,
-  } = usefcmTemplateInfinite(params);
+  } = useFcmTemplateInfinite(params);
 
   // 평탄화 + 중복 제거(커서 경계에서 같은 uid가 들어오는 상황 방지)
   const items: IFcmTemplate[] = useMemo(() => {

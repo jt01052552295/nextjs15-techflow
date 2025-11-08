@@ -10,7 +10,7 @@ import {
   type FcmMessageBaseParams,
 } from '@/lib/queryKeys/fcm/message';
 
-export function usefcmMessageInfinite(baseParams: FcmMessageBaseParams) {
+export function useFcmMessageInfinite(baseParams: FcmMessageBaseParams) {
   return useInfiniteQuery<
     ListResult<IFcmMessage>,
     Error,

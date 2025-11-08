@@ -5,7 +5,7 @@ import { Metadata } from 'next';
 import { getRouteUrl } from '@/utils/routes';
 import PageHeader from '@/components/common/PageHeader';
 import Breadcrumb from '@/components/common/Breadcrumb';
-import CreateForm from '@/components/fcm/token/CreateForm';
+import CreateForm from '@/components/fcm/template/CreateForm';
 
 type Props = {
   params: { language: LocaleType };
@@ -14,15 +14,15 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { language } = await params;
   const dictionary = await getDictionary(language);
-  const metadata = getRouteMetadata('fcmTokens.index', dictionary, language);
+  const metadata = getRouteMetadata('fcmTemplates.index', dictionary, language);
 
   return {
     title: metadata.name,
     description: metadata.desc,
     alternates: {
       languages: {
-        ko: `/ko/fcm/token`,
-        en: `/en/fcm/token`,
+        ko: `/ko/fcm/template`,
+        en: `/en/fcm/template`,
       },
     },
   };
@@ -31,8 +31,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function Page({ params }: Props) {
   const { language } = await params;
   const dictionary = await getDictionary(language);
-  const metadata = getRouteMetadata('fcmTokens.index', dictionary, language);
-  const url = getRouteUrl('fcmTokens.index', language);
+  const metadata = getRouteMetadata('fcmTemplates.index', dictionary, language);
+  const url = getRouteUrl('fcmTemplates.index', language);
 
   const breadcrumbPaths = [
     {

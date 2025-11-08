@@ -43,8 +43,12 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
   // 통합 검색(q)이 들어오면 name/email OR 매칭. 없으면 기존 name/email 개별 필드 사용
   const filteredWhere: Prisma.FcmAlarmWhereInput = q
     ? {
-        ...baseWhere,
-        OR: [{ templateId: { contains: q }, message: { contains: q } }],
+        AND: [
+          baseWhere,
+          {
+            OR: [{ templateId: { contains: q }, message: { contains: q } }],
+          },
+        ],
       }
     : {
         ...baseWhere,

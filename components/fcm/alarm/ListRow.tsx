@@ -14,6 +14,7 @@ import { faSquare } from '@fortawesome/free-regular-svg-icons';
 import { useLanguage } from '@/components/context/LanguageContext';
 import { getRouteUrl } from '@/utils/routes';
 import { useSearchParams } from 'next/navigation';
+import UserProfileDisplay from '@/components/common/UserProfileDisplay';
 
 type Props = {
   row: IFcmAlarm;
@@ -23,7 +24,7 @@ type Props = {
 };
 
 const ListRow = ({ row, setSelectedRow, isChecked, onCheck }: Props) => {
-  const { locale, t } = useLanguage();
+  const { locale } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryString = searchParams.toString();
@@ -57,7 +58,7 @@ const ListRow = ({ row, setSelectedRow, isChecked, onCheck }: Props) => {
         <span className="badge text-bg-secondary">{row.uid}</span>
       </td>
       <td className="text-center">
-        <span className="badge text-bg-primary">{row.userId}</span>
+        <UserProfileDisplay user={row.user} />
       </td>
       <td className="text-center">
         <span className="badge text-bg-primary">{row.templateId}</span>

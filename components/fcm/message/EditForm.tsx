@@ -25,6 +25,7 @@ import { useSearchParams } from 'next/navigation';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { fcmMessageQK } from '@/lib/queryKeys/fcm/message';
 import { showAction } from '@/actions/fcm/message/show';
+import UserSelect from '@/components/common/UserSelect';
 
 type Props = {
   uid: string;
@@ -179,14 +180,15 @@ export default function EditForm({ uid }: Props) {
                         <label className="form-label" htmlFor="userId">
                           {t('columns.fcmMessage.userId')}
                         </label>
-                        <input
-                          type="text"
-                          className={`form-control ${getInputClass('userId')}`}
-                          {...register('userId', {
-                            onChange: () => handleInputChange('userId'),
-                            onBlur: () => handleInputChange('userId'),
-                          })}
-                          readOnly={isPending}
+                        <UserSelect
+                          name="userId"
+                          control={control}
+                          label={t('columns.fcmMessage.userId')}
+                          required
+                          error={errors.userId?.message}
+                          feedbackMessages={{ valid: t('common.form.valid') }}
+                          disabled={isPending}
+                          onChange={() => handleInputChange('userId')}
                         />
                         {errors.userId?.message && (
                           <div className="invalid-feedback">

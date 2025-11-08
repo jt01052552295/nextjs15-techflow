@@ -5,16 +5,19 @@ import { Metadata } from 'next';
 import { getRouteUrl } from '@/utils/routes';
 import PageHeader from '@/components/common/PageHeader';
 import Breadcrumb from '@/components/common/Breadcrumb';
-import ListForm from '@/components/fcm/token/ListForm';
-import type { SortBy, SortOrder } from '@/types/fcm/token';
+import ListForm from '@/components/fcm/template/ListForm';
+import type { SortBy, SortOrder } from '@/types/fcm/template';
 
 import {
   HydrationBoundary,
   dehydrate,
   QueryClient,
 } from '@tanstack/react-query';
-import { fcmTokenQK, type FcmTokenBaseParams } from '@/lib/queryKeys/fcm/token';
-import { listAction } from '@/actions/fcm/token/list';
+import {
+  fcmTemplateQK,
+  type FcmTemplateBaseParams,
+} from '@/lib/queryKeys/fcm/template';
+import { listAction } from '@/actions/fcm/template/list';
 
 type Props = {
   params: { language: LocaleType };
@@ -24,15 +27,15 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { language } = await params;
   const dictionary = await getDictionary(language);
-  const metadata = getRouteMetadata('fcmTokens.index', dictionary, language);
+  const metadata = getRouteMetadata('fcmTemplates.index', dictionary, language);
 
   return {
     title: metadata.name,
     description: metadata.desc,
     alternates: {
       languages: {
-        ko: `/ko/fcm/token`,
-        en: `/en/fcm/token`,
+        ko: `/ko/fcm/template`,
+        en: `/en/fcm/template`,
       },
     },
   };
@@ -41,8 +44,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function Page({ params, searchParams }: Props) {
   const { language } = await params;
   const dictionary = await getDictionary(language);
-  const metadata = getRouteMetadata('fcmTokens.index', dictionary, language);
-  const url = getRouteUrl('fcmTokens.index', language);
+  const metadata = getRouteMetadata('fcmTemplates.index', dictionary, language);
+  const url = getRouteUrl('fcmTemplates.index', language);
   const sp = await searchParams;
 
   const breadcrumbPaths = [
@@ -56,7 +59,7 @@ export default async function Page({ params, searchParams }: Props) {
   const one = (v: string | string[] | undefined) =>
     Array.isArray(v) ? v[0] : v;
 
-  const baseParams: FcmTokenBaseParams = {
+  const baseParams: FcmTemplateBaseParams = {
     q: one(sp.q) || undefined,
     dateType: one(sp.dateType) as 'createdAt' | 'updatedAt' | undefined,
     startDate: one(sp.startDate) || undefined,
@@ -73,7 +76,7 @@ export default async function Page({ params, searchParams }: Props) {
 
   const qc = new QueryClient();
   await qc.prefetchInfiniteQuery({
-    queryKey: fcmTokenQK.list(baseParams),
+    queryKey: fcmTemplateQK.list(baseParams),
     queryFn: ({ pageParam }: { pageParam?: string }) =>
       listAction({ ...baseParams, cursor: pageParam ?? null }),
     initialPageParam: undefined,

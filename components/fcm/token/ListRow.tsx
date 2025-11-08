@@ -11,10 +11,10 @@ import {
   faSquareCheck,
 } from '@fortawesome/free-solid-svg-icons';
 import { faSquare } from '@fortawesome/free-regular-svg-icons';
-import EditableCell from './EditableCell';
 import { useLanguage } from '@/components/context/LanguageContext';
 import { getRouteUrl } from '@/utils/routes';
 import { useSearchParams } from 'next/navigation';
+import UserProfileDisplay from '@/components/common/UserProfileDisplay';
 
 type Props = {
   row: IFcmToken;
@@ -58,7 +58,7 @@ const ListRow = ({ row, setSelectedRow, isChecked, onCheck }: Props) => {
         <span className="badge text-bg-secondary">{row.uid}</span>
       </td>
       <td className="text-center">
-        <span className="badge text-bg-primary">{row.userId}</span>
+        <UserProfileDisplay user={row.user} />
       </td>
       <td className="text-center">
         <span className="badge text-bg-primary">{row.token}</span>

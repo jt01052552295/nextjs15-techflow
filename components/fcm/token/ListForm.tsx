@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useLanguage } from '@/components/context/LanguageContext';
 import { getRouteUrl } from '@/utils/routes';
-import { usefcmTokenInfinite } from '@/hooks/react-query/fcm/useToken';
+import { useFcmTokenInfinite } from '@/hooks/react-query/fcm/useToken';
 import ListRowSkeleton from './ListRowSkeleton';
 import ListRow from './ListRow';
 import type { IFcmToken } from '@/types/fcm/token';
@@ -64,7 +64,7 @@ const ListForm = ({ baseParams }: Props) => {
     hasNextPage,
     fetchNextPage,
     refetch,
-  } = usefcmTokenInfinite(params);
+  } = useFcmTokenInfinite(params);
 
   // 평탄화 + 중복 제거(커서 경계에서 같은 uid가 들어오는 상황 방지)
   const items: IFcmToken[] = useMemo(() => {
@@ -193,9 +193,9 @@ const ListForm = ({ baseParams }: Props) => {
             <tr>
               <th className="text-center">#</th>
               <th className="text-center">{t('columns.fcmToken.uid')}</th>
-              <th className="text-center">{t('columns.fcmToken.type')}</th>
-              <th className="text-center">{t('columns.fcmToken.activity')}</th>
-              <th className="text-center">{t('columns.fcmToken.title')}</th>
+              <th className="text-center">{t('columns.fcmToken.userId')}</th>
+              <th className="text-center">{t('columns.fcmToken.token')}</th>
+              <th className="text-center">{t('columns.fcmToken.platform')}</th>
               <th className="text-center">{t('columns.fcmToken.isUse')}</th>
               <th className="text-center">{t('columns.fcmToken.isVisible')}</th>
               <th className="text-center">{t('common.actions')}</th>

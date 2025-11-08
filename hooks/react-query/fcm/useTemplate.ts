@@ -10,7 +10,7 @@ import {
   type FcmTemplateBaseParams,
 } from '@/lib/queryKeys/fcm/template';
 
-export function usefcmTemplateInfinite(baseParams: FcmTemplateBaseParams) {
+export function useFcmTemplateInfinite(baseParams: FcmTemplateBaseParams) {
   return useInfiniteQuery<
     ListResult<IFcmTemplate>,
     Error,

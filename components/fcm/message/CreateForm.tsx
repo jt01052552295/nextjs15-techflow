@@ -23,6 +23,7 @@ import useFormUtils from '@/hooks/useFormUtils';
 import ResultConfirm from '@/components/fcm/message/modal/ResultConfirm';
 import { useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
+import UserSelect from '@/components/common/UserSelect';
 
 export default function CreateForm() {
   const { dictionary, locale, t } = useLanguage();
@@ -130,15 +131,17 @@ export default function CreateForm() {
                         <label className="form-label" htmlFor="userId">
                           {t('columns.fcmMessage.userId')}
                         </label>
-                        <input
-                          type="text"
-                          className={`form-control ${getInputClass('userId')}`}
-                          {...register('userId', {
-                            onChange: () => handleInputChange('userId'),
-                            onBlur: () => handleInputChange('userId'),
-                          })}
-                          readOnly={isPending}
+                        <UserSelect
+                          name="userId"
+                          control={control}
+                          label={t('columns.fcmMessage.userId')}
+                          required
+                          error={errors.userId?.message}
+                          feedbackMessages={{ valid: t('common.form.valid') }}
+                          disabled={isPending}
+                          onChange={() => handleInputChange('userId')}
                         />
+
                         {errors.userId?.message && (
                           <div className="invalid-feedback">
                             {errors.userId?.message}

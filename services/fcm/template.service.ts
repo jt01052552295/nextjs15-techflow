@@ -4,12 +4,12 @@ import { b64e, b64d } from '@/lib/util';
 import type {
   ListParams,
   ListResult,
-  IFcmToken,
+  IFcmTemplate,
   DeleteInput,
   DeleteResult,
-} from '@/types/fcm/token';
-import type { CreateType } from '@/actions/fcm/token/create/schema';
-import type { UpdateType } from '@/actions/fcm/token/update/schema';
+} from '@/types/fcm/template';
+import type { CreateType } from '@/actions/fcm/template/create/schema';
+import type { UpdateType } from '@/actions/fcm/template/update/schema';
 
 /**
  * 목록: 커서 기반(keyset) + 정렬/검색/필터 + 카운트 2종 + 풀컬럼
@@ -48,8 +48,12 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
   // 통합 검색(q)이 들어오면 name/email OR 매칭. 없으면 기존 name/email 개별 필드 사용
   const filteredWhere: Prisma.FcmTemplateWhereInput = q
     ? {
-        ...baseWhere,
-        OR: [{ type: { contains: q }, activity: { contains: q } }],
+        AND: [
+          baseWhere,
+          {
+            OR: [{ type: { contains: q } }, { activity: { contains: q } }],
+          },
+        ],
       }
     : {
         ...baseWhere,
@@ -102,11 +106,13 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
     { idx: order }, // tie-breaker도 동일 방향
   ];
 
+  console.log(filteredWhere, q);
+
   const whereForPage: Prisma.FcmTemplateWhereInput = keysetWhere
     ? { AND: [filteredWhere, keysetWhere] }
     : filteredWhere;
 
-  const rows = await prisma.fcmToken.findMany({
+  const rows = await prisma.fcmTemplate.findMany({
     where: whereForPage,
     orderBy,
     take: safeLimit + 1,
@@ -117,7 +123,7 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
   });
 
   const hasMore = rows.length > safeLimit;
-  const items = (hasMore ? rows.slice(0, safeLimit) : rows) as IFcmToken[];
+  const items = (hasMore ? rows.slice(0, safeLimit) : rows) as IFcmTemplate[];
 
   let nextCursor: string | undefined;
   if (hasMore) {
@@ -126,23 +132,23 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
   }
 
   const [totalAll, totalFiltered] = await Promise.all([
-    prisma.fcmToken.count({ where: baseWhere }),
-    prisma.fcmToken.count({ where: filteredWhere }),
+    prisma.fcmTemplate.count({ where: baseWhere }),
+    prisma.fcmTemplate.count({ where: filteredWhere }),
   ]);
 
   return { items, nextCursor, totalAll, totalFiltered };
 }
 
 /** 보기 */
-export async function show(uid: string): Promise<IFcmToken> {
+export async function show(uid: string): Promise<IFcmTemplate> {
   // 먼저 존재 확인 (선택)
-  const exists = await prisma.fcmToken.findUnique({
+  const exists = await prisma.fcmTemplate.findUnique({
     where: { uid },
     select: { uid: true },
   });
   if (!exists) throw new Error('NOT_FOUND');
 
-  const rs = await prisma.fcmToken.findUnique({
+  const rs = await prisma.fcmTemplate.findUnique({
     where: { uid },
     include: {
       fcmMessages: true,
@@ -151,7 +157,7 @@ export async function show(uid: string): Promise<IFcmToken> {
   });
 
   if (!rs) throw new Error('NOT_FOUND');
-  return rs as IFcmToken;
+  return rs as IFcmTemplate;
 }
 
 /** 작성 */
@@ -172,7 +178,7 @@ export async function create(input: CreateType) {
     isVisible = true,
   } = input;
 
-  const exists = await prisma.fcmToken.findUnique({
+  const exists = await prisma.fcmTemplate.findUnique({
     where: { uid },
     select: { uid: true },
   });
@@ -197,14 +203,14 @@ export async function create(input: CreateType) {
       },
     };
 
-    const created = await tx.fcmToken.create(createData);
+    const created = await tx.fcmTemplate.create(createData);
 
     // 관계 포함 최종 반환
-    const withRelations = await tx.fcmToken.findUnique({
+    const withRelations = await tx.fcmTemplate.findUnique({
       where: { uid: created.uid },
     });
 
-    return withRelations as IFcmToken;
+    return withRelations as IFcmTemplate;
   });
 
   return result;
@@ -228,7 +234,7 @@ export async function update(input: UpdateType) {
     isVisible,
   } = input;
 
-  const exist = await prisma.fcmToken.findUnique({
+  const exist = await prisma.fcmTemplate.findUnique({
     where: { uid },
     select: { uid: true },
   });
@@ -251,12 +257,12 @@ export async function update(input: UpdateType) {
       isVisible,
     };
 
-    const updated = await tx.fcmToken.update({
+    const updated = await tx.fcmTemplate.update({
       where: { uid },
       data,
     });
 
-    return updated as IFcmToken;
+    return updated as IFcmTemplate;
   });
 
   return rs;
@@ -275,12 +281,12 @@ export async function remove(input: DeleteInput): Promise<DeleteResult> {
   if (uids && uids.length > 0) {
     return await prisma.$transaction(async (tx) => {
       if (hard) {
-        const rs = await tx.fcmToken.deleteMany({
+        const rs = await tx.fcmTemplate.deleteMany({
           where: { uid: { in: uids } },
         });
         return { mode: 'bulk', affected: rs.count };
       } else {
-        const rs = await tx.fcmToken.updateMany({
+        const rs = await tx.fcmTemplate.updateMany({
           where: { uid: { in: uids } },
           data: { isUse: false, isVisible: false },
         });
@@ -290,7 +296,7 @@ export async function remove(input: DeleteInput): Promise<DeleteResult> {
   }
 
   // Single
-  const todo = await prisma.fcmToken.findUnique({
+  const todo = await prisma.fcmTemplate.findUnique({
     where: { uid: uid! },
     select: { uid: true },
   });
@@ -298,10 +304,10 @@ export async function remove(input: DeleteInput): Promise<DeleteResult> {
 
   return await prisma.$transaction(async (tx) => {
     if (hard) {
-      const rs = await tx.fcmToken.delete({ where: { uid: uid! } });
+      const rs = await tx.fcmTemplate.delete({ where: { uid: uid! } });
       return { mode: 'single', affected: rs ? 1 : 0 };
     } else {
-      const rs = await tx.fcmToken.update({
+      const rs = await tx.fcmTemplate.update({
         where: { uid: uid! },
         data: { isUse: false, isVisible: false },
       });

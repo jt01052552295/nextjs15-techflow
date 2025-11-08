@@ -7,7 +7,7 @@ import { listAction } from '@/actions/fcm/token/list';
 import type { ListResult, IFcmToken } from '@/types/fcm/token';
 import { fcmTokenQK, type FcmTokenBaseParams } from '@/lib/queryKeys/fcm/token';
 
-export function usefcmTokenInfinite(baseParams: FcmTokenBaseParams) {
+export function useFcmTokenInfinite(baseParams: FcmTokenBaseParams) {
   return useInfiniteQuery<
     ListResult<IFcmToken>,
     Error,

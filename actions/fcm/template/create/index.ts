@@ -3,7 +3,7 @@
 import { CreateType, CreateSchema } from './schema';
 import { __ts, getDictionary } from '@/utils/get-dictionary';
 import { ckLocale } from '@/lib/cookie';
-import { create } from '@/services/fcm/token.service';
+import { create } from '@/services/fcm/template.service';
 
 export async function createAction(data: CreateType) {
   const language = await ckLocale();

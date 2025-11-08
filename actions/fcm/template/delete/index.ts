@@ -1,7 +1,7 @@
 'use server';
 
-import { remove } from '@/services/fcm/token.service';
-import type { DeleteInput } from '@/types/fcm/token';
+import { remove } from '@/services/fcm/template.service';
+import type { DeleteInput } from '@/types/fcm/template';
 import { __ts } from '@/utils/get-dictionary';
 import { ckLocale } from '@/lib/cookie';
 

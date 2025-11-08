@@ -70,9 +70,9 @@ const Navigation = () => {
     {
       id: 'fcm',
       icon: faBell,
-      route: 'fcmTokens.index',
+      route: 'fcmTemplates.index',
       subMenus: [
-        { id: 'fcmTokens-list', route: 'fcmTokens.index' },
+        { id: 'fcmTemplates-list', route: 'fcmTemplates.index' },
         { id: 'fcmTokens-list', route: 'fcmTokens.index' },
         { id: 'fcmMessages-list', route: 'fcmMessages.index' },
         { id: 'fcmAlarms-list', route: 'fcmAlarms.index' },
