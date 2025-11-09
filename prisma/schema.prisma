@@ -1126,7 +1126,7 @@ model ShopCategory {
   idx       Int      @id @default(autoincrement())
   uid       String   @unique @default(uuid())
   cid       String   @default(cuid())
-  code      String   @db.VarChar(255)
+  code      String   @unique @db.VarChar(255)
   name      String   @db.VarChar(255)
   desc      String   @db.VarChar(255)
   createdAt DateTime @default(now()) @map("created_at")
@@ -1136,6 +1136,7 @@ model ShopCategory {
 
   ShopItem     ShopItem[] 
 
+  @@index([code], map: "code_index")
   @@map("ec_shop_category")
 }
 
@@ -1146,7 +1147,6 @@ model ShopItem {
   cid                String           @default(cuid())
   shopId             Int              @default(0) @map("shop")
   code               String           @default("") @db.VarChar(255)
-  categoryId         Int              @default(0) @map("category")
   categoryCode       String           @default("") @map("category_code") @db.VarChar(45)
   name               String           @default("") @db.VarChar(255)
   nameEn             String           @default("") @map("name_en") @db.VarChar(255)
@@ -1166,7 +1166,7 @@ model ShopItem {
   stock              Int              @default(0)
   ymd                String           @default("") @db.VarChar(255)
   his                String           @default("") @db.VarChar(255)
-  createdAt          DateTime?        @default(now()) @map("created_at") 
+  createdAt          DateTime         @default(now()) @map("created_at") 
   updatedAt          DateTime         @default(now()) @updatedAt @map("updated_at")
   isUse              Boolean          @default(true) @map("is_use") // 필드명 일관성 유지
   isVisible          Boolean          @default(true) @map("is_visible") // 필드명 일관성 유지
@@ -1177,7 +1177,7 @@ model ShopItem {
   sortOrder          Int              @default(0) @map("sort_order") 
   
   // 관계 설정
-  ShopCategory           ShopCategory     @relation(fields: [categoryId], references: [idx]) // 카테고리 관계 추가
+  ShopCategory           ShopCategory     @relation(fields: [categoryCode], references: [code]) // 카테고리 관계 추가
   ShopItemFile           ShopItemFile[]   
   ShopItemOption         ShopItemOption[] // 상품 옵션 관계
   ShopItemSupply         ShopItemSupply[] // 추가 상품 관계
@@ -1187,7 +1187,7 @@ model ShopItem {
   ShopSubscription   ShopSubscription[]
   ShopReview ShopReview[]
 
-  @@index([categoryId], map: "categoryId_index")
+  @@index([categoryCode])
   @@map("ec_shop_item")
 }
 
@@ -1216,8 +1216,9 @@ model ShopItemOption {
   idx         Int           @id @default(autoincrement())
   uid         String        @unique @default(uuid())
   itemId      Int           @map("item")
+  pid         String
   gubun       String        @default("") @db.VarChar(45)
-  parentId    Int           @default(0) @map("pid") // 부모 옵션 ID
+  parentId    Int           @default(0)
   choiceType  String        @default("") @map("choice_type") @db.VarChar(255)
   name        String        @default("") @db.VarChar(255)
   price       Int           @default(0)
@@ -1239,6 +1240,7 @@ model ShopItemOption {
   ShopOrderOption    ShopOrderOption[]
 
   @@index([itemId])
+  @@index([pid], map: "pid_index")
   @@index([parentId])
   @@map("ec_shop_item_option")
 }
@@ -1248,8 +1250,9 @@ model ShopItemSupply {
   idx         Int            @id @default(autoincrement())
   uid         String         @unique @default(uuid())
   itemId      Int            @map("item")
+  pid         String
   gubun       String         @default("") @db.VarChar(45)
-  parentId    Int            @default(0) @map("pid") // 부모 구성 ID
+  parentId    Int            @default(0)
   choiceType  String         @default("") @map("choice_type") @db.VarChar(255)
   name        String         @default("") @db.VarChar(255)
   price       Int            @default(0)
@@ -1268,6 +1271,7 @@ model ShopItemSupply {
   ShopOrderSupply     ShopOrderSupply[] 
 
   @@index([itemId])
+  @@index([pid], map: "pid_index")
   @@index([parentId])
   @@map("ec_shop_item_supply")
 }

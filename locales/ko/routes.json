@@ -601,5 +601,23 @@
       "name": "수정",
       "desc": ""
     }
+  },
+  "shopItem": {
+    "index": {
+      "name": "상품",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
+      "desc": ""
+    }
   }
 }

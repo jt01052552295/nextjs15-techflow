@@ -1,15 +1,21 @@
-import type { ListParams } from '@/types/shop/category';
+import type { ListParams } from '@/types/shop/item';
 
 // 커서 제외 타입
-export type ShopCategoryBaseParams = Omit<ListParams, 'cursor'>;
+export type ShopItemBaseParams = Omit<ListParams, 'cursor'>;
 
-export const DEFAULTS: ShopCategoryBaseParams = {
-  sortBy: 'code',
+export const DEFAULTS: ShopItemBaseParams = {
+  sortBy: 'sortOrder',
   order: 'asc',
   limit: 20,
 };
 
-const sortBySet = new Set(['idx', 'code', 'createdAt', 'updatedAt']);
+const sortBySet = new Set([
+  'idx',
+  'code',
+  'sortOrder',
+  'createdAt',
+  'updatedAt',
+]);
 const orderSet = new Set(['asc', 'desc']);
 
 export function parseBool(v?: string): boolean | undefined {
@@ -20,7 +26,7 @@ export function parseBool(v?: string): boolean | undefined {
 
 export function toBaseParamsFromSearch(
   sp: URLSearchParams,
-): ShopCategoryBaseParams {
+): ShopItemBaseParams {
   const sortBy = sp.get('sortBy') ?? DEFAULTS.sortBy!;
   const order = sp.get('order') ?? DEFAULTS.order!;
   const limit = Number(sp.get('limit') ?? DEFAULTS.limit);
@@ -40,9 +46,7 @@ export function toBaseParamsFromSearch(
   };
 }
 
-export function toSearchParamsFromBase(
-  p: ShopCategoryBaseParams,
-): URLSearchParams {
+export function toSearchParamsFromBase(p: ShopItemBaseParams): URLSearchParams {
   const sp = new URLSearchParams();
   if (p.q) sp.set('q', p.q);
   // if (p.name) sp.set('name', p.name);
@@ -62,10 +66,7 @@ export function toSearchParamsFromBase(
 // 빈 문자열/공백을 undefined로 정리(안전용)
 const norm = (v?: string) => (v && v.trim() ? v.trim() : undefined);
 
-export function isSameBaseParams(
-  a: ShopCategoryBaseParams,
-  b: ShopCategoryBaseParams,
-) {
+export function isSameBaseParams(a: ShopItemBaseParams, b: ShopItemBaseParams) {
   return (
     norm(a.q) === norm(b.q) &&
     // norm(a.name) === norm(b.name) &&
@@ -76,6 +77,7 @@ export function isSameBaseParams(
     (a.isUse ?? null) === (b.isUse ?? null) &&
     (a.isVisible ?? null) === (b.isVisible ?? null) &&
     (a.sortBy ?? 'idx') === (b.sortBy ?? 'idx') &&
+    (a.sortBy ?? 'sortOrder') === (b.sortBy ?? 'sortOrder') &&
     (a.order ?? 'desc') === (b.order ?? 'desc') &&
     (a.limit ?? 20) === (b.limit ?? 20)
   );

@@ -197,4 +197,10 @@ export const routesData = {
     show: '/shop/category/{id}',
     edit: '/shop/category/{id}/edit',
   },
+  shopItem: {
+    index: '/shop/item',
+    create: '/shop/item/p/create',
+    show: '/shop/item/{id}',
+    edit: '/shop/item/{id}/edit',
+  },
 };

@@ -82,8 +82,11 @@ const Navigation = () => {
     {
       id: 'shop',
       icon: faCartShopping,
-      route: 'shopCategory.index',
-      subMenus: [{ id: 'shopCategory-list', route: 'shopCategory.index' }],
+      route: 'shopItem.index',
+      subMenus: [
+        { id: 'shopCategory-list', route: 'shopCategory.index' },
+        { id: 'shopItem-list', route: 'shopItem.index' },
+      ],
     },
     {
       id: 'Config',
