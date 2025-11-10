@@ -296,3 +296,250 @@ export async function remove(input: DeleteInput): Promise<DeleteResult> {
     }
   });
 }
+
+/** 모바일 토큰 등록 (Bridge API용) */
+export async function registerMobileToken(params: {
+  userId: string;
+  token: string;
+  deviceInfo?: {
+    deviceId?: string;
+    model?: string;
+    os?: string;
+    appVersion?: string;
+    osVersion?: string;
+    [key: string]: any;
+  };
+}) {
+  const { userId, token, deviceInfo = {} } = params;
+
+  // FCM 토큰 형식 검증
+  if (!token || !/^[a-zA-Z0-9:_\-]{50,}$/.test(token)) {
+    throw new Error('Invalid or missing FCM token.');
+  }
+
+  // 사용자 확인
+  const user = await prisma.user.findUnique({
+    where: { id: userId, isUse: true, isVisible: true, isSignout: false },
+    select: { id: true, idx: true },
+  });
+
+  if (!user) {
+    throw new Error('사용자 정보를 찾을 수 없습니다.');
+  }
+
+  return await prisma.$transaction(async (tx) => {
+    // 기존에 동일한 토큰이 있는지 확인
+    const existing = await tx.fcmToken.findUnique({
+      where: { token },
+      select: { uid: true, userId: true },
+    });
+
+    if (existing) {
+      if (existing.userId === userId) {
+        throw new Error('이미 등록된 FCM 토큰입니다.');
+      } else {
+        // 다른 사용자의 토큰이면 삭제
+        await tx.fcmToken.delete({ where: { uid: existing.uid } });
+      }
+    }
+
+    // 해당 사용자의 기존 토큰이 1개 이상이면 가장 오래된 것 삭제
+    const oldTokens = await tx.fcmToken.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'asc' },
+      select: { uid: true },
+    });
+
+    if (oldTokens.length >= 1) {
+      const oldest = oldTokens[0];
+      if (oldest?.uid) {
+        await tx.fcmToken.delete({ where: { uid: oldest.uid } });
+      }
+    }
+
+    // 플랫폼 결정
+    const os = deviceInfo.os?.toLowerCase() || '';
+    let platform: 'ios' | 'android' | 'web' = 'web';
+    if (os === 'ios') {
+      platform = 'ios';
+    } else if (os === 'android') {
+      platform = 'android';
+    }
+
+    // 새 토큰 등록
+    const newToken = await tx.fcmToken.create({
+      data: {
+        userId,
+        token,
+        platform,
+        deviceId: deviceInfo.deviceId || null,
+        appVersion: deviceInfo.appVersion || null,
+        deviceInfo: deviceInfo ? JSON.stringify(deviceInfo) : null,
+      },
+    });
+
+    return newToken;
+  });
+}
+
+/** 모바일 토큰 삭제 (Bridge API용) */
+export async function revokeMobileToken(params: {
+  userId: string;
+  token: string;
+}) {
+  const { userId, token } = params;
+
+  // FCM 토큰 형식 검증
+  if (!token || !/^[a-zA-Z0-9:_\-]{50,}$/.test(token)) {
+    throw new Error('Invalid or missing FCM token.');
+  }
+
+  // 사용자 확인
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true },
+  });
+
+  if (!user) {
+    throw new Error('사용자 정보를 찾을 수 없습니다.');
+  }
+
+  return await prisma.$transaction(async (tx) => {
+    // 토큰 존재 확인
+    const existing = await tx.fcmToken.findUnique({
+      where: { token },
+      select: { uid: true, userId: true },
+    });
+
+    if (!existing) {
+      throw new Error('이미 삭제되었거나 존재하지 않는 토큰입니다.');
+    }
+
+    // 토큰 삭제
+    await tx.fcmToken.delete({ where: { uid: existing.uid } });
+
+    return { removed: 1 };
+  });
+}
+
+/** 모바일 자동 로그인 (Bridge API용) - 토큰으로 사용자 조회 */
+export async function loginByToken(token: string) {
+  // FCM 토큰 형식 검증
+  if (!token || !/^[a-zA-Z0-9:_\-]{50,}$/.test(token)) {
+    throw new Error('Invalid or missing FCM token.');
+  }
+
+  // 토큰으로 사용자 정보 조회
+  const tokenData = await prisma.fcmToken.findUnique({
+    where: { token },
+    select: {
+      userId: true,
+      user: {
+        select: {
+          idx: true,
+          id: true,
+          email: true,
+          name: true,
+          level: true,
+          role: true,
+          isUse: true,
+          isVisible: true,
+          isSignout: true,
+        },
+      },
+    },
+  });
+
+  if (!tokenData) {
+    throw new Error('이미 삭제되었거나 존재하지 않는 토큰입니다.');
+  }
+
+  const user = tokenData.user;
+
+  // 사용자 상태 확인
+  if (!user.isUse || !user.isVisible || user.isSignout) {
+    throw new Error('사용자 정보를 찾을 수 없습니다.');
+  }
+
+  return {
+    idx: user.idx,
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    level: user.level,
+    role: user.role,
+  };
+}
+
+/** 웹 토큰 등록 (Bridge API용) */
+export async function registerWebToken(params: {
+  userId: string;
+  token: string;
+  userAgent?: string;
+  platform?: string;
+  browser?: string;
+  os?: string;
+}) {
+  const { userId, token, userAgent, platform, browser, os } = params;
+
+  // FCM 토큰 형식 검증
+  if (!token || !token.trim()) {
+    throw new Error('Invalid or missing FCM token.');
+  }
+
+  // 사용자 확인
+  const user = await prisma.user.findUnique({
+    where: { idx: parseInt(userId), isUse: true, isVisible: true },
+    select: { id: true, idx: true },
+  });
+
+  if (!user) {
+    throw new Error('사용자 정보를 찾을 수 없습니다.');
+  }
+
+  return await prisma.$transaction(async (tx) => {
+    // 기존에 동일한 토큰이 있는지 확인
+    const existing = await tx.fcmToken.findUnique({
+      where: { token },
+      select: { uid: true },
+    });
+
+    if (existing) {
+      throw new Error('이미 존재하는 토큰입니다.');
+    }
+
+    // 해당 사용자의 웹 토큰이 5개 이상이면 가장 오래된 것 삭제
+    const webTokens = await tx.fcmToken.findMany({
+      where: { userId: user.id, platform: 'web' },
+      orderBy: { createdAt: 'asc' },
+      select: { uid: true },
+    });
+
+    if (webTokens.length >= 5) {
+      const oldest = webTokens[0];
+      if (oldest?.uid) {
+        await tx.fcmToken.delete({ where: { uid: oldest.uid } });
+      }
+    }
+
+    // 디바이스 정보 구성
+    const deviceInfo = {
+      platform: platform || 'desktop',
+      browser: browser || '',
+      os: os || '',
+      userAgent: userAgent?.substring(0, 500) || '',
+    };
+
+    // 새 웹 토큰 등록
+    const newToken = await tx.fcmToken.create({
+      data: {
+        userId: user.id,
+        token,
+        platform: 'web',
+        deviceInfo: JSON.stringify(deviceInfo),
+      },
+    });
+
+    return newToken;
+  });
+}

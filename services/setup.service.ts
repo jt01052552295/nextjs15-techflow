@@ -143,3 +143,43 @@ export async function upsert(input: CreateType) {
 
   return row;
 }
+
+/** 버전 체크 (앱용) */
+export async function getVersionInfo() {
+  const setup = await prisma.setup.findFirst({
+    where: { isDefault: true },
+    select: {
+      aosVersion: true,
+      aosUpdate: true,
+      aosStoreApp: true,
+      aosStoreWeb: true,
+      iosVersion: true,
+      iosUpdate: true,
+      iosStoreApp: true,
+      iosStoreWeb: true,
+    },
+  });
+
+  if (!setup) {
+    return null;
+  }
+
+  return {
+    android: {
+      ver: setup.aosVersion || '',
+      update: parseInt(setup.aosUpdate || '1', 10),
+      store: {
+        app: setup.aosStoreApp || '',
+        web: setup.aosStoreWeb || '',
+      },
+    },
+    ios: {
+      ver: setup.iosVersion || '',
+      update: parseInt(setup.iosUpdate || '1', 10),
+      store: {
+        app: setup.iosStoreApp || '',
+        web: setup.iosStoreWeb || '',
+      },
+    },
+  };
+}
