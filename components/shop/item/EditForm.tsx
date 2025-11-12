@@ -34,6 +34,7 @@ import FormTextField from '@/components/common/form/FormTextField';
 import FormTextarea from '@/components/common/form/FormTextarea';
 import FormEditor from '@/components/common/form/FormEditor';
 import FormSwitch from '@/components/common/form/FormSwitch';
+import ShopCategorySelect from '@/components/common/ShopCategorySelect';
 
 type Props = {
   uid: string;
@@ -103,13 +104,88 @@ export default function EditForm({ uid }: Props) {
     // console.log('edit form', props.uid)
     // console.log(props.rs)
 
+    // 기본 정보
     setValue('item.uid', data.uid ?? '', { shouldValidate: true });
     setValue('item.cid', data.cid ?? '', { shouldValidate: true });
-    setValue('item.name', data.name ?? '', { shouldValidate: true });
+    setValue('item.shopId', data.shopId ?? 0, { shouldValidate: true });
 
+    // 코드 및 카테고리
+    setValue('item.code', data.code ?? '', { shouldValidate: true });
+    setValue('item.categoryCode', data.categoryCode ?? '', {
+      shouldValidate: true,
+    });
+
+    // 상품명 및 설명
+    setValue('item.name', data.name ?? '', { shouldValidate: true });
+    setValue('item.desc1', data.desc1 ?? '', { shouldValidate: true });
+
+    // 가격 정보
+    setValue('item.basicPrice', data.basicPrice ?? 0, { shouldValidate: true });
+    setValue('item.basicPriceDc', data.basicPriceDc ?? 0, {
+      shouldValidate: true,
+    });
+    setValue('item.salePrice', data.salePrice ?? 0, { shouldValidate: true });
+
+    // 상세 설명
+    setValue('item.basicDesc', data.basicDesc ?? null, {
+      shouldValidate: true,
+    });
+    setValue('item.etcDesc', data.etcDesc ?? null, { shouldValidate: true });
+
+    // 재고 및 기간
+    setValue('item.useDuration', data.useDuration ?? 0, {
+      shouldValidate: true,
+    });
+    setValue('item.stock', data.stock ?? 0, { shouldValidate: true });
+    setValue('item.orderMinimumCnt', data.orderMinimumCnt ?? 0, {
+      shouldValidate: true,
+    });
+    setValue('item.orderMaximumCnt', data.orderMaximumCnt ?? 0, {
+      shouldValidate: true,
+    });
+
+    // 상태 플래그
     setValue('item.isUse', !!(data as any).isUse);
     setValue('item.isVisible', !!(data as any).isVisible);
+    setValue('item.isSoldout', !!(data as any).isSoldout);
 
+    // 옵션 데이터 설정
+    if (data.ShopItemOption && data.ShopItemOption.length > 0) {
+      const optionRecords = data.ShopItemOption.map((opt: any) => ({
+        uid: opt.uid ?? undefined,
+        gubun: opt.gubun ?? '',
+        parentId: opt.parentId ?? 0,
+        choiceType: opt.choiceType ?? '',
+        name: opt.name ?? '',
+        price: opt.price ?? 0,
+        stock: opt.stock ?? 0,
+        buyMin: opt.buyMin ?? 0,
+        buyMax: opt.buyMax ?? 0,
+        isUse: !!opt.isUse,
+        isVisible: !!opt.isVisible,
+        isSoldout: !!opt.isSoldout,
+      }));
+      setValue('options', optionRecords, { shouldValidate: true });
+    }
+
+    // 추가구성 데이터 설정
+    if (data.ShopItemSupply && data.ShopItemSupply.length > 0) {
+      const supplyRecords = data.ShopItemSupply.map((sup: any) => ({
+        uid: sup.uid ?? undefined,
+        gubun: sup.gubun ?? '',
+        parentId: sup.parentId ?? 0,
+        choiceType: sup.choiceType ?? '',
+        name: sup.name ?? '',
+        price: sup.price ?? 0,
+        stock: sup.stock ?? 0,
+        isUse: !!sup.isUse,
+        isVisible: !!sup.isVisible,
+        isSoldout: !!sup.isSoldout,
+      }));
+      setValue('supplies', supplyRecords, { shouldValidate: true });
+    }
+
+    // 이미지 파일 설정
     if (data.ShopItemFile) {
       const initialImages =
         data.ShopItemFile.map((file: any) => ({
@@ -226,17 +302,17 @@ export default function EditForm({ uid }: Props) {
                   <div className="row">
                     <div className="col">
                       <div className="mb-2">
-                        <FormTextField
-                          label={t('columns.shopItem.categoryCode')}
+                        <ShopCategorySelect
                           name="item.categoryCode"
-                          register={register}
-                          error={errors.item?.categoryCode}
-                          validMessage={t('common.form.valid')}
-                          readOnly={isPending}
+                          control={control}
+                          label={t('columns.shopItem.categoryCode')}
+                          required
+                          error={errors.item?.categoryCode?.message}
+                          feedbackMessages={{ valid: t('common.form.valid') }}
+                          disabled={isPending}
                           onChange={() =>
                             handleInputChange('item.categoryCode')
                           }
-                          onBlur={() => handleInputChange('item.categoryCode')}
                         />
                       </div>
                       <div className="mb-2">

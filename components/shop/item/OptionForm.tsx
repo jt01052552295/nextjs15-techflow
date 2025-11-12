@@ -239,13 +239,10 @@ const OptionForm = ({
             )}
             <input
               type="hidden"
-              {...register(`options.${index}.parentId`)}
+              {...register(`options.${index}.parentId`, {
+                valueAsNumber: true,
+              })}
               value={0}
-            />
-            <input
-              type="hidden"
-              {...register(`options.${index}.isVisible`)}
-              value="true"
             />
           </div>
         ))}

@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma';
+import { IShopCategory } from '@/types/shop/category';
 
 /**
  * 부모 코드를 기반으로 새 카테고리 코드를 생성합니다
@@ -67,28 +68,31 @@ export function getCategoryLevel(code: string): number {
 /**
  * 데이터베이스에서 모든 카테고리를 가져옵니다
  */
-export async function getAllCategories() {
-  return await prisma.$queryRaw`
-      SELECT * FROM ec_shop_category; 
-      WHERE is_use = true AND is_visible = true 
-      ORDER BY code ASC
-    `;
+export async function getAllCategories(): Promise<IShopCategory[]> {
+  return prisma.$queryRaw<IShopCategory[]>`
+    SELECT *
+    FROM \`ec_shop_category\`
+    WHERE \`is_use\` = 1 AND \`is_visible\` = 1
+    ORDER BY \`code\` ASC
+  `;
 }
 
 /**
  * 부모 카테고리의 하위 카테고리를 가져옵니다
  * @param parentCode 부모 카테고리 코드
  */
-export async function getChildCategories(parentCode: string) {
+export async function getChildCategories(
+  parentCode: string,
+): Promise<IShopCategory[]> {
   const parentLength = parentCode.length;
   const childLength = parentLength + 2;
 
-  return await prisma.$queryRaw`
-      SELECT * FROM ec_shop_category; 
-      WHERE is_use = true 
-      AND code LIKE ${parentCode + '%'} 
-      AND code <> ${parentCode} 
-      AND CHAR_LENGTH(code) = ${childLength} 
-      ORDER BY code ASC
+  return await prisma.$queryRaw<IShopCategory[]>`
+      SELECT * FROM \`ec_shop_category\`; 
+      WHERE \`is_use\` = 1 
+      AND \`code\` LIKE ${parentCode + '%'} 
+      AND \`code\` <> ${parentCode} 
+      AND \`CHAR_LENGTH(code)\` = ${childLength} 
+      ORDER BY \`code\` ASC
     `;
 }

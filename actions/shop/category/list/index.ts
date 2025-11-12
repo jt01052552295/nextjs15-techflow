@@ -4,6 +4,7 @@ import type { ListParams, ListResult } from '@/types/shop/category';
 import { list } from '@/services/shop/category.service';
 import type { IShopCategoryListRow } from '@/types/shop/category';
 import { fmtDateD } from '@/lib/util';
+import { getAllCategories } from '@/lib/shop/category-utils';
 
 export async function listAction(
   params?: ListParams,
@@ -27,4 +28,8 @@ function toDTO(row: any): IShopCategoryListRow {
     createdAt: fmtDateD(row.createdAt),
     updatedAt: fmtDateD(row.updatedAt),
   };
+}
+
+export async function fetchAllShopCategoryAction() {
+  return await getAllCategories();
 }

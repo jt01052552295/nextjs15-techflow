@@ -331,45 +331,30 @@ export async function update(input: UpdateType) {
 
     // 3) 본문 업데이트 + 관계 include
     const data: any = {
-      item: {
-        shopId: item.shopId ?? 0,
+      shopId: item.shopId ?? 0,
 
-        code: item.code ?? '',
-        categoryCode: item.categoryCode ?? '',
+      code: item.code ?? '',
+      categoryCode: item.categoryCode ?? '',
 
-        name: item.name,
-        nameEn: item.nameEn ?? '',
-        desc1: item.desc1 ?? '',
+      name: item.name,
+      desc1: item.desc1 ?? '',
 
-        basicPrice: item.basicPrice ?? 0,
-        basicPriceDc: item.basicPriceDc ?? 0,
-        salePrice: item.salePrice ?? 0,
+      basicPrice: item.basicPrice ?? 0,
+      basicPriceDc: item.basicPriceDc ?? 0,
+      salePrice: item.salePrice ?? 0,
 
-        basicDesc: item.basicDesc ?? null,
-        etcDesc: item.etcDesc ?? null,
+      basicDesc: item.basicDesc ?? null,
+      etcDesc: item.etcDesc ?? null,
 
-        useBasicPeople: item.useBasicPeople ?? 0,
-        useAccount: item.useAccount ?? 0,
-        useMaxPeople: item.useMaxPeople ?? 0,
-        useMaxSign: item.useMaxSign ?? 0,
-        useMaxUpload: item.useMaxUpload ?? 0,
-        useDuration: item.useDuration ?? 0,
+      useDuration: item.useDuration ?? 0,
+      stock: item.stock ?? 0,
 
-        rSend: item.rSend ?? false,
-        stock: item.stock ?? 0,
+      isUse: item.isUse ?? true,
+      isVisible: item.isVisible ?? true,
+      isSoldout: item.isSoldout ?? false,
 
-        ymd: item.ymd ?? '',
-        his: item.his ?? '',
-
-        isUse: item.isUse ?? false,
-        isVisible: item.isVisible ?? false,
-        isNft: item.isNft ?? false,
-        isSoldout: item.isSoldout ?? false,
-
-        orderMinimumCnt: item.orderMinimumCnt ?? 0,
-        orderMaximumCnt: item.orderMaximumCnt ?? 0,
-        sortOrder: item.sortOrder ?? 0,
-      },
+      orderMinimumCnt: item.orderMinimumCnt ?? 0,
+      orderMaximumCnt: item.orderMaximumCnt ?? 0,
     };
 
     // 3-1) 새 파일 추가 (기존과 중복 URL 제외)

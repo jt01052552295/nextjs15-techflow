@@ -211,13 +211,10 @@ const SupplyForm = ({
             )}
             <input
               type="hidden"
-              {...register(`supplies.${index}.parentId`)}
+              {...register(`supplies.${index}.parentId`, {
+                valueAsNumber: true,
+              })}
               value={0}
-            />
-            <input
-              type="hidden"
-              {...register(`supplies.${index}.isVisible`)}
-              value="true"
             />
           </div>
         ))}
