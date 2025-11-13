@@ -78,7 +78,7 @@ export type IShopItemFileListRow = IShopItemFile & {
 export interface IShopItemOption {
   idx: number;
   uid: string;
-  itemId: number; // 상품 ID
+  pid: string; // 상품 ID
   gubun: string; // 구분
   parentId: number; // 부모 옵션 ID (루트면 0)
   choiceType: string; // 선택 유형
@@ -103,7 +103,7 @@ export type IShopItemOptionListRow = IShopItemOption & {
 export interface IShopItemSupply {
   idx: number;
   uid: string;
-  itemId: number; // 상품 ID
+  pid: string; // 상품 ID
   gubun: string; // 구분
   parentId: number; // 부모 구성 ID (루트면 0)
   choiceType: string; // 선택 유형

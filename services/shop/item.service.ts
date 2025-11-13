@@ -178,94 +178,81 @@ export async function create(input: CreateType) {
   }
 
   const result = await prisma.$transaction(async (tx) => {
-    const createData: any = {
+    const created = await tx.shopItem.create({
       data: {
         uid: item.uid,
         shopId: item.shopId ?? 0,
-
         code: item.code,
         categoryCode: item.categoryCode,
-
         name: item.name,
         desc1: item.desc1 ?? '',
-
         basicPrice: item.basicPrice ?? 0,
         basicPriceDc: item.basicPriceDc ?? 0,
         salePrice: item.salePrice ?? 0,
-
         basicDesc: item.basicDesc ?? null,
         etcDesc: item.etcDesc ?? null,
-
         useDuration: item.useDuration ?? 0,
-
         stock: item.stock ?? 0,
-
         isUse: item.isUse ?? true,
         isVisible: item.isVisible ?? true,
         isSoldout: item.isSoldout ?? false,
-
         orderMinimumCnt: item.orderMinimumCnt ?? 0,
         orderMaximumCnt: item.orderMaximumCnt ?? 0,
       },
-      include: {
-        ShopCategory: true,
-        ShopItemFile: true,
-        ShopItemOption: true,
-        ShopItemSupply: true,
-      },
-    };
+    });
 
     // 파일
     if (files && files.length > 0) {
-      const fileRecords = files.map((f) => ({
-        pid: item.uid,
-        name: f.name ?? '',
-        originalName: f.originalName,
-        url: f.url,
-        size: f.size,
-        ext: f.ext,
-        type: f.type,
-      }));
-      createData.data.ShopItemFile = { create: fileRecords };
+      await tx.shopItemFile.createMany({
+        data: files.map((f) => ({
+          pid: item.uid,
+          name: f.name ?? '',
+          originalName: f.originalName,
+          url: f.url,
+          size: f.size,
+          ext: f.ext,
+          type: f.type,
+        })),
+      });
     }
 
     // 옵션
     if (options && options.length > 0) {
-      const optionRecords = options.map((o) => ({
-        pid: item.uid,
-        gubun: o.gubun ?? '',
-        parentId: o.parentId ?? 0,
-        choiceType: o.choiceType ?? '',
-        name: o.name,
-        price: o.price ?? 0,
-        stock: o.stock ?? 0,
-        buyMin: o.buyMin ?? 0,
-        buyMax: o.buyMax ?? 0,
-        isUse: o.isUse ?? true,
-        isVisible: o.isVisible ?? true,
-        isSoldout: o.isSoldout ?? false,
-      }));
-      createData.data.ShopItemOption = { create: optionRecords };
+      await tx.shopItemOption.createMany({
+        data: options.map((o) => ({
+          pid: item.uid,
+          gubun: o.gubun ?? '',
+          parentId: o.parentId ?? 0,
+          choiceType: o.choiceType ?? '',
+          name: o.name,
+          price: o.price ?? 0,
+          stock: o.stock ?? 0,
+          buyMin: o.buyMin ?? 0,
+          buyMax: o.buyMax ?? 0,
+          isUse: o.isUse ?? true,
+          isVisible: o.isVisible ?? true,
+          isSoldout: o.isSoldout ?? false,
+        })),
+      });
     }
 
     // 추가구성
     if (supplies && supplies.length > 0) {
-      const supplyRecords = supplies.map((s) => ({
-        pid: item.uid,
-        gubun: s.gubun ?? '',
-        parentId: s.parentId ?? 0,
-        choiceType: s.choiceType ?? '',
-        name: s.name,
-        price: s.price ?? 0,
-        stock: s.stock ?? 0,
-        isUse: s.isUse ?? true,
-        isVisible: s.isVisible ?? true,
-        isSoldout: s.isSoldout ?? false,
-      }));
-      createData.data.ShopItemSupply = { create: supplyRecords };
+      await tx.shopItemSupply.createMany({
+        data: supplies.map((s) => ({
+          pid: item.uid,
+          gubun: s.gubun ?? '',
+          parentId: s.parentId ?? 0,
+          choiceType: s.choiceType ?? '',
+          name: s.name,
+          price: s.price ?? 0,
+          stock: s.stock ?? 0,
+          isUse: s.isUse ?? true,
+          isVisible: s.isVisible ?? true,
+          isSoldout: s.isSoldout ?? false,
+        })),
+      });
     }
-
-    const created = await tx.shopItem.create(createData);
 
     // 정렬 기본값: sortOrder = idx
     await tx.shopItem.update({
@@ -329,35 +316,31 @@ export async function update(input: UpdateType) {
       });
     }
 
-    // 3) 본문 업데이트 + 관계 include
-    const data: any = {
-      shopId: item.shopId ?? 0,
+    // 3) 본문 업데이트
+    await tx.shopItem.update({
+      where: { uid: item.uid },
+      data: {
+        shopId: item.shopId ?? 0,
+        code: item.code ?? '',
+        categoryCode: item.categoryCode ?? '',
+        name: item.name,
+        desc1: item.desc1 ?? '',
+        basicPrice: item.basicPrice ?? 0,
+        basicPriceDc: item.basicPriceDc ?? 0,
+        salePrice: item.salePrice ?? 0,
+        basicDesc: item.basicDesc ?? null,
+        etcDesc: item.etcDesc ?? null,
+        useDuration: item.useDuration ?? 0,
+        stock: item.stock ?? 0,
+        isUse: item.isUse ?? true,
+        isVisible: item.isVisible ?? true,
+        isSoldout: item.isSoldout ?? false,
+        orderMinimumCnt: item.orderMinimumCnt ?? 0,
+        orderMaximumCnt: item.orderMaximumCnt ?? 0,
+      },
+    });
 
-      code: item.code ?? '',
-      categoryCode: item.categoryCode ?? '',
-
-      name: item.name,
-      desc1: item.desc1 ?? '',
-
-      basicPrice: item.basicPrice ?? 0,
-      basicPriceDc: item.basicPriceDc ?? 0,
-      salePrice: item.salePrice ?? 0,
-
-      basicDesc: item.basicDesc ?? null,
-      etcDesc: item.etcDesc ?? null,
-
-      useDuration: item.useDuration ?? 0,
-      stock: item.stock ?? 0,
-
-      isUse: item.isUse ?? true,
-      isVisible: item.isVisible ?? true,
-      isSoldout: item.isSoldout ?? false,
-
-      orderMinimumCnt: item.orderMinimumCnt ?? 0,
-      orderMaximumCnt: item.orderMaximumCnt ?? 0,
-    };
-
-    // 3-1) 새 파일 추가 (기존과 중복 URL 제외)
+    // 4) 새 파일 추가 (기존과 중복 URL 제외)
     if (files && files.length > 0) {
       const existing = await tx.shopItemFile.findMany({
         where: { pid: item.uid },
@@ -366,8 +349,9 @@ export async function update(input: UpdateType) {
       const existingUrls = new Set(existing.map((f) => f.url));
       const newFiles = files.filter((f) => f.url && !existingUrls.has(f.url));
       if (newFiles.length > 0) {
-        data.ShopItemFile = {
-          create: newFiles.map((f) => ({
+        await tx.shopItemFile.createMany({
+          data: newFiles.map((f) => ({
+            pid: item.uid,
             name: f.name ?? '',
             originalName: f.originalName,
             url: f.url,
@@ -375,15 +359,16 @@ export async function update(input: UpdateType) {
             ext: f.ext,
             type: f.type,
           })),
-        };
+        });
       }
     }
 
-    // 3-2) 옵션 create/update 분기
+    // 5) 옵션 update/create
     if (options && options.length > 0) {
-      const updateOptionRecords = options
-        .filter((o) => !!o.uid)
-        .map((o) => ({
+      // 기존 옵션 업데이트
+      const updateOptions = options.filter((o) => !!o.uid);
+      for (const o of updateOptions) {
+        await tx.shopItemOption.update({
           where: { uid: o.uid! },
           data: {
             gubun: o.gubun ?? '',
@@ -398,39 +383,37 @@ export async function update(input: UpdateType) {
             isVisible: o.isVisible ?? true,
             isSoldout: o.isSoldout ?? false,
           },
-        }));
+        });
+      }
 
-      const createOptionRecords = options
-        .filter((o) => !o.uid)
-        .map((o) => ({
-          gubun: o.gubun ?? '',
-          parentId: o.parentId ?? 0,
-          choiceType: o.choiceType ?? '',
-          name: o.name,
-          price: o.price ?? 0,
-          stock: o.stock ?? 0,
-          buyMin: o.buyMin ?? 0,
-          buyMax: o.buyMax ?? 0,
-          isUse: o.isUse ?? true,
-          isVisible: o.isVisible ?? true,
-          isSoldout: o.isSoldout ?? false,
-        }));
-
-      data.ShopItemOption = {
-        ...(updateOptionRecords.length > 0
-          ? { update: updateOptionRecords }
-          : {}),
-        ...(createOptionRecords.length > 0
-          ? { create: createOptionRecords }
-          : {}),
-      };
+      // 새 옵션 생성
+      const createOptions = options.filter((o) => !o.uid);
+      if (createOptions.length > 0) {
+        await tx.shopItemOption.createMany({
+          data: createOptions.map((o) => ({
+            pid: item.uid,
+            gubun: o.gubun ?? '',
+            parentId: o.parentId ?? 0,
+            choiceType: o.choiceType ?? '',
+            name: o.name,
+            price: o.price ?? 0,
+            stock: o.stock ?? 0,
+            buyMin: o.buyMin ?? 0,
+            buyMax: o.buyMax ?? 0,
+            isUse: o.isUse ?? true,
+            isVisible: o.isVisible ?? true,
+            isSoldout: o.isSoldout ?? false,
+          })),
+        });
+      }
     }
 
-    // 3-3) 추가 create/update 분기
+    // 6) 추가구성 update/create
     if (supplies && supplies.length > 0) {
-      const updateSupplyRecords = supplies
-        .filter((s) => !!s.uid)
-        .map((s) => ({
+      // 기존 추가구성 업데이트
+      const updateSupplies = supplies.filter((s) => !!s.uid);
+      for (const s of updateSupplies) {
+        await tx.shopItemSupply.update({
           where: { uid: s.uid! },
           data: {
             gubun: s.gubun ?? '',
@@ -439,39 +422,36 @@ export async function update(input: UpdateType) {
             name: s.name,
             price: s.price ?? 0,
             stock: s.stock ?? 0,
-            isUse: s.isUse ?? false,
-            isVisible: s.isVisible ?? false,
+            isUse: s.isUse ?? true,
+            isVisible: s.isVisible ?? true,
             isSoldout: s.isSoldout ?? false,
           },
-        }));
+        });
+      }
 
-      const createSupplyRecords = supplies
-        .filter((s) => !s.uid)
-        .map((s) => ({
-          gubun: s.gubun ?? '',
-          parentId: s.parentId ?? 0,
-          choiceType: s.choiceType ?? '',
-          name: s.name,
-          price: s.price ?? 0,
-          stock: s.stock ?? 0,
-          isUse: s.isUse ?? true,
-          isVisible: s.isVisible ?? true,
-          isSoldout: s.isSoldout ?? false,
-        }));
-
-      data.ShopItemSupply = {
-        ...(updateSupplyRecords.length > 0
-          ? { update: updateSupplyRecords }
-          : {}),
-        ...(createSupplyRecords.length > 0
-          ? { create: createSupplyRecords }
-          : {}),
-      };
+      // 새 추가구성 생성
+      const createSupplies = supplies.filter((s) => !s.uid);
+      if (createSupplies.length > 0) {
+        await tx.shopItemSupply.createMany({
+          data: createSupplies.map((s) => ({
+            pid: item.uid,
+            gubun: s.gubun ?? '',
+            parentId: s.parentId ?? 0,
+            choiceType: s.choiceType ?? '',
+            name: s.name,
+            price: s.price ?? 0,
+            stock: s.stock ?? 0,
+            isUse: s.isUse ?? true,
+            isVisible: s.isVisible ?? true,
+            isSoldout: s.isSoldout ?? false,
+          })),
+        });
+      }
     }
 
-    const updated = await tx.shopItem.update({
+    // 7) 최종 결과 반환
+    const updated = await tx.shopItem.findUnique({
       where: { uid: item.uid },
-      data,
       include: {
         ShopCategory: true,
         ShopItemFile: true,
@@ -480,12 +460,11 @@ export async function update(input: UpdateType) {
       },
     });
 
-    return updated;
+    return updated!;
   });
 
   return rs;
 }
-
 /** 삭제 */
 export async function remove(input: DeleteInput): Promise<DeleteResult> {
   const { uid, uids, hard = false } = input;

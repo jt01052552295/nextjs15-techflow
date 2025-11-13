@@ -1215,8 +1215,7 @@ model ShopItemFile {
 model ShopItemOption {
   idx         Int           @id @default(autoincrement())
   uid         String        @unique @default(uuid())
-  itemId      Int           @map("item")
-  pid         String
+  pid         String        
   gubun       String        @default("") @db.VarChar(45)
   parentId    Int           @default(0)
   choiceType  String        @default("") @map("choice_type") @db.VarChar(255)
@@ -1232,14 +1231,13 @@ model ShopItemOption {
   updatedAt   DateTime      @default(now()) @updatedAt @map("updated_at") // 날짜 필드 추가
   
   // 관계 설정
-  ShopItem    ShopItem      @relation(fields: [itemId], references: [idx], onDelete: Cascade)
+  ShopItem    ShopItem      @relation(fields: [pid], references: [uid], onDelete: Cascade)
   parent      ShopItemOption? @relation("OptionHierarchy", fields: [parentId], references: [idx], onUpdate: NoAction, onDelete: NoAction)
   children    ShopItemOption[] @relation("OptionHierarchy")
 
   ShopCartOption     ShopCartOption[]
   ShopOrderOption    ShopOrderOption[]
 
-  @@index([itemId])
   @@index([pid], map: "pid_index")
   @@index([parentId])
   @@map("ec_shop_item_option")
@@ -1249,8 +1247,7 @@ model ShopItemOption {
 model ShopItemSupply {
   idx         Int            @id @default(autoincrement())
   uid         String         @unique @default(uuid())
-  itemId      Int            @map("item")
-  pid         String
+  pid         String         
   gubun       String         @default("") @db.VarChar(45)
   parentId    Int            @default(0)
   choiceType  String         @default("") @map("choice_type") @db.VarChar(255)
@@ -1264,13 +1261,13 @@ model ShopItemSupply {
   updatedAt   DateTime       @default(now()) @updatedAt @map("updated_at")
   
   // 관계 설정
-  ShopItem    ShopItem       @relation(fields: [itemId], references: [idx], onDelete: Cascade)
+  ShopItem    ShopItem       @relation(fields: [pid], references: [uid], onDelete: Cascade)
   parent      ShopItemSupply? @relation("SupplyHierarchy", fields: [parentId], references: [idx], onUpdate: NoAction, onDelete: NoAction)
   children    ShopItemSupply[] @relation("SupplyHierarchy")
   ShopCartSupply ShopCartSupply[]
   ShopOrderSupply     ShopOrderSupply[] 
 
-  @@index([itemId])
+
   @@index([pid], map: "pid_index")
   @@index([parentId])
   @@map("ec_shop_item_supply")
