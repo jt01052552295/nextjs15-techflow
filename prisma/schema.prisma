@@ -1315,8 +1315,8 @@ model ShopCart {
 model ShopCartOption {
   idx          Int       @id @default(autoincrement())
   uid          String    @unique @default(uuid())
-  cartId       Int       @map("cart_id") // 장바구니 ID (ShopCart.idx)
-  optionId     Int       @map("option_id") // 상품 옵션 ID (ShopItemOption.idx)
+  cartId       Int       @map("cart") // 장바구니 ID (ShopCart.idx)
+  optionId     Int       @map("option") // 상품 옵션 ID (ShopItemOption.idx)
   name         String    @default("") @db.VarChar(255) // 옵션명
   price        Int       @default(0) // 옵션 가격
   quantity     Int       @default(1) @map("cnt") // 옵션 수량
@@ -1335,8 +1335,8 @@ model ShopCartOption {
 model ShopCartSupply {
   idx          Int       @id @default(autoincrement())
   uid          String    @unique @default(uuid())
-  cartId       Int       @map("cart_id") // 장바구니 ID (ShopCart.idx)
-  supplyId     Int       @map("supply_id") // 추가상품 ID (ShopItemSupply.idx)
+  cartId       Int       @map("cart") // 장바구니 ID (ShopCart.idx)
+  supplyId     Int       @map("supply") // 추가상품 ID (ShopItemSupply.idx)
   name         String    @default("") @db.VarChar(255) // 추가상품명
   price        Int       @default(0) // 추가상품 가격
   quantity     Int       @default(1) @map("cnt") // 추가상품 수량
@@ -1430,8 +1430,8 @@ model ShopOrder {
 model ShopOrderItem {
   idx          Int       @id @default(autoincrement())
   uid          String    @unique @default(uuid())
-  orderId      Int       @map("order_id") // ShopOrder.idx 참조
-  itemId       Int       @map("item_id") // ShopItem.idx 참조
+  orderId      Int       @map("order") // ShopOrder.idx 참조
+  itemId       Int       @map("item") // ShopItem.idx 참조
   itemName     String    @map("item_name") @db.VarChar(255) // 상품명
   quantity     Int       @default(0) @map("cnt") // 수량
   salePrice    Int       @default(0) @map("sale_price") // 기본 판매가
@@ -1458,8 +1458,8 @@ model ShopOrderItem {
 model ShopOrderOption {
   idx          Int       @id @default(autoincrement())
   uid          String    @unique @default(uuid())
-  orderItemId  Int       @map("order_item_id") // ShopOrderItem.idx 참조
-  optionId     Int       @map("option_id") // ShopItemOption.idx 참조
+  orderItemId  Int       @map("order_item") // ShopOrderItem.idx 참조
+  optionId     Int       @map("option") // ShopItemOption.idx 참조
   name         String    @default("") @db.VarChar(255) // 옵션명
   price        Int       @default(0) // 옵션 가격
   quantity     Int       @default(1) @map("cnt") // 옵션 수량
@@ -1478,8 +1478,8 @@ model ShopOrderOption {
 model ShopOrderSupply {
   idx          Int       @id @default(autoincrement())
   uid          String    @unique @default(uuid())
-  orderItemId  Int       @map("order_item_id") // ShopOrderItem.idx 참조
-  supplyId     Int       @map("supply_id") // ShopItemSupply.idx 참조
+  orderItemId  Int       @map("order_item") // ShopOrderItem.idx 참조
+  supplyId     Int       @map("supply") // ShopItemSupply.idx 참조
   name         String    @default("") @db.VarChar(255) // 추가상품명
   price        Int       @default(0) // 추가상품 가격
   quantity     Int       @default(1) @map("cnt") // 추가상품 수량
@@ -1498,7 +1498,7 @@ model ShopOrderSupply {
 model ShopOrderPayment {
   idx           Int       @id @default(autoincrement())
   uid           String    @unique @default(uuid())
-  orderId       Int       @map("order_id") // ShopOrder.idx 참조
+  orderId       Int       @map("order") // ShopOrder.idx 참조
   gubun         String    @default("shop") @db.VarChar(45) // 구분값 (예: shop, subs 등)
   applyNum      String    @default("") @map("apply_num") @db.VarChar(255) // PG 승인번호
   amount        Int       @default(0) // 결제 요청 금액
