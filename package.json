@@ -22,7 +22,7 @@
     "lint-and-format:fix": "ESLint && Prettier 동시수정"
   },
   "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/todoComment.ts"
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed-shop-order.ts"
   },
   "dependencies": {
     "@faker-js/faker": "^9.7.0",
