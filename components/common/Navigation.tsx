@@ -86,6 +86,7 @@ const Navigation = () => {
       subMenus: [
         { id: 'shopCategory-list', route: 'shopCategory.index' },
         { id: 'shopItem-list', route: 'shopItem.index' },
+        { id: 'shopOrder-list', route: 'shopOrder.index' },
       ],
     },
     {

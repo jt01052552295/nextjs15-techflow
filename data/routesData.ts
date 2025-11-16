@@ -203,4 +203,10 @@ export const routesData = {
     show: '/shop/item/{id}',
     edit: '/shop/item/{id}/edit',
   },
+  shopOrder: {
+    index: '/shop/order',
+    create: '/shop/order/p/create',
+    show: '/shop/order/{id}',
+    edit: '/shop/order/{id}/edit',
+  },
 };

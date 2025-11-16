@@ -311,3 +311,8 @@ export const isImageFile = (url: string): boolean => {
   const extension = url.toLowerCase().substring(url.lastIndexOf('.'));
   return imageExtensions.includes(extension);
 };
+
+export function formatKrw(value: number | null | undefined) {
+  if (value == null) return '-';
+  return `${value.toLocaleString('ko-KR')}원`;
+}

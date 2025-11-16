@@ -771,5 +771,155 @@
     "isSoldout": "품절 여부",
     "createdAt": "생성일",
     "updatedAt": "수정일"
+  },
+  "shopOrder": {
+    "t": "주문",
+    "idx": "인덱스",
+    "uid": "UUID",
+    "ordNo": "주문번호",
+    "shopId": "쇼핑몰 ID",
+    "sellerId": "판매자 ID",
+    "userId": "회원 ID",
+    "userIdx": "회원 번호",
+    "gubun": "구분(일반/단체/정기 등)",
+
+    "basicPrice": "기본 상품 금액 합계",
+    "optionPrice": "옵션 추가 금액 합계",
+    "deliveryPrice": "배송비",
+    "boxDc": "포장/박스 할인",
+    "payPrice": "총 결제 금액",
+    "stock": "재고 반영 여부",
+    "memo": "주문 메모",
+
+    "orderPaid": "결제 여부 상태",
+    "orderStatus": "주문 상태",
+    "cancelStatus": "취소 상태",
+    "cancelRequestedBy": "취소요청 주체",
+    "cancelRequestedAt": "취소요청 일시",
+    "cancelReasonCode": "취소 사유 코드",
+    "cancelReasonText": "취소 사유(직접입력)",
+    "cancelRejectedReasonText": "취소 거절 사유",
+
+    "paymethod": "결제 수단",
+
+    "name": "주문자명",
+    "email": "주문자 이메일",
+    "hp": "주문자 휴대폰",
+    "zipcode": "주문자 우편번호",
+    "jibunAddr1": "지번 주소1",
+    "jibunAddr2": "지번 주소2",
+    "roadAddr1": "도로명 주소1",
+    "roadAddr2": "도로명 주소2",
+
+    "rcvStore": "수령 매장명",
+    "rcvName": "수령자명",
+    "rcvHp": "수령자 연락처",
+    "rcvEmail": "수령자 이메일",
+    "rcvDate": "희망 수령일",
+    "rcvAddr1": "수령 주소1",
+    "rcvAddr2": "수령 주소2",
+    "rcvZipcode": "수령자 우편번호",
+
+    "bankAccount": "무통장입금 계좌 ID",
+    "bankDepositName": "입금자명",
+    "payEmail": "결제자 이메일",
+    "payRepresent": "대표 결제 여부",
+    "payDay": "결제일",
+    "payYear": "연결제 여부",
+    "payPeople": "사용 인원",
+
+    "ipAddress": "IP 주소",
+    "merchantData": "PG 원본 데이터",
+    "createdAt": "생성일",
+    "isUse": "사용",
+    "isVisible": "표시"
+  },
+
+  "shopOrderItem": {
+    "t": "주문상품",
+    "idx": "인덱스",
+    "uid": "UUID",
+    "orderId": "주문 ID",
+    "itemId": "상품 ID",
+    "itemName": "상품명",
+    "quantity": "수량",
+    "salePrice": "기본 판매가",
+    "optionPrice": "옵션 추가금액",
+    "supplyPrice": "추가상품 금액",
+    "totalPrice": "총 결제예정금액",
+    "cartNo": "장바구니 코드",
+    "statusCode": "상품별 상태코드",
+    "createdAt": "생성일"
+  },
+
+  "shopOrderOption": {
+    "t": "주문옵션",
+    "idx": "인덱스",
+    "uid": "UUID",
+    "orderItemId": "주문상품 ID",
+    "optionId": "옵션 ID",
+    "name": "옵션명",
+    "price": "옵션 가격",
+    "quantity": "옵션 수량",
+    "createdAt": "생성일"
+  },
+
+  "shopOrderSupply": {
+    "t": "주문추가상품",
+    "idx": "인덱스",
+    "uid": "UUID",
+    "orderItemId": "주문상품 ID",
+    "supplyId": "추가상품 ID",
+    "name": "추가상품명",
+    "price": "추가상품 가격",
+    "quantity": "추가상품 수량",
+    "createdAt": "생성일"
+  },
+
+  "shopOrderPayment": {
+    "t": "주문결제",
+    "idx": "인덱스",
+    "uid": "UUID",
+    "orderId": "주문 ID",
+    "gubun": "구분",
+
+    "applyNum": "PG 승인번호",
+    "amount": "결제 요청 금액",
+    "cancelAmount": "취소 금액",
+
+    "buyerAddr": "구매자 주소",
+    "buyerEmail": "구매자 이메일",
+    "buyerName": "구매자 이름",
+    "buyerPostcode": "구매자 우편번호",
+    "buyerTel": "구매자 연락처",
+
+    "cardName": "카드사명",
+    "cardNumber": "카드 번호(마스킹)",
+    "cardQuota": "할부 개월 수",
+
+    "customData": "사용자 정의 데이터",
+
+    "impUid": "아임포트 거래 고유번호",
+    "merchantUid": "주문 고유번호",
+    "name": "결제 상품명",
+
+    "paidAmount": "실결제 금액",
+    "paidAt": "결제 완료 시각(타임스탬프)",
+    "cancelledAt": "결제 취소 시각(타임스탬프)",
+
+    "payMethod": "결제 수단",
+    "pgProvider": "PG사 이름",
+    "pgTid": "PG 거래번호",
+    "pgType": "결제 PG 타입",
+    "receiptUrl": "영수증 URL",
+    "status": "결제 상태",
+
+    "orderData": "주문 데이터 백업",
+    "device": "접속 기기정보",
+    "shopId": "쇼핑몰 ID",
+    "sellerId": "판매자 ID",
+    "createdAt": "생성일",
+    "isUse": "사용",
+    "isVisible": "표시"
   }
 }

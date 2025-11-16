@@ -1369,6 +1369,12 @@ model ShopOrder {
   orderPaid       String    @default("") @map("order_paid") @db.VarChar(255) // 결제 여부 상태
   orderStatus     String    @default("") @map("order_status") @db.VarChar(255) // 주문 상태
   cancelStatus    String    @default("") @map("cancel_status") @db.VarChar(255) // 취소 상태
+  cancelRequestedBy  String   @default("") @map("cancel_requested_by") @db.VarChar(45)
+  cancelRequestedAt  DateTime? @map("cancel_requested_at")
+  cancelReasonCode   String   @default("") @map("cancel_reason_code") @db.VarChar(45)
+  cancelReasonText   String?  @map("cancel_reason_text") @db.VarChar(500)
+  cancelRejectedReasonText String? @map("cancel_rejected_reason_text") @db.VarChar(500)
+
   paymethod       String    @default("") @map("paymethod") @db.VarChar(45) // 결제 수단
   
   // 주문자 정보

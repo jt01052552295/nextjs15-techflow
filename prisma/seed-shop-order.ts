@@ -15,6 +15,8 @@ const USER_IDS = [
   '81cf6d86-72da-45ad-8440-2ea76ded67bb',
   'ab249162-a286-4c48-9778-c4b8747b4554',
   'ab84dabf-2029-469c-b2a6-03b421f492c1',
+  'c7f6ee32-aa08-46db-b82d-b3a021a2eb8a',
+  'c2d35ab7-27ea-4d00-925b-b4d7efe442ee',
 ];
 
 async function main() {
@@ -105,7 +107,7 @@ async function main() {
         optionPrice,
         supplyPrice,
         totalPrice,
-        statusCode: 'order_complete',
+        statusCode: 'payment_complete',
       };
 
       // 주문 옵션 (ShopOrderOption) 생성
