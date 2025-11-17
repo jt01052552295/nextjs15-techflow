@@ -1705,8 +1705,9 @@ model ShopReview {
   userIdx      Int       @default(0) @map("user") // 작성자 회원 ID (User.idx)
   userId       String?   @map("user_id") // 다른 테이블 패턴과 일관성을 위해 추가
   subject      String    @default("") @db.VarChar(255) // 리뷰 제목
-  content      String?   @db.LongText // 리뷰 내용
-  createdAt    DateTime? @default(now()) @map("created_at") // 등록일시
+  content      String    @db.LongText // 리뷰 내용
+  createdAt    DateTime  @default(now()) @map("created_at") // 등록일시
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") // 수정일시
   score        Int       @default(0) // 평점 (1~5점)
   hit          Int       @default(0) // 조회수
   good         Int       @default(0) // 추천 수
@@ -1714,7 +1715,6 @@ model ShopReview {
   isUse        Boolean   @default(true) @map("use") // 사용여부(y사용,n삭제)
   isVisible    Boolean   @default(true) @map("visible") // 노출여부(y노출,n숨김)
   isSecret     Boolean   @default(false) @map("secret") // 비공개 여부(y/n)
-  ipAddress    String    @default("") @map("ip") @db.VarChar(20) // 작성자 IP
   
   // 관계 설정
   ShopOrder    ShopOrder  @relation(fields: [orderId], references: [idx], onDelete: Cascade)
