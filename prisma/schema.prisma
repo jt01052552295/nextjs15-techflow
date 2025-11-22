@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider     = "mysql"
-  url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
 
@@ -1700,10 +1699,11 @@ model PortoneSchedulePayment {
 model ShopReview {
   idx          Int       @id @default(autoincrement())
   uid          String    @unique @default(uuid()) // 다른 모델과의 일관성을 위해 추가
-  orderId      Int       @default(0) @map("order") // 주문 마스터 ID
+  orderId      Int?       @default(0) @map("order") // 주문 마스터 ID
   itemId       Int       @default(0) @map("item") // 리뷰 대상 상품 ID
-  userIdx      Int       @default(0) @map("user") // 작성자 회원 ID (User.idx)
   userId       String?   @map("user_id") // 다른 테이블 패턴과 일관성을 위해 추가
+  name         String?   @db.VarChar(255)
+  email        String?   @db.VarChar(255)
   subject      String    @default("") @db.VarChar(255) // 리뷰 제목
   content      String    @db.LongText // 리뷰 내용
   createdAt    DateTime  @default(now()) @map("created_at") // 등록일시
@@ -1715,15 +1715,15 @@ model ShopReview {
   isUse        Boolean   @default(true) @map("use") // 사용여부(y사용,n삭제)
   isVisible    Boolean   @default(true) @map("visible") // 노출여부(y노출,n숨김)
   isSecret     Boolean   @default(false) @map("secret") // 비공개 여부(y/n)
+  isAdmin     Boolean   @default(false) @map("is_admin") 
   
   // 관계 설정
-  ShopOrder    ShopOrder  @relation(fields: [orderId], references: [idx], onDelete: Cascade)
+  ShopOrder    ShopOrder?  @relation(fields: [orderId], references: [idx], onDelete: SetNull)
   ShopItem     ShopItem   @relation(fields: [itemId], references: [idx], onDelete: Cascade)
   User         User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([orderId])
   @@index([itemId])
-  @@index([userIdx])
   @@index([userId])
   @@index([score])
   @@map("ec_shop_review")

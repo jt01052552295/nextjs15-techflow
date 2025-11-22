@@ -22,7 +22,7 @@ import EditableCell from './EditableCell';
 import { useLanguage } from '@/components/context/LanguageContext';
 import { getRouteUrl } from '@/utils/routes';
 import { useSearchParams } from 'next/navigation';
-import { getCategoryLevel } from '@/lib/shop/category-utils';
+import { getCategoryLevel } from '@/lib/shop/category-utils.client';
 
 type Props = {
   row: IShopCategoryListRow;
