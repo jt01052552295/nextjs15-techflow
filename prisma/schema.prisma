@@ -1720,7 +1720,7 @@ model ShopReview {
   // 관계 설정
   ShopOrder    ShopOrder?  @relation(fields: [orderId], references: [idx], onDelete: SetNull)
   ShopItem     ShopItem   @relation(fields: [itemId], references: [idx], onDelete: Cascade)
-  User         User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user         User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([orderId])
   @@index([itemId])

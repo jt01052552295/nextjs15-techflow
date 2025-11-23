@@ -30,8 +30,12 @@ import { useSearchParams } from 'next/navigation';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { shopReviewQK } from '@/lib/queryKeys/shop/review';
 import { showAction } from '@/actions/shop/review/show';
+import FormSelect, { SelectOption } from '@/components/common/form/FormSelect';
 import FormTextField from '@/components/common/form/FormTextField';
+import FormTextarea from '@/components/common/form/FormTextarea';
+import FormEditor from '@/components/common/form/FormEditor';
 import FormSwitch from '@/components/common/form/FormSwitch';
+import UserSelect from '@/components/common/UserSelect';
 
 type Props = {
   uid: string;
@@ -49,6 +53,14 @@ export default function EditForm({ uid }: Props) {
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | undefined>('');
   const [isResultOpen, setIsResultOpen] = useState<boolean>(false);
+
+  const cntOptions: SelectOption[] = [
+    { value: '1', label: '1점' },
+    { value: '2', label: '2점' },
+    { value: '3', label: '3점' },
+    { value: '4', label: '4점' },
+    { value: '5', label: '5점' },
+  ];
 
   const { data, isLoading, error } = useQuery({
     queryKey: shopReviewQK.detail(uid),
@@ -68,7 +80,7 @@ export default function EditForm({ uid }: Props) {
     register,
     control,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors, isValid, dirtyFields },
     setValue,
     getValues,
     trigger,
@@ -192,6 +204,7 @@ export default function EditForm({ uid }: Props) {
                           register={register}
                           error={errors?.orderId}
                           validMessage={t('common.form.valid')}
+                          isDirty={!!dirtyFields.orderId}
                           readOnly={isPending}
                           onChange={() => handleInputChange('orderId')}
                           onBlur={() => handleInputChange('orderId')}
@@ -204,22 +217,34 @@ export default function EditForm({ uid }: Props) {
                           register={register}
                           error={errors?.itemId}
                           validMessage={t('common.form.valid')}
+                          isDirty={!!dirtyFields.itemId}
                           readOnly={isPending}
                           onChange={() => handleInputChange('itemId')}
                           onBlur={() => handleInputChange('itemId')}
                         />
                       </div>
                       <div className="mb-2">
-                        <FormTextField
-                          label={t('columns.shopReview.userId')}
+                        <UserSelect
                           name="userId"
-                          register={register}
-                          error={errors?.userId}
-                          validMessage={t('common.form.valid')}
-                          readOnly={isPending}
+                          control={control}
+                          label={t('columns.shopReview.userId')}
+                          required
+                          error={errors.userId?.message}
+                          feedbackMessages={{ valid: t('common.form.valid') }}
+                          disabled={isPending}
                           onChange={() => handleInputChange('userId')}
-                          onBlur={() => handleInputChange('userId')}
                         />
+
+                        {errors.userId?.message && (
+                          <div className="invalid-feedback">
+                            {errors.userId?.message}
+                          </div>
+                        )}
+                        {!errors.userId && (
+                          <div className="valid-feedback">
+                            {t('common.form.valid')}
+                          </div>
+                        )}
                       </div>
 
                       <div className="mb-2">
@@ -229,31 +254,42 @@ export default function EditForm({ uid }: Props) {
                           register={register}
                           error={errors?.subject}
                           validMessage={t('common.form.valid')}
+                          isDirty={!!dirtyFields.subject}
                           readOnly={isPending}
                           onChange={() => handleInputChange('subject')}
                           onBlur={() => handleInputChange('subject')}
                         />
                       </div>
                       <div className="mb-2">
-                        <FormTextField
+                        <FormEditor
+                          label={t('columns.shopReview.content')}
+                          name="content"
+                          control={control}
+                        />
+                        {/* <FormTextarea
                           label={t('columns.shopReview.content')}
                           name="content"
                           register={register}
-                          error={errors?.content}
+                          error={errors.content}
                           validMessage={t('common.form.valid')}
+                          isDirty={!!dirtyFields.content}
                           readOnly={isPending}
+                          minRows={3}
+                          maxRows={10}
                           onChange={() => handleInputChange('content')}
                           onBlur={() => handleInputChange('content')}
-                        />
+                        /> */}
                       </div>
                       <div className="mb-2">
-                        <FormTextField
+                        <FormSelect
                           label={t('columns.shopReview.score')}
                           name="score"
                           register={register}
-                          error={errors?.score}
+                          options={cntOptions}
+                          error={errors.score}
                           validMessage={t('common.form.valid')}
-                          readOnly={isPending}
+                          isDirty={!!dirtyFields.score}
+                          placeholder={t('common.choose')}
                           onChange={() => handleInputChange('score')}
                           onBlur={() => handleInputChange('score')}
                         />
@@ -278,6 +314,7 @@ export default function EditForm({ uid }: Props) {
                           register={register}
                           error={errors?.name}
                           validMessage={t('common.form.valid')}
+                          isDirty={!!dirtyFields.name}
                           readOnly={isPending}
                           onChange={() => handleInputChange('name')}
                           onBlur={() => handleInputChange('name')}
@@ -290,6 +327,7 @@ export default function EditForm({ uid }: Props) {
                           register={register}
                           error={errors?.email}
                           validMessage={t('common.form.valid')}
+                          isDirty={!!dirtyFields.email}
                           readOnly={isPending}
                           onChange={() => handleInputChange('email')}
                           onBlur={() => handleInputChange('email')}
@@ -301,6 +339,7 @@ export default function EditForm({ uid }: Props) {
                           name={`isSecret` as any}
                           register={register}
                           error={errors?.isSecret}
+                          isDirty={!!dirtyFields.isSecret}
                           switchLabel={t('common.yes')}
                           disabled={isPending}
                           onChange={() => handleInputChange(`isSecret`)}
@@ -313,6 +352,7 @@ export default function EditForm({ uid }: Props) {
                           name={`isAdmin` as any}
                           register={register}
                           error={errors?.isAdmin}
+                          isDirty={!!dirtyFields.isAdmin}
                           switchLabel={t('common.yes')}
                           disabled={isPending}
                           onChange={() => handleInputChange(`isAdmin`)}

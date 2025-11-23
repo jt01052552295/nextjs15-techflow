@@ -1,3 +1,4 @@
+import { IUser } from '@/types/user';
 export interface IShopReview {
   idx: number;
   uid: string;
@@ -23,6 +24,8 @@ export interface IShopReview {
   isVisible: boolean; // 노출 여부
   isSecret: boolean; // 비공개 여부
   isAdmin: boolean; // 관리자 작성 여부
+
+  user?: IUser | null; // required relation
 }
 
 export type IShopReviewPart = Partial<IShopReview>;

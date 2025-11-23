@@ -1,8 +1,9 @@
+// /home/techflow/admin/components/editor/QEditor.tsx
+
 'use client';
 
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useCallback } from 'react'; // useCallback 추가
 import dynamic from 'next/dynamic';
-import type ReactQuillType from 'react-quill';
 import { editorUploadAction } from '@/actions/editor';
 import 'react-quill/dist/quill.snow.css';
 import styles from './QEditor.module.scss';
@@ -13,15 +14,13 @@ type Props = {
   value: string;
   onChange: (value: string) => void;
   error?: string;
+  isValid?: boolean;
 };
 
-export default function QEditor({ value, onChange, error }: Props) {
-  const quillRef = useRef<ReactQuillType | null>(null);
+export default function QEditor({ value, onChange, error, isValid }: Props) {
   const [editor, setEditor] = useState<any>(null);
 
   const insertImage = (url: string) => {
-    if (!quillRef.current) return;
-    const editor = quillRef.current?.getEditor();
     if (editor) {
       const range = editor.getSelection();
       if (range) {
@@ -30,18 +29,24 @@ export default function QEditor({ value, onChange, error }: Props) {
     }
   };
 
-  const handleSelectionChange = (_range: any, quill: any) => {
-    if (!editor && quill) setEditor(quill);
+  const handleSelectionChange = (_range: any, _source: any, quill: any) => {
+    // .getEditor() 제거, quill 인스턴스를 바로 사용
+    if (quill && !editor) {
+      setEditor(quill);
+    }
   };
 
-  const imageHandler = () => {
+  // useCallback으로 imageHandler 감싸기
+  const imageHandler = useCallback(() => {
+    if (!editor) return; // editor가 설정되었는지 확인
+
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
     input.click();
 
     input.onchange = async () => {
-      if (!input.files?.length || !editor) return;
+      if (!input.files?.length) return;
 
       const file = input.files[0];
       const formData = new FormData();
@@ -54,7 +59,6 @@ export default function QEditor({ value, onChange, error }: Props) {
 
       try {
         const res = await editorUploadAction(formData);
-        console.log(res);
         const fileUrl = res?.output?.[0]?.url;
         if (fileUrl) {
           insertImage(fileUrl);
@@ -63,7 +67,7 @@ export default function QEditor({ value, onChange, error }: Props) {
         console.error('이미지 업로드 실패', err);
       }
     };
-  };
+  }, [editor]); // editor를 의존성 배열에 추가
 
   const modules = useMemo(
     () => ({
@@ -82,16 +86,17 @@ export default function QEditor({ value, onChange, error }: Props) {
         matchVisual: false,
       },
     }),
-    [editor],
+    [imageHandler], // 의존성을 imageHandler로 변경
   );
 
   return (
-    <div className={`${styles.editor} ${error ? 'is-invalid' : ''}`}>
+    <div
+      className={`${styles.editor} ${error ? 'is-invalid' : ''} ${isValid ? 'is-valid' : ''}`}
+    >
       <ReactQuill
-        ref={quillRef as any}
         value={value}
         onChange={onChange}
-        onChangeSelection={handleSelectionChange} // ✅ 여기서 editor 추출
+        onChangeSelection={handleSelectionChange}
         theme="snow"
         modules={modules}
       />

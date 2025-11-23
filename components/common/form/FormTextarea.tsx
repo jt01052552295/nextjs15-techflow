@@ -21,6 +21,7 @@ type FormTextareaProps<T extends FieldValues> = {
   textareaClassName?: string;
   minRows?: number;
   maxRows?: number;
+  isDirty?: boolean;
   onChange?: () => void;
   onBlur?: () => void;
 };
@@ -38,12 +39,13 @@ export default function FormTextarea<T extends FieldValues>({
   textareaClassName = '',
   minRows = 3,
   maxRows = 10,
+  isDirty,
   onChange,
   onBlur,
 }: FormTextareaProps<T>) {
   const getInputClass = () => {
     if (error) return 'is-invalid';
-    if (validMessage) return 'is-valid';
+    if (isDirty && validMessage) return 'is-valid';
     return '';
   };
 
@@ -68,7 +70,7 @@ export default function FormTextarea<T extends FieldValues>({
       {error?.message && (
         <div className="invalid-feedback d-block">{error.message}</div>
       )}
-      {!error && validMessage && (
+      {!error && isDirty && validMessage && (
         <div className="valid-feedback d-block">{validMessage}</div>
       )}
     </div>

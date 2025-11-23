@@ -19,6 +19,7 @@ import { faSquare } from '@fortawesome/free-regular-svg-icons';
 import { useLanguage } from '@/components/context/LanguageContext';
 import { getRouteUrl } from '@/utils/routes';
 import { useSearchParams } from 'next/navigation';
+import UserProfileDisplay from '@/components/common/UserProfileDisplay';
 
 type Props = {
   row: IShopReviewListRow;
@@ -86,7 +87,9 @@ const ListRow = ({
       <td className="text-center">
         <span className="badge text-bg-secondary">{row.uid}</span>
       </td>
-      <td className="text-center">{row.userId}</td>
+      <td className="text-center">
+        <UserProfileDisplay user={row.user} />
+      </td>
       <td className="text-center">{row.subject}</td>
 
       <td className="text-center">{row.createdAt}</td>

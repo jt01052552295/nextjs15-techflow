@@ -15,6 +15,7 @@ type FormSwitchProps<T extends FieldValues> = {
   disabled?: boolean;
   className?: string;
   switchLabel?: string;
+  isDirty?: boolean;
   onChange?: () => void;
   onBlur?: () => void;
 };
@@ -27,6 +28,7 @@ export default function FormSwitch<T extends FieldValues>({
   disabled = false,
   className = 'mb-2',
   switchLabel,
+  isDirty,
   onChange,
   onBlur,
 }: FormSwitchProps<T>) {
@@ -38,7 +40,7 @@ export default function FormSwitch<T extends FieldValues>({
       <div className="form-check form-switch mt-2">
         <input
           type="checkbox"
-          className={`form-check-input ${error ? 'is-invalid' : ''}`}
+          className={`form-check-input ${error ? 'is-invalid' : ''} ${!error && isDirty ? 'is-valid' : ''}`}
           id={id}
           {...register(name, {
             onChange,

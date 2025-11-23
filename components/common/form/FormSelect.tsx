@@ -27,6 +27,7 @@ type FormSelectProps<T extends FieldValues> = {
   onChange?: () => void;
   onBlur?: () => void;
   showPlaceholder?: boolean;
+  isDirty?: boolean;
 };
 
 export default function FormSelect<T extends FieldValues>({
@@ -43,10 +44,11 @@ export default function FormSelect<T extends FieldValues>({
   onChange,
   onBlur,
   showPlaceholder = true,
+  isDirty,
 }: FormSelectProps<T>) {
   const getInputClass = () => {
     if (error) return 'is-invalid';
-    if (validMessage) return 'is-valid';
+    if (isDirty && validMessage) return 'is-valid';
     return '';
   };
 
@@ -81,7 +83,7 @@ export default function FormSelect<T extends FieldValues>({
       {error?.message && (
         <div className="invalid-feedback d-block">{error.message}</div>
       )}
-      {!error && validMessage && (
+      {!error && isDirty && validMessage && (
         <div className="valid-feedback d-block">{validMessage}</div>
       )}
     </div>

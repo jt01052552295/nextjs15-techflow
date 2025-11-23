@@ -19,6 +19,7 @@ type FormTextFieldProps<T extends FieldValues> = {
   disabled?: boolean;
   className?: string;
   inputClassName?: string;
+  isDirty?: boolean;
   onChange?: () => void;
   onBlur?: () => void;
 };
@@ -35,12 +36,13 @@ export default function FormTextField<T extends FieldValues>({
   disabled = false,
   className = '',
   inputClassName = '',
+  isDirty,
   onChange,
   onBlur,
 }: FormTextFieldProps<T>) {
   const getInputClass = () => {
     if (error) return 'is-invalid';
-    if (validMessage) return 'is-valid';
+    if (isDirty && validMessage) return 'is-valid';
     return '';
   };
 
@@ -64,7 +66,7 @@ export default function FormTextField<T extends FieldValues>({
       {error?.message && (
         <div className="invalid-feedback">{error.message}</div>
       )}
-      {!error && validMessage && (
+      {!error && isDirty && validMessage && (
         <div className="valid-feedback">{validMessage}</div>
       )}
     </div>

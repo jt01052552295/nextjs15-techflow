@@ -1,19 +1,12 @@
 'use client';
 
-import {
-  Control,
-  Controller,
-  FieldError,
-  Path,
-  FieldValues,
-} from 'react-hook-form';
+import { Control, Controller, Path, FieldValues } from 'react-hook-form';
 import QEditor from '@/components/editor/QEditor';
 
 type FormEditorProps<T extends FieldValues> = {
   label: string;
   name: Path<T>;
   control: Control<T>;
-  error?: FieldError;
   placeholder?: string;
   className?: string;
 };
@@ -22,7 +15,6 @@ export default function FormEditor<T extends FieldValues>({
   label,
   name,
   control,
-  error,
   className = '',
 }: FormEditorProps<T>) {
   return (
@@ -39,6 +31,7 @@ export default function FormEditor<T extends FieldValues>({
               value={field.value ?? ''}
               onChange={field.onChange}
               error={fieldState.error?.message}
+              isValid={fieldState.isDirty && !fieldState.error}
             />
             {fieldState.error?.message && (
               <div className="invalid-feedback d-block">

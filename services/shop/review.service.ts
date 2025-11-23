@@ -108,6 +108,13 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
     where: whereForPage,
     orderBy,
     take: safeLimit + 1,
+    include: {
+      user: {
+        include: {
+          profile: true,
+        },
+      },
+    },
   });
 
   const hasMore = rows.length > safeLimit;
@@ -138,6 +145,13 @@ export async function show(uid: string): Promise<IShopReview> {
 
   const rs = await prisma.shopReview.findUnique({
     where: { uid },
+    include: {
+      user: {
+        include: {
+          profile: true,
+        },
+      },
+    },
   });
 
   if (!rs) throw new Error('NOT_FOUND');
@@ -205,6 +219,9 @@ export async function create(input: CreateType) {
 export async function update(input: UpdateType) {
   const {
     uid,
+    orderId,
+    itemId,
+    userId,
     name,
     email,
     subject,
@@ -225,6 +242,9 @@ export async function update(input: UpdateType) {
   const rs = await prisma.$transaction(async (tx) => {
     // 3) 본문 업데이트 + 관계 include
     const data: any = {
+      orderId,
+      itemId,
+      userId,
       name,
       email,
       subject,
