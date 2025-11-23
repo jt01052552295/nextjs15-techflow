@@ -921,5 +921,27 @@
     "createdAt": "생성일",
     "isUse": "사용",
     "isVisible": "표시"
+  },
+  "shopReview": {
+    "t": "상품 리뷰",
+    "idx": "인덱스",
+    "uid": "UUID",
+    "orderId": "주문 마스터 ID",
+    "itemId": "리뷰 대상 상품 ID",
+    "userId": "작성자 회원 ID",
+    "name": "작성자 이름",
+    "email": "작성자 이메일",
+    "subject": "리뷰 제목",
+    "content": "리뷰 내용",
+    "createdAt": "등록일시",
+    "updatedAt": "수정일시",
+    "score": "평점",
+    "hit": "조회수",
+    "good": "추천 수",
+    "bad": "비추천 수",
+    "isUse": "사용 여부",
+    "isVisible": "노출 여부",
+    "isSecret": "비공개 여부",
+    "isAdmin": "관리자 작성 여부"
   }
 }

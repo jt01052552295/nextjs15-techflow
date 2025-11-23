@@ -209,4 +209,10 @@ export const routesData = {
     show: '/shop/order/{id}',
     edit: '/shop/order/{id}/edit',
   },
+  shopReview: {
+    index: '/shop/review',
+    create: '/shop/review/p/create',
+    show: '/shop/review/{id}',
+    edit: '/shop/review/{id}/edit',
+  },
 };

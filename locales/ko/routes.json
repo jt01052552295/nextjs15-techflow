@@ -637,5 +637,23 @@
       "name": "수정",
       "desc": ""
     }
+  },
+  "shopReview": {
+    "index": {
+      "name": "리뷰",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
+      "desc": ""
+    }
   }
 }
