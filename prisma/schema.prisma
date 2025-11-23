@@ -328,8 +328,8 @@ model GreenCard {
   represent   Boolean  @default(true) @map("represent")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
-  isUse       Boolean  @default(true) @map("use")
-  isVisible   Boolean  @default(true) @map("visible")
+  isUse       Boolean  @default(true) @map("is_use")
+  isVisible   Boolean  @default(true) @map("is_visible")
 
   @@map("ec_green_card")
 }
@@ -347,8 +347,8 @@ model CarbonPoint {
   expiredDate DateTime? @map("expired_date")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
-  isVisible   Boolean   @default(true) @map("visible")
-  isUse       Boolean   @default(true) @map("use")
+  isVisible   Boolean   @default(true) @map("is_visible")
+  isUse       Boolean   @default(true) @map("is_use")
   user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -691,8 +691,8 @@ model ElectricIotData {
   totExportReactive Float?         @default(0) @map("tot_export_reactive") @db.Float
   totReactive       Float?         @default(0) @map("tot_reactive") @db.Float
   createdAt         DateTime       @default(now()) @map("created_at")
-  isUse             String         @default("y") @map("use") @db.VarChar(1)
-  isVisible         String         @default("y") @map("visible") @db.VarChar(1)
+  isUse             String         @default("y") @map("is_use") @db.VarChar(1)
+  isVisible         String         @default("y") @map("is_visible") @db.VarChar(1)
   ElectricDevice    ElectricDevice @relation(fields: [iotNum], references: [iotNum], onDelete: Cascade)
 
   @@index([dataDate], map: "data_date")
@@ -1408,8 +1408,8 @@ model ShopOrder {
   ipAddress       String    @default("") @map("ip") @db.VarChar(45) // IP 주소
   merchantData    String?   @map("merchantData") @db.LongText // PG사 연동용 원본 데이터
   createdAt       DateTime  @default(now()) @map("created_at")
-  isUse           Boolean   @default(true) @map("use")
-  isVisible       Boolean   @default(true) @map("visible")
+  isUse           Boolean   @default(true) @map("is_use")
+  isVisible       Boolean   @default(true) @map("is_visible")
 
   // 관계 설정
   ShopOrderItem           ShopOrderItem[]
@@ -1531,8 +1531,8 @@ model ShopOrderPayment {
   shopId        Int       @default(0) @map("shop") // 쇼핑몰 ID
   sellerId      Int       @default(0) @map("seller") // 판매자 ID
   createdAt     DateTime  @default(now()) @map("created_at")
-  isUse         Boolean   @default(true) @map("use")
-  isVisible     Boolean   @default(true) @map("visible")
+  isUse         Boolean   @default(true) @map("is_use")
+  isVisible     Boolean   @default(true) @map("is_visible")
   
   // 관계 설정
   ShopOrder     ShopOrder @relation(fields: [orderId], references: [idx], onDelete: Cascade)
@@ -1561,7 +1561,7 @@ model ShopSubscription {
   startDate   DateTime? @map("start_date") // 구독 시작일
   endDate     DateTime? @map("end_date") // 구독 종료일
   status      String    @default("") @db.VarChar(45) // 구독 상태
-  isUse       Boolean   @default(true) @map("use") // 사용여부(y사용,n삭제) -> Boolean으로 변환
+  isUse       Boolean   @default(true) @map("is_use") // 사용여부(y사용,n삭제) -> Boolean으로 변환
   usage       Int       @default(0) // 현재 사용량
   usageQuota  Int       @default(0) @map("usage_quota") // 총 허용 사용량
   createdAt   DateTime  @default(now()) @map("created_at") // 생성일 추가 (다른 테이블과 일관성)
@@ -1615,8 +1615,8 @@ model PortonePayment {
   shopId        Int       @default(0) @map("shop") // 쇼핑몰 ID
   sellerId      Int       @default(0) @map("seller") // 판매자 ID
   createdAt     DateTime  @default(now()) @map("created_at")
-  isUse         Boolean   @default(true) @map("use")
-  isVisible     Boolean   @default(true) @map("visible")
+  isUse         Boolean   @default(true) @map("is_use")
+  isVisible     Boolean   @default(true) @map("is_visible")
   
 
   @@index([merchantUid])
@@ -1659,8 +1659,8 @@ model PortoneBillingPayment {
   cancelInput     String    @default("") @map("cancel_input") @db.VarChar(255) // 취소 입력값(관리자)
   cancelledAt     DateTime? @map("cancelled_at") // 결제 취소 시각
   createdAt       DateTime? @default(now()) @map("created_at") // 등록일시
-  isUse           Boolean   @default(true) @map("use") // 사용여부
-  isVisible       Boolean   @default(true) @map("visible") // 노출여부
+  isUse           Boolean   @default(true) @map("is_use") // 사용여부
+  isVisible       Boolean   @default(true) @map("is_visible") // 노출여부
   device          String    @default("") @db.VarChar(255) // 결제 기기 정보
   shopId          Int       @default(0) @map("shop") // 쇼핑몰 ID
   
@@ -1685,7 +1685,7 @@ model PortoneSchedulePayment {
   createdAt    DateTime? @default(now()) @map("created_at") // 등록일시
   reservDate   DateTime? @map("reserv_date") // 예약 결제 실행 예정일
   isPayment    Boolean   @default(false) @map("payment") // 결제 성공 여부(y/n)
-  isUse        Boolean   @default(true) @map("use") // 사용여부
+  isUse        Boolean   @default(true) @map("is_use") // 사용여부
   
   // 관계 설정
   ShopOrder    ShopOrder? @relation(fields: [orderId], references: [idx], onDelete: SetNull)
@@ -1712,8 +1712,8 @@ model ShopReview {
   hit          Int       @default(0) // 조회수
   good         Int       @default(0) // 추천 수
   bad          Int       @default(0) // 비추천 수
-  isUse        Boolean   @default(true) @map("use") // 사용여부(y사용,n삭제)
-  isVisible    Boolean   @default(true) @map("visible") // 노출여부(y노출,n숨김)
+  isUse        Boolean   @default(true) @map("is_use") // 사용여부(y사용,n삭제)
+  isVisible    Boolean   @default(true) @map("is_visible") // 노출여부(y노출,n숨김)
   isSecret     Boolean   @default(false) @map("secret") // 비공개 여부(y/n)
   isAdmin     Boolean   @default(false) @map("is_admin") 
   

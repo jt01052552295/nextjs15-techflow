@@ -4,6 +4,7 @@ import type { ListParams, ListResult } from '@/types/shop/order';
 import { list } from '@/services/shop/order.service';
 import type { IShopOrderListRow } from '@/types/shop/order';
 import { fmtDateD } from '@/lib/util';
+import { getAllOrders } from '@/lib/shop/db-utils';
 
 export async function listAction(
   params?: ListParams,
@@ -27,4 +28,8 @@ function toDTO(row: any): IShopOrderListRow {
     createdAt: fmtDateD(row.createdAt),
     updatedAt: fmtDateD(row.updatedAt),
   };
+}
+
+export async function fetchAllShopOrderAction() {
+  return await getAllOrders();
 }

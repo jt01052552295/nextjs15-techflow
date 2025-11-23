@@ -26,9 +26,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import FormSelect, { SelectOption } from '@/components/common/form/FormSelect';
 import FormTextField from '@/components/common/form/FormTextField';
 import FormTextarea from '@/components/common/form/FormTextarea';
-import FormEditor from '@/components/common/form/FormEditor';
 import FormSwitch from '@/components/common/form/FormSwitch';
 import UserSelect from '@/components/common/UserSelect';
+import ShopItemSelect from '@/components/common/ShopItemSelect';
+import ShopOrderSelect from '@/components/common/ShopOrderSelect';
 
 export default function CreateForm() {
   const { dictionary, locale, t } = useLanguage();
@@ -138,29 +139,27 @@ export default function CreateForm() {
                   <div className="row">
                     <div className="col">
                       <div className="mb-2">
-                        <FormTextField
-                          label={t('columns.shopReview.orderId')}
+                        <ShopOrderSelect
                           name="orderId"
-                          register={register}
-                          error={errors?.orderId}
-                          validMessage={t('common.form.valid')}
-                          isDirty={!!dirtyFields.orderId}
-                          readOnly={isPending}
+                          control={control}
+                          label={t('columns.shopReview.orderId')}
+                          required
+                          error={errors.orderId?.message}
+                          feedbackMessages={{ valid: t('common.form.valid') }}
+                          disabled={isPending}
                           onChange={() => handleInputChange('orderId')}
-                          onBlur={() => handleInputChange('orderId')}
                         />
                       </div>
                       <div className="mb-2">
-                        <FormTextField
-                          label={t('columns.shopReview.itemId')}
+                        <ShopItemSelect
                           name="itemId"
-                          register={register}
-                          error={errors?.itemId}
-                          validMessage={t('common.form.valid')}
-                          isDirty={!!dirtyFields.itemId}
-                          readOnly={isPending}
+                          control={control}
+                          label={t('columns.shopReview.itemId')}
+                          required
+                          error={errors.itemId?.message}
+                          feedbackMessages={{ valid: t('common.form.valid') }}
+                          disabled={isPending}
                           onChange={() => handleInputChange('itemId')}
-                          onBlur={() => handleInputChange('itemId')}
                         />
                       </div>
 

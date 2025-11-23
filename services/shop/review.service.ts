@@ -203,7 +203,7 @@ export async function create(input: CreateType) {
       include: {
         ShopOrder: true,
         ShopItem: true,
-        User: true,
+        user: true,
       },
     };
 
