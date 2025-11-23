@@ -87,3 +87,7 @@ npm run dev
 │       │           └── 📁 (.)[uid]
 │       │               ├── page.tsx
 │       │               └── default.tsx
+
+
+npm run prisma -- generate
+npm run prisma -- db push
