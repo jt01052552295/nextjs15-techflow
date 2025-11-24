@@ -77,6 +77,11 @@ model User {
   coupons       CouponMember[]
   couponUseLogs CouponUseLog[]
 
+  blogPosts            BlogPost[]            @relation("UserToBlogPosts")
+  blogPostComments     BlogPostComment[]     @relation("UserToBlogPostComments")
+  blogPostLikes        BlogPostLike[]        @relation("UserToBlogPostLikes")
+  blogPostCommentLikes BlogPostCommentLike[] @relation("UserToBlogPostCommentLikes")
+
 
   @@map("ec_user")
 }
@@ -1730,6 +1735,209 @@ model ShopReview {
 }
 
 
+model BlogPost {
+  idx           Int          @id @default(autoincrement())
+  uid           String       @unique @default(uuid())
+  cid           String       @default(cuid())
+
+  userId        String       @map("user_id")
+  lang          String       @default("ko")
+
+  content       String       @db.LongText
+  linkUrl       String?      @db.VarChar(255)
+
+  // 카테고리 (단일)
+  postCategoryId Int?
+  blogCategory   BlogCategory? @relation(fields: [postCategoryId], references: [idx])
+
+  status        PostStatus       @default(DRAFT)
+  visibility    PostVisibility   @default(PUBLIC) 
+
+  likeCount     Int          @default(0)
+  commentCount  Int          @default(0)
+  isPinned      Boolean      @default(false)
+
+  // 관리자용 플래그
+  isUse         Boolean      @default(true) @map("is_use")
+  isVisible     Boolean      @default(true) @map("is_visible")
+  sortOrder     Int          @default(0) @map("sort_order")
+
+  scheduledAt   DateTime?    @map("scheduled_at")   // 예약 발행 예정 시각
+  publishedAt   DateTime?    @map("published_at")   // 실제 발행된 시각
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @default(now()) @updatedAt @map("updated_at")
+
+  // 관계
+  user          User?              @relation("UserToBlogPosts", fields: [userId], references: [id], onDelete: Cascade)
+  images        BlogPostImage[]
+  tags          BlogPostTagMap[]
+  comments      BlogPostComment[]
+  likes         BlogPostLike[]     // 블로그 포스트 좋아요 목록
+
+  @@index([uid], map: "uid_index")
+  @@index([cid], map: "cid_index")
+  @@index([userId], map: "userId_index")
+  @@index([postCategoryId], map: "postCategory_index")
+  @@map("ec_post")
+}
+
+// 블로그 카테고리
+model BlogCategory {
+  idx       Int      @id @default(autoincrement())
+  uid       String   @unique @default(uuid())
+  cid       String   @default(cuid())
+
+  code      String   @db.VarChar(255)
+  name      String   @db.VarChar(100)
+  slug      String   @unique @db.VarChar(100)
+  desc      String?  @db.VarChar(255)
+
+  depth     Int      @default(1) 
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  isUse     Boolean  @default(true) @map("is_use")
+  isVisible Boolean  @default(true) @map("is_visible")
+
+  posts     BlogPost[]
+
+  @@map("ec_post_category")
+}
+
+// 태그 정의
+model BlogTag {
+  idx       Int      @id @default(autoincrement())
+  uid       String   @unique @default(uuid())
+  cid       String   @default(cuid())
+
+  name      String   @unique @db.VarChar(100)
+  slug      String   @unique @db.VarChar(100)
+  desc      String?  @db.VarChar(255)
+
+  isUse     Boolean  @default(true) @map("is_use")
+  isVisible Boolean  @default(true) @map("is_visible")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  posts     BlogPostTagMap[]
+
+  @@map("ec_post_tag")
+}
+
+// BlogPost <-> BlogTag N:N 매핑
+model BlogPostTagMap {
+  postId Int
+  tagId  Int
+
+  post   BlogPost  @relation(fields: [postId], references: [idx], onDelete: Cascade)
+  tag    BlogTag   @relation(fields: [tagId], references: [idx], onDelete: Cascade)
+
+  @@id([postId, tagId])
+  @@index([tagId], map: "tagId_index")
+  @@map("ec_post_tag_map")
+}
+
+/// 블로그 포스트에 첨부된 이미지
+model BlogPostImage {
+  idx          Int      @id @default(autoincrement())
+  uid          String   @unique @default(uuid())
+
+  postId       Int
+  url          String   @db.VarChar(255)
+  ext          String?  @db.VarChar(10)
+  originalName String
+  size         Int?     // byte 단위
+  type         String?  @db.VarChar(50) // mime-type 등
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+
+  post         BlogPost @relation(fields: [postId], references: [idx], onDelete: Cascade)
+
+  @@index([postId], map: "postId_index")
+  @@map("ec_post_image")
+}
+
+/// 1차 댓글 + 2차 답글 구조
+model BlogPostComment {
+  idx        Int       @id @default(autoincrement())
+  uid        String    @unique @default(uuid())
+  cid        String    @default(cuid())
+
+  postId     Int
+
+  // 회원 댓글이면 userId(User.id), 비회원이면 null + author 사용
+  userId     String?   @map("user_id")
+  author     String?   @db.VarChar(255)
+
+  content    String    @db.Text
+  status     PostCommentStatus @default(APPROVED)
+  ipAddress  String?   @db.VarChar(45)
+
+  // 1차/2차 구조
+  parentIdx  Int?
+  depth      Int       @default(1) // 1 = 댓글, 2 = 답글
+
+  likeCount  Int       @default(0)
+  replyCount Int       @default(0)
+
+  isUse      Boolean   @default(true) @map("is_use")
+  isVisible  Boolean   @default(true) @map("is_visible")
+
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  // 관계
+  post       BlogPost         @relation(fields: [postId], references: [idx], onDelete: Cascade)
+  user       User?            @relation("UserToBlogPostComments", fields: [userId], references: [id], onDelete: Cascade)
+
+  parent     BlogPostComment?  @relation("BlogPostCommentToReply", fields: [parentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction)
+  replies    BlogPostComment[] @relation("BlogPostCommentToReply")
+
+  likes      BlogPostCommentLike[] // 댓글 좋아요 목록
+
+  @@index([postId], map: "postId_index")
+  @@index([parentIdx], map: "parentIdx_index")
+  @@index([userId], map: "userId_index")
+  @@map("ec_post_comment")
+}
+
+/// 블로그 포스트 좋아요
+model BlogPostLike {
+  idx       Int      @id @default(autoincrement())
+  postId    Int
+  userId    String   // 회원 기반 좋아요
+
+  createdAt DateTime @default(now())
+
+  post      BlogPost @relation(fields: [postId], references: [idx], onDelete: Cascade)
+  user      User?    @relation("UserToBlogPostLikes", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])                // 한 유저가 한 포스트에 한 번만 좋아요
+  @@index([postId], map: "postId_index")
+  @@index([userId], map: "userId_index")
+  @@map("ec_post_like")
+}
+
+/// 댓글/답글 좋아요
+model BlogPostCommentLike {
+  idx       Int      @id @default(autoincrement())
+  commentId Int
+  userId    String   // 회원 기반 좋아요
+
+  createdAt DateTime @default(now())
+
+  comment   BlogPostComment @relation(fields: [commentId], references: [idx], onDelete: Cascade)
+  user      User?           @relation("UserToBlogPostCommentLikes", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId])             // 한 유저가 한 댓글에 한 번만 좋아요
+  @@index([commentId], map: "commentId_index")
+  @@index([userId], map: "userId_index")
+  @@map("ec_post_comment_like")
+}
+
+
+
 
 // 쿠폰 관련 enum 정의
 enum CouponServiceType {
@@ -1973,4 +2181,28 @@ enum DeliveryMemoType {
   SECURITY @map("SECURITY") // 경비실에 맡겨주세요
   DELIVERY_BOX @map("DELIVERY_BOX") // 택배함에 넣어주세요
   CUSTOM       @map("CUSTOM")       // 직접 입력
+}
+
+enum PostStatus {
+  TEMP       // 임시저장 
+  DRAFT      // 작성중 
+  REVIEW     // 검토중
+  SCHEDULED  // 예약발행 
+  PUBLISHED  // 발행됨 
+  ARCHIVED   // 보관됨 
+}
+
+// 게시글 공개 범위
+enum PostVisibility {
+  PUBLIC    // 전체 공개
+  MEMBERS   // 회원 전용
+  PRIVATE   // 비공개
+}
+
+// 댓글 상태
+enum PostCommentStatus {
+  PENDING    // 승인 대기 (필요한 경우)
+  APPROVED   // 정상 노출
+  HIDDEN     // 숨김
+  SPAM       // 스팸 처리
 }

@@ -215,4 +215,22 @@ export const routesData = {
     show: '/shop/review/{id}',
     edit: '/shop/review/{id}/edit',
   },
+  blogCategory: {
+    index: '/blog/category',
+    create: '/blog/category/p/create',
+    show: '/blog/category/{id}',
+    edit: '/blog/category/{id}/edit',
+  },
+  blogTag: {
+    index: '/blog/tag',
+    create: '/blog/tag/p/create',
+    show: '/blog/tag/{id}',
+    edit: '/blog/tag/{id}/edit',
+  },
+  blogPost: {
+    index: '/blog/post',
+    create: '/blog/post/p/create',
+    show: '/blog/post/{id}',
+    edit: '/blog/post/{id}/edit',
+  },
 };

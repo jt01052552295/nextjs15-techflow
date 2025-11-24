@@ -782,7 +782,6 @@
     "userId": "회원 ID",
     "userIdx": "회원 번호",
     "gubun": "구분(일반/단체/정기 등)",
-
     "basicPrice": "기본 상품 금액 합계",
     "optionPrice": "옵션 추가 금액 합계",
     "deliveryPrice": "배송비",
@@ -790,7 +789,6 @@
     "payPrice": "총 결제 금액",
     "stock": "재고 반영 여부",
     "memo": "주문 메모",
-
     "orderPaid": "결제 여부 상태",
     "orderStatus": "주문 상태",
     "cancelStatus": "취소 상태",
@@ -799,9 +797,7 @@
     "cancelReasonCode": "취소 사유 코드",
     "cancelReasonText": "취소 사유(직접입력)",
     "cancelRejectedReasonText": "취소 거절 사유",
-
     "paymethod": "결제 수단",
-
     "name": "주문자명",
     "email": "주문자 이메일",
     "hp": "주문자 휴대폰",
@@ -810,7 +806,6 @@
     "jibunAddr2": "지번 주소2",
     "roadAddr1": "도로명 주소1",
     "roadAddr2": "도로명 주소2",
-
     "rcvStore": "수령 매장명",
     "rcvName": "수령자명",
     "rcvHp": "수령자 연락처",
@@ -819,7 +814,6 @@
     "rcvAddr1": "수령 주소1",
     "rcvAddr2": "수령 주소2",
     "rcvZipcode": "수령자 우편번호",
-
     "bankAccount": "무통장입금 계좌 ID",
     "bankDepositName": "입금자명",
     "payEmail": "결제자 이메일",
@@ -827,14 +821,12 @@
     "payDay": "결제일",
     "payYear": "연결제 여부",
     "payPeople": "사용 인원",
-
     "ipAddress": "IP 주소",
     "merchantData": "PG 원본 데이터",
     "createdAt": "생성일",
     "isUse": "사용",
     "isVisible": "표시"
   },
-
   "shopOrderItem": {
     "t": "주문상품",
     "idx": "인덱스",
@@ -851,7 +843,6 @@
     "statusCode": "상품별 상태코드",
     "createdAt": "생성일"
   },
-
   "shopOrderOption": {
     "t": "주문옵션",
     "idx": "인덱스",
@@ -863,7 +854,6 @@
     "quantity": "옵션 수량",
     "createdAt": "생성일"
   },
-
   "shopOrderSupply": {
     "t": "주문추가상품",
     "idx": "인덱스",
@@ -875,45 +865,36 @@
     "quantity": "추가상품 수량",
     "createdAt": "생성일"
   },
-
   "shopOrderPayment": {
     "t": "주문결제",
     "idx": "인덱스",
     "uid": "UUID",
     "orderId": "주문 ID",
     "gubun": "구분",
-
     "applyNum": "PG 승인번호",
     "amount": "결제 요청 금액",
     "cancelAmount": "취소 금액",
-
     "buyerAddr": "구매자 주소",
     "buyerEmail": "구매자 이메일",
     "buyerName": "구매자 이름",
     "buyerPostcode": "구매자 우편번호",
     "buyerTel": "구매자 연락처",
-
     "cardName": "카드사명",
     "cardNumber": "카드 번호(마스킹)",
     "cardQuota": "할부 개월 수",
-
     "customData": "사용자 정의 데이터",
-
     "impUid": "아임포트 거래 고유번호",
     "merchantUid": "주문 고유번호",
     "name": "결제 상품명",
-
     "paidAmount": "실결제 금액",
     "paidAt": "결제 완료 시각(타임스탬프)",
     "cancelledAt": "결제 취소 시각(타임스탬프)",
-
     "payMethod": "결제 수단",
     "pgProvider": "PG사 이름",
     "pgTid": "PG 거래번호",
     "pgType": "결제 PG 타입",
     "receiptUrl": "영수증 URL",
     "status": "결제 상태",
-
     "orderData": "주문 데이터 백업",
     "device": "접속 기기정보",
     "shopId": "쇼핑몰 ID",
@@ -943,5 +924,109 @@
     "isVisible": "노출 여부",
     "isSecret": "비공개 여부",
     "isAdmin": "관리자 작성 여부"
+  },
+  "blogPost": {
+    "t": "블로그 포스트",
+    "idx": "인덱스",
+    "uid": "UUID",
+    "cid": "CID",
+    "userId": "작성자 회원 ID",
+    "lang": "언어 코드",
+    "content": "본문 내용",
+    "linkUrl": "링크 URL",
+    "postCategoryId": "카테고리 ID",
+    "status": "게시글 상태",
+    "visibility": "공개 범위",
+    "likeCount": "좋아요 수",
+    "commentCount": "댓글 수",
+    "isPinned": "상단 고정 여부",
+    "isUse": "사용 여부",
+    "isVisible": "노출 여부",
+    "sortOrder": "정렬 순서",
+    "scheduledAt": "예약 발행 시각",
+    "publishedAt": "발행 시각",
+    "createdAt": "등록일시",
+    "updatedAt": "수정일시"
+  },
+  "blogCategory": {
+    "t": "블로그 카테고리",
+    "idx": "인덱스",
+    "uid": "UUID",
+    "cid": "CID",
+    "code": "카테고리 코드",
+    "name": "카테고리명",
+    "slug": "카테고리 슬러그",
+    "desc": "카테고리 설명",
+    "depth": "카테고리 깊이",
+    "sortOrder": "정렬 순서",
+    "createdAt": "등록일시",
+    "updatedAt": "수정일시",
+    "isUse": "사용 여부",
+    "isVisible": "노출 여부"
+  },
+  "blogTag": {
+    "t": "블로그 태그",
+    "idx": "인덱스",
+    "uid": "UUID",
+    "cid": "CID",
+    "name": "태그명",
+    "slug": "태그 슬러그",
+    "desc": "태그 설명",
+    "isUse": "사용 여부",
+    "isVisible": "노출 여부",
+    "createdAt": "등록일시",
+    "updatedAt": "수정일시"
+  },
+  "blogPostTagMap": {
+    "t": "포스트-태그 매핑",
+    "postId": "포스트 ID",
+    "tagId": "태그 ID"
+  },
+  "blogPostImage": {
+    "t": "블로그 포스트 이미지",
+    "idx": "인덱스",
+    "uid": "UUID",
+    "postId": "포스트 ID",
+    "url": "이미지 URL",
+    "ext": "파일 확장자",
+    "size": "파일 크기(바이트)",
+    "type": "MIME 타입",
+    "originalName": "원본 파일명",
+    "createdAt": "등록일시",
+    "updatedAt": "수정일시"
+  },
+  "blogPostComment": {
+    "t": "블로그 포스트 댓글",
+    "idx": "인덱스",
+    "uid": "UUID",
+    "cid": "CID",
+    "postId": "포스트 ID",
+    "userId": "작성자 회원 ID",
+    "author": "작성자 이름",
+    "content": "댓글 내용",
+    "status": "댓글 상태",
+    "ipAddress": "IP 주소",
+    "parentIdx": "부모 댓글 인덱스",
+    "depth": "댓글 깊이",
+    "likeCount": "좋아요 수",
+    "replyCount": "답글 수",
+    "isUse": "사용 여부",
+    "isVisible": "노출 여부",
+    "createdAt": "등록일시",
+    "updatedAt": "수정일시"
+  },
+  "blogPostLike": {
+    "t": "블로그 포스트 좋아요",
+    "idx": "인덱스",
+    "postId": "포스트 ID",
+    "userId": "회원 ID",
+    "createdAt": "등록일시"
+  },
+  "blogPostCommentLike": {
+    "t": "블로그 댓글 좋아요",
+    "idx": "인덱스",
+    "commentId": "댓글 ID",
+    "userId": "회원 ID",
+    "createdAt": "등록일시"
   }
 }
