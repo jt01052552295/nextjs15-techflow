@@ -16,6 +16,7 @@ import {
   faAngleDown,
   faBell,
   faCartShopping,
+  faBlog,
 } from '@fortawesome/free-solid-svg-icons';
 
 interface SubMenu {
@@ -88,6 +89,15 @@ const Navigation = () => {
         { id: 'shopItem-list', route: 'shopItem.index' },
         { id: 'shopOrder-list', route: 'shopOrder.index' },
         { id: 'shopReview-list', route: 'shopReview.index' },
+      ],
+    },
+    {
+      id: 'blog',
+      icon: faBlog,
+      route: 'blogCategory.index',
+      subMenus: [
+        { id: 'blogCategory-list', route: 'blogCategory.index' },
+        { id: 'blogTag-list', route: 'blogTag.index' },
       ],
     },
     {

@@ -6,11 +6,10 @@ import type {
   ListResult,
   DeleteInput,
   DeleteResult,
-} from '@/types/blog/category';
-import { IBlogCategory } from '@/types/blog/category';
-import type { CreateType } from '@/actions/blog/category/create/schema';
-import type { UpdateType } from '@/actions/blog/category/update/schema';
-import { getChildCategories } from '@/lib/blog/category-utils';
+} from '@/types/blog/tag';
+import { IBlogTag } from '@/types/blog/tag';
+import type { CreateType } from '@/actions/blog/tag/create/schema';
+import type { UpdateType } from '@/actions/blog/tag/update/schema';
 
 /**
  * 목록: 커서 기반(keyset) + 정렬/검색/필터 + 카운트 2종 + 풀컬럼
@@ -22,15 +21,15 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
   const {
     q,
     name,
-    code,
+    slug,
     dateType,
     startDate,
     endDate,
     isUse,
     isVisible,
 
-    sortBy = 'code',
-    order = 'asc',
+    sortBy = 'idx',
+    order = 'desc',
 
     limit = 20,
     cursor,
@@ -41,21 +40,21 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
   // ───────────────────────────────────
   // where (검색/필터)
   // ───────────────────────────────────
-  const baseWhere: Prisma.BlogCategoryWhereInput = {
+  const baseWhere: Prisma.BlogTagWhereInput = {
     isUse: typeof isUse === 'boolean' ? isUse : true,
     isVisible: typeof isVisible === 'boolean' ? isVisible : true,
   };
 
   // 통합 검색(q)이 들어오면 name/email OR 매칭. 없으면 기존 name/email 개별 필드 사용
-  const filteredWhere: Prisma.BlogCategoryWhereInput = q
+  const filteredWhere: Prisma.BlogTagWhereInput = q
     ? {
         ...baseWhere,
-        OR: [{ name: { contains: q } }, { code: { contains: q } }],
+        OR: [{ name: { contains: q } }, { slug: { contains: q } }],
       }
     : {
         ...baseWhere,
         ...(name?.trim() ? { name: { contains: name.trim() } } : {}),
-        ...(code?.trim() ? { code: { contains: code.trim() } } : {}),
+        ...(slug?.trim() ? { slug: { contains: slug.trim() } } : {}),
       };
 
   if (dateType && (startDate || endDate)) {
@@ -75,7 +74,7 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
   //   (A > a0) OR (A = a0 AND idx > i0)   // asc
   //   (A < a0) OR (A = a0 AND idx < i0)   // desc
   // ───────────────────────────────────
-  let keysetWhere: Prisma.BlogCategoryWhereInput | undefined;
+  let keysetWhere: Prisma.BlogTagWhereInput | undefined;
   if (cursor) {
     const c = b64d(cursor) as { sortValue: any; idx: number };
     const cmpOp = order === 'asc' ? 'gt' : 'lt';
@@ -96,16 +95,16 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
   // ───────────────────────────────────
   // orderBy
   // ───────────────────────────────────
-  const orderBy: Prisma.BlogCategoryOrderByWithRelationInput[] = [
+  const orderBy: Prisma.BlogTagOrderByWithRelationInput[] = [
     { [sortBy]: order },
     { idx: order }, // tie-breaker도 동일 방향
   ];
 
-  const whereForPage: Prisma.BlogCategoryWhereInput = keysetWhere
+  const whereForPage: Prisma.BlogTagWhereInput = keysetWhere
     ? { AND: [filteredWhere, keysetWhere] }
     : filteredWhere;
 
-  const rows = await prisma.blogCategory.findMany({
+  const rows = await prisma.blogTag.findMany({
     where: whereForPage,
     orderBy,
     take: safeLimit + 1,
@@ -121,23 +120,23 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
   }
 
   const [totalAll, totalFiltered] = await Promise.all([
-    prisma.blogCategory.count({ where: baseWhere }),
-    prisma.blogCategory.count({ where: filteredWhere }),
+    prisma.blogTag.count({ where: baseWhere }),
+    prisma.blogTag.count({ where: filteredWhere }),
   ]);
 
   return { items, nextCursor, totalAll, totalFiltered };
 }
 
 /** 보기 */
-export async function show(uid: string): Promise<IBlogCategory> {
+export async function show(uid: string): Promise<IBlogTag> {
   // 먼저 존재 확인 (선택)
-  const exists = await prisma.blogCategory.findUnique({
+  const exists = await prisma.blogTag.findUnique({
     where: { uid },
     select: { uid: true },
   });
   if (!exists) throw new Error('NOT_FOUND');
 
-  const rs = await prisma.blogCategory.findUnique({
+  const rs = await prisma.blogTag.findUnique({
     where: { uid },
   });
 
@@ -150,14 +149,13 @@ export async function create(input: CreateType) {
   const {
     uid,
     name,
-    code,
     slug,
     desc = null,
     isUse = true,
     isVisible = true,
   } = input;
 
-  const exists = await prisma.blogCategory.findUnique({
+  const exists = await prisma.blogTag.findUnique({
     where: { uid },
     select: { uid: true },
   });
@@ -168,7 +166,6 @@ export async function create(input: CreateType) {
       data: {
         uid,
         name,
-        code,
         slug,
         desc,
         isUse,
@@ -176,10 +173,10 @@ export async function create(input: CreateType) {
       },
     };
 
-    const created = await tx.blogCategory.create(createData);
+    const created = await tx.blogTag.create(createData);
 
     // 관계 포함 최종 반환
-    const withRelations = await tx.blogCategory.findUnique({
+    const withRelations = await tx.blogTag.findUnique({
       where: { uid: created.uid },
     });
 
@@ -191,9 +188,9 @@ export async function create(input: CreateType) {
 
 /** 수정 */
 export async function update(input: UpdateType) {
-  const { uid, cid, name, code, slug, desc = null, isUse, isVisible } = input;
+  const { uid, cid, name, slug, desc = null, isUse, isVisible } = input;
 
-  const exist = await prisma.blogCategory.findUnique({
+  const exist = await prisma.blogTag.findUnique({
     where: { uid, cid },
     select: { uid: true, cid: true },
   });
@@ -203,14 +200,13 @@ export async function update(input: UpdateType) {
     // 3) 본문 업데이트 + 관계 include
     const data: any = {
       name,
-      code,
       slug,
       desc,
       isUse,
       isVisible,
     };
 
-    const updated = await tx.blogCategory.update({
+    const updated = await tx.blogTag.update({
       where: { uid },
       data,
     });
@@ -232,32 +228,15 @@ export async function remove(input: DeleteInput): Promise<DeleteResult> {
 
   // Bulk
   if (uids && uids.length > 0) {
-    const categories = await prisma.blogCategory.findMany({
-      where: { uid: { in: uids } },
-      select: { uid: true, code: true },
-    });
-
-    const deletableUids: string[] = [];
-    for (const cat of categories) {
-      const children = await getChildCategories(cat.code);
-      if (Array.isArray(children) && children.length === 0) {
-        deletableUids.push(cat.uid);
-      }
-    }
-
-    if (deletableUids.length === 0) {
-      throw new Error('HAS_CHILD_CATEGORIES_ALL');
-    }
-
     return await prisma.$transaction(async (tx) => {
       if (hard) {
-        const rs = await tx.blogCategory.deleteMany({
-          where: { uid: { in: deletableUids } },
+        const rs = await tx.blogTag.deleteMany({
+          where: { uid: { in: uids } },
         });
         return { mode: 'bulk', affected: rs.count };
       } else {
-        const rs = await tx.blogCategory.updateMany({
-          where: { uid: { in: deletableUids } },
+        const rs = await tx.blogTag.updateMany({
+          where: { uid: { in: uids } },
           data: { isUse: false, isVisible: false },
         });
         return { mode: 'bulk', affected: rs.count };
@@ -266,24 +245,18 @@ export async function remove(input: DeleteInput): Promise<DeleteResult> {
   }
 
   // Single
-  const category = await prisma.blogCategory.findUnique({
+  const category = await prisma.blogTag.findUnique({
     where: { uid: uid! },
-    select: { uid: true, code: true },
+    select: { uid: true },
   });
   if (!category) throw new Error('NOT_FOUND');
 
-  // 하위 카테고리 확인
-  const children = await getChildCategories(category.code);
-  if (Array.isArray(children) && children.length > 0) {
-    throw new Error('HAS_CHILD_CATEGORIES');
-  }
-
   return await prisma.$transaction(async (tx) => {
     if (hard) {
-      const rs = await tx.blogCategory.delete({ where: { uid: uid! } });
+      const rs = await tx.blogTag.delete({ where: { uid: uid! } });
       return { mode: 'single', affected: rs ? 1 : 0 };
     } else {
-      const rs = await tx.blogCategory.update({
+      const rs = await tx.blogTag.update({
         where: { uid: uid! },
         data: { isUse: false, isVisible: false },
       });
