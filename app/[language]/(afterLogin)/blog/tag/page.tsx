@@ -66,7 +66,7 @@ export default async function Page({ params, searchParams }: Props) {
       one(sp.isVisible) === undefined
         ? undefined
         : one(sp.isVisible) === 'true',
-    sortBy: (one(sp.sortBy) as SortBy) ?? 'code',
+    sortBy: (one(sp.sortBy) as SortBy) ?? 'idx',
     order: (one(sp.order) as SortOrder) ?? 'asc',
     limit: Number(one(sp.limit) ?? 20),
   };

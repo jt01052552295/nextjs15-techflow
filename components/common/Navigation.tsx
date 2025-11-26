@@ -94,10 +94,11 @@ const Navigation = () => {
     {
       id: 'blog',
       icon: faBlog,
-      route: 'blogCategory.index',
+      route: 'blogPost.index',
       subMenus: [
         { id: 'blogCategory-list', route: 'blogCategory.index' },
         { id: 'blogTag-list', route: 'blogTag.index' },
+        { id: 'blogPost-list', route: 'blogPost.index' },
       ],
     },
     {
