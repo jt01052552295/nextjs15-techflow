@@ -1747,8 +1747,8 @@ model BlogPost {
   linkUrl       String?      @db.VarChar(255)
 
   // 카테고리 (단일)
-  postCategoryId Int?
-  blogCategory   BlogCategory? @relation(fields: [postCategoryId], references: [idx])
+  categoryCode  String?
+  blogCategory  BlogCategory? @relation(fields: [categoryCode], references: [code])
 
   status        PostStatus       @default(DRAFT)
   visibility    PostVisibility   @default(PUBLIC) 
@@ -1777,7 +1777,7 @@ model BlogPost {
   @@index([uid], map: "uid_index")
   @@index([cid], map: "cid_index")
   @@index([userId], map: "userId_index")
-  @@index([postCategoryId], map: "postCategory_index")
+  @@index([categoryCode], map: "categoryCode_index")
   @@map("ec_post")
 }
 
@@ -1787,7 +1787,7 @@ model BlogCategory {
   uid       String   @unique @default(uuid())
   cid       String   @default(cuid())
 
-  code      String   @db.VarChar(255)
+  code      String   @unique @db.VarChar(255)
   name      String   @db.VarChar(100)
   slug      String   @unique @db.VarChar(100)
   desc      String?  @db.VarChar(255)
@@ -1801,6 +1801,7 @@ model BlogCategory {
 
   posts     BlogPost[]
 
+  @@index([code], map: "code_index")
   @@map("ec_post_category")
 }
 

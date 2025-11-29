@@ -1,5 +1,6 @@
 import type { PostStatus, PostVisibility } from '@prisma/client';
 import type { IBlogCategory } from '@/types/blog/category';
+import { IUser } from '@/types/user';
 
 export interface IBlogPost {
   idx: number;
@@ -12,7 +13,7 @@ export interface IBlogPost {
   content: string;
   linkUrl?: string | null;
 
-  postCategoryId?: number | null;
+  categoryCode?: string | null;
 
   status: PostStatus;
   visibility: PostVisibility;
@@ -32,6 +33,7 @@ export interface IBlogPost {
 
   // 관계 (필요할 때만 씀)
   blogCategory?: IBlogCategory | null;
+  user?: IUser | null;
 }
 export type IBlogPostPart = Partial<IBlogPost>;
 

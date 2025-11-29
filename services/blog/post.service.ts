@@ -106,6 +106,13 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
     where: whereForPage,
     orderBy,
     take: safeLimit + 1,
+    include: {
+      user: {
+        include: {
+          profile: true,
+        },
+      },
+    },
   });
 
   const hasMore = rows.length > safeLimit;
@@ -136,6 +143,13 @@ export async function show(uid: string): Promise<IBlogPost> {
 
   const rs = await prisma.blogPost.findUnique({
     where: { uid },
+    include: {
+      user: {
+        include: {
+          profile: true,
+        },
+      },
+    },
   });
 
   if (!rs) throw new Error('NOT_FOUND');
@@ -148,7 +162,7 @@ export async function create(input: CreateType) {
     uid,
     userId,
     content,
-    postCategoryId = null,
+    categoryCode = null,
     linkUrl = null,
     status,
     visibility,
@@ -169,7 +183,7 @@ export async function create(input: CreateType) {
         uid,
         userId,
         content,
-        postCategoryId,
+        categoryCode,
         linkUrl,
         status,
         visibility,
@@ -204,7 +218,7 @@ export async function update(input: UpdateType) {
     cid,
     userId,
     content,
-    postCategoryId = null,
+    categoryCode = null,
     linkUrl = null,
     status,
     visibility,
@@ -224,7 +238,7 @@ export async function update(input: UpdateType) {
     const data: any = {
       userId,
       content,
-      postCategoryId,
+      categoryCode,
       linkUrl,
       status,
       visibility,

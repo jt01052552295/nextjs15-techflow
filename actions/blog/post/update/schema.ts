@@ -14,7 +14,7 @@ export const UpdateSchema = (messages: Record<string, any>) =>
     }),
 
     // 카테고리: 선택 안 할 수도 있다고 가정 (null/optional 허용)
-    postCategoryId: z.coerce.number().int().optional().nullable(),
+    categoryCode: z.string().optional().nullable(),
 
     content: z.string().min(1, {
       message: messages.required,

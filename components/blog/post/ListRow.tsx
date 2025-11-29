@@ -18,6 +18,7 @@ import { faSquare } from '@fortawesome/free-regular-svg-icons';
 import { useLanguage } from '@/components/context/LanguageContext';
 import { getRouteUrl } from '@/utils/routes';
 import { useSearchParams } from 'next/navigation';
+import UserProfileDisplay from '@/components/common/UserProfileDisplay';
 
 type Props = {
   row: IBlogPostListRow;
@@ -83,7 +84,7 @@ const ListRow = ({
         <span className="badge text-bg-secondary">{row.uid}</span>
       </td>
       <td className="text-start">
-        <span className="badge text-bg-primary">{row.userId}</span>
+        <UserProfileDisplay user={row.user} />
       </td>
       <td className="text-center">{row.content}</td>
 

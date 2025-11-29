@@ -23,8 +23,13 @@ import useFormUtils from '@/hooks/useFormUtils';
 import ResultConfirm from '@/components/blog/post/modal/ResultConfirm';
 import { useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
+import FormSelect from '@/components/common/form/FormSelect';
+import FormTextarea from '@/components/common/form/FormTextarea';
 import FormTextField from '@/components/common/form/FormTextField';
 import FormSwitch from '@/components/common/form/FormSwitch';
+import UserSelect from '@/components/common/UserSelect';
+import { getPostStatusOptions, getPostVisibilityOptions } from '@/constants';
+import BlogCategorySelect from '@/components/common/BlogCategorySelect';
 
 export default function CreateForm() {
   const { dictionary, locale, t } = useLanguage();
@@ -34,6 +39,9 @@ export default function CreateForm() {
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | undefined>('');
   const [isResultOpen, setIsResultOpen] = useState<boolean>(false);
+
+  const statusOptions = getPostStatusOptions(locale);
+  const visibilityOptions = getPostVisibilityOptions(locale);
 
   const methods = useForm<CreateType>({
     mode: 'onChange',
@@ -57,7 +65,7 @@ export default function CreateForm() {
     setError,
   } = methods;
 
-  const { handleInputChange, getInputClass } = useFormUtils<CreateType>({
+  const { handleInputChange } = useFormUtils<CreateType>({
     trigger,
     errors,
     watch,
@@ -128,20 +136,30 @@ export default function CreateForm() {
                   <div className="row">
                     <div className="col">
                       <div className="mb-2">
-                        <FormTextField
-                          label={t('columns.blogPost.userId')}
+                        <UserSelect
                           name="userId"
-                          register={register}
-                          error={errors?.userId}
-                          validMessage={t('common.form.valid')}
-                          isDirty={!!dirtyFields.userId}
-                          readOnly={isPending}
+                          control={control}
+                          label={t('columns.shopReview.userId')}
+                          required
+                          error={errors.userId?.message}
+                          feedbackMessages={{ valid: t('common.form.valid') }}
+                          disabled={isPending}
                           onChange={() => handleInputChange('userId')}
-                          onBlur={() => handleInputChange('userId')}
                         />
+
+                        {errors.userId?.message && (
+                          <div className="invalid-feedback">
+                            {errors.userId?.message}
+                          </div>
+                        )}
+                        {!errors.userId && (
+                          <div className="valid-feedback">
+                            {t('common.form.valid')}
+                          </div>
+                        )}
                       </div>
                       <div className="mb-2">
-                        <FormTextField
+                        <FormTextarea
                           label={t('columns.blogPost.content')}
                           name="content"
                           register={register}
@@ -149,10 +167,13 @@ export default function CreateForm() {
                           validMessage={t('common.form.valid')}
                           isDirty={!!dirtyFields.content}
                           readOnly={isPending}
+                          minRows={1}
+                          maxRows={10}
                           onChange={() => handleInputChange('content')}
                           onBlur={() => handleInputChange('content')}
                         />
                       </div>
+
                       <div className="mb-2">
                         <FormTextField
                           label={t('columns.blogPost.linkUrl')}
@@ -167,16 +188,15 @@ export default function CreateForm() {
                         />
                       </div>
                       <div className="mb-2">
-                        <FormTextField
-                          label={t('columns.blogPost.postCategoryId')}
-                          name="postCategoryId"
-                          register={register}
-                          error={errors?.postCategoryId}
-                          validMessage={t('common.form.valid')}
-                          isDirty={!!dirtyFields.postCategoryId}
-                          readOnly={isPending}
-                          onChange={() => handleInputChange('postCategoryId')}
-                          onBlur={() => handleInputChange('postCategoryId')}
+                        <BlogCategorySelect
+                          name="categoryCode"
+                          control={control}
+                          label={t('columns.blogPost.categoryCode')}
+                          required
+                          error={errors?.categoryCode?.message}
+                          feedbackMessages={{ valid: t('common.form.valid') }}
+                          disabled={isPending}
+                          onChange={() => handleInputChange('categoryCode')}
                         />
                       </div>
                     </div>
@@ -193,27 +213,27 @@ export default function CreateForm() {
                   <div className="row">
                     <div className="col">
                       <div className="mb-2">
-                        <FormTextField
+                        <FormSelect
                           label={t('columns.blogPost.status')}
                           name="status"
                           register={register}
+                          options={statusOptions}
                           error={errors?.status}
                           validMessage={t('common.form.valid')}
-                          isDirty={!!dirtyFields.status}
-                          readOnly={isPending}
+                          placeholder={t('common.choose')}
                           onChange={() => handleInputChange('status')}
                           onBlur={() => handleInputChange('status')}
                         />
                       </div>
                       <div className="mb-2">
-                        <FormTextField
+                        <FormSelect
                           label={t('columns.blogPost.visibility')}
                           name="visibility"
                           register={register}
+                          options={visibilityOptions}
                           error={errors?.visibility}
                           validMessage={t('common.form.valid')}
-                          isDirty={!!dirtyFields.visibility}
-                          readOnly={isPending}
+                          placeholder={t('common.choose')}
                           onChange={() => handleInputChange('visibility')}
                           onBlur={() => handleInputChange('visibility')}
                         />

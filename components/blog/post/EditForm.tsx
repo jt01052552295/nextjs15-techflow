@@ -30,8 +30,13 @@ import { useSearchParams } from 'next/navigation';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { blogPostQK } from '@/lib/queryKeys/blog/post';
 import { showAction } from '@/actions/blog/post/show';
+import FormSelect, { SelectOption } from '@/components/common/form/FormSelect';
+import FormTextarea from '@/components/common/form/FormTextarea';
 import FormTextField from '@/components/common/form/FormTextField';
 import FormSwitch from '@/components/common/form/FormSwitch';
+import UserSelect from '@/components/common/UserSelect';
+import { getPostStatusOptions, getPostVisibilityOptions } from '@/constants';
+import BlogCategorySelect from '@/components/common/BlogCategorySelect';
 
 type Props = {
   uid: string;
@@ -50,6 +55,9 @@ export default function EditForm({ uid }: Props) {
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | undefined>('');
   const [isResultOpen, setIsResultOpen] = useState<boolean>(false);
+
+  const statusOptions = getPostStatusOptions(locale);
+  const visibilityOptions = getPostVisibilityOptions(locale);
 
   const { data, isLoading, error } = useQuery({
     queryKey: blogPostQK.detail(uid),
@@ -98,7 +106,7 @@ export default function EditForm({ uid }: Props) {
     setValue('status', data.status ?? '', { shouldValidate: true });
     setValue('visibility', data.visibility ?? '', { shouldValidate: true });
     setValue('linkUrl', data.linkUrl ?? '', { shouldValidate: true });
-    setValue('postCategoryId', (data as any).postCategoryId ?? 0);
+    setValue('categoryCode', (data as any).categoryCode ?? 0);
     setValue('isPinned', !!(data as any).isPinned);
     setValue('isUse', !!(data as any).isUse);
     setValue('isVisible', !!(data as any).isVisible);
@@ -186,20 +194,30 @@ export default function EditForm({ uid }: Props) {
                   <div className="row">
                     <div className="col">
                       <div className="mb-2">
-                        <FormTextField
-                          label={t('columns.blogPost.userId')}
+                        <UserSelect
                           name="userId"
-                          register={register}
-                          error={errors?.userId}
-                          validMessage={t('common.form.valid')}
-                          isDirty={!!dirtyFields.userId}
-                          readOnly={isPending}
+                          control={control}
+                          label={t('columns.shopReview.userId')}
+                          required
+                          error={errors.userId?.message}
+                          feedbackMessages={{ valid: t('common.form.valid') }}
+                          disabled={isPending}
                           onChange={() => handleInputChange('userId')}
-                          onBlur={() => handleInputChange('userId')}
                         />
+
+                        {errors.userId?.message && (
+                          <div className="invalid-feedback">
+                            {errors.userId?.message}
+                          </div>
+                        )}
+                        {!errors.userId && (
+                          <div className="valid-feedback">
+                            {t('common.form.valid')}
+                          </div>
+                        )}
                       </div>
                       <div className="mb-2">
-                        <FormTextField
+                        <FormTextarea
                           label={t('columns.blogPost.content')}
                           name="content"
                           register={register}
@@ -207,6 +225,8 @@ export default function EditForm({ uid }: Props) {
                           validMessage={t('common.form.valid')}
                           isDirty={!!dirtyFields.content}
                           readOnly={isPending}
+                          minRows={1}
+                          maxRows={10}
                           onChange={() => handleInputChange('content')}
                           onBlur={() => handleInputChange('content')}
                         />
@@ -225,16 +245,15 @@ export default function EditForm({ uid }: Props) {
                         />
                       </div>
                       <div className="mb-2">
-                        <FormTextField
-                          label={t('columns.blogPost.postCategoryId')}
-                          name="postCategoryId"
-                          register={register}
-                          error={errors?.postCategoryId}
-                          validMessage={t('common.form.valid')}
-                          isDirty={!!dirtyFields.postCategoryId}
-                          readOnly={isPending}
-                          onChange={() => handleInputChange('postCategoryId')}
-                          onBlur={() => handleInputChange('postCategoryId')}
+                        <BlogCategorySelect
+                          name="categoryCode"
+                          control={control}
+                          label={t('columns.blogPost.categoryCode')}
+                          required
+                          error={errors?.categoryCode?.message}
+                          feedbackMessages={{ valid: t('common.form.valid') }}
+                          disabled={isPending}
+                          onChange={() => handleInputChange('categoryCode')}
                         />
                       </div>
                     </div>
@@ -251,27 +270,27 @@ export default function EditForm({ uid }: Props) {
                   <div className="row">
                     <div className="col">
                       <div className="mb-2">
-                        <FormTextField
+                        <FormSelect
                           label={t('columns.blogPost.status')}
                           name="status"
                           register={register}
+                          options={statusOptions}
                           error={errors?.status}
                           validMessage={t('common.form.valid')}
-                          isDirty={!!dirtyFields.status}
-                          readOnly={isPending}
+                          placeholder={t('common.choose')}
                           onChange={() => handleInputChange('status')}
                           onBlur={() => handleInputChange('status')}
                         />
                       </div>
                       <div className="mb-2">
-                        <FormTextField
+                        <FormSelect
                           label={t('columns.blogPost.visibility')}
                           name="visibility"
                           register={register}
+                          options={visibilityOptions}
                           error={errors?.visibility}
                           validMessage={t('common.form.valid')}
-                          isDirty={!!dirtyFields.visibility}
-                          readOnly={isPending}
+                          placeholder={t('common.choose')}
                           onChange={() => handleInputChange('visibility')}
                           onBlur={() => handleInputChange('visibility')}
                         />

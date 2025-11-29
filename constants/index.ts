@@ -388,3 +388,39 @@ export function getDeliveryMemoLabel(
 ) {
   return DELIVERY_MEMO_LABELS[code]?.[locale] ?? code;
 }
+
+/** PostStatus 라벨 */
+export const POST_STATUS_LABELS: Record<string, { ko: string; en: string }> = {
+  TEMP: { ko: '임시저장', en: 'Temporary' },
+  DRAFT: { ko: '작성중', en: 'Draft' },
+  REVIEW: { ko: '검토중', en: 'Under Review' },
+  SCHEDULED: { ko: '예약발행', en: 'Scheduled' },
+  PUBLISHED: { ko: '발행됨', en: 'Published' },
+  ARCHIVED: { ko: '보관됨', en: 'Archived' },
+};
+
+/** PostVisibility 라벨 */
+export const POST_VISIBILITY_LABELS: Record<
+  string,
+  { ko: string; en: string }
+> = {
+  PUBLIC: { ko: '공개', en: 'Public' },
+  PRIVATE: { ko: '비공개', en: 'Private' },
+  FOLLOWERS: { ko: '팔로워만', en: 'Followers Only' },
+};
+
+/** PostStatus 선택용 옵션 리스트 생성기 */
+export function getPostStatusOptions(locale: LocaleType) {
+  return Object.entries(POST_STATUS_LABELS).map(([value, labels]) => ({
+    value,
+    label: labels[locale] || labels.ko,
+  }));
+}
+
+/** PostVisibility 선택용 옵션 리스트 생성기 */
+export function getPostVisibilityOptions(locale: LocaleType) {
+  return Object.entries(POST_VISIBILITY_LABELS).map(([value, labels]) => ({
+    value,
+    label: labels[locale] || labels.ko,
+  }));
+}
