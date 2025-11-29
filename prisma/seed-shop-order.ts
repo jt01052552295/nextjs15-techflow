@@ -10,7 +10,7 @@ function rand<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// 비회원 X, 아래 3명만 주문자로 사용
+// 비회원 X, 미리 생성된 회원 ID 목록
 const USER_IDS = [
   '81cf6d86-72da-45ad-8440-2ea76ded67bb',
   'ab249162-a286-4c48-9778-c4b8747b4554',

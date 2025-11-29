@@ -267,6 +267,7 @@ const ListForm = ({ baseParams }: Props) => {
               <th className="text-center">{t('columns.blogPost.content')}</th>
               <th className="text-center">{t('columns.blogPost.createdAt')}</th>
               <th className="text-center">{t('columns.blogPost.updatedAt')}</th>
+              <th className="text-center">{t('common.counts')}</th>
               <th className="text-center">{t('common.actions')}</th>
             </tr>
           </thead>

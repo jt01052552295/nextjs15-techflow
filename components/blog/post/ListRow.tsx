@@ -90,6 +90,9 @@ const ListRow = ({
 
       <td className="text-center">{row.createdAt}</td>
       <td className="text-center">{row.updatedAt}</td>
+      <td className="text-center">
+        {row._count?.images ?? 0} {row._count?.comments ?? 0}{' '}
+      </td>
 
       <td className="text-center">
         <div className="d-flex justify-content-center gap-1">

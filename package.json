@@ -12,7 +12,8 @@
     "format:fix": "prettier --write --ignore-path .gitignore .",
     "lint-and-format": "npm run lint && npm run format",
     "lint-and-format:fix": "npm run lint:fix && npm run format:fix",
-    "prisma": "dotenv -e .env -- prisma"
+    "prisma": "dotenv -e .env -- prisma",
+    "prisma:seed": "npx dotenv-cli -e .env -- npx ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed-blog-comments.ts"
   },
   "scriptDescriptions": {
     "lint": "ESLint 실행/검사",
@@ -21,9 +22,6 @@
     "format:fix": "Prettier 위반된 파일을 수정",
     "lint-and-format": "ESLint && Prettier 동시검사",
     "lint-and-format:fix": "ESLint && Prettier 동시수정"
-  },
-  "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed-shop-order.ts"
   },
   "dependencies": {
     "@faker-js/faker": "^9.7.0",
