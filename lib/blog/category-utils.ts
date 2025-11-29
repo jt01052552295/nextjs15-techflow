@@ -66,11 +66,11 @@ export async function getChildCategories(
   const childLength = parentLength + 2;
 
   return await prisma.$queryRaw<IBlogCategory[]>`
-      SELECT * FROM \`ec_post_category\`; 
+      SELECT * FROM \`ec_post_category\`
       WHERE \`is_use\` = 1 
       AND \`code\` LIKE ${parentCode + '%'} 
       AND \`code\` <> ${parentCode} 
-      AND \`CHAR_LENGTH(code)\` = ${childLength} 
+      AND CHAR_LENGTH(\`code\`) = ${childLength} 
       ORDER BY \`code\` ASC
     `;
 }

@@ -23,6 +23,7 @@ const DeleteConfirmModal = ({ row, uids, onDeleted }: Props) => {
     const formData = row ? { uid: row.uid } : { uids };
 
     const response = await deleteAction(formData);
+    console.log(response);
 
     if (response.data && response.status === 'success') {
       toast.success(response.message);

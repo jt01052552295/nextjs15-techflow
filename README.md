@@ -1,26 +1,4 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-
-# Getting Started
-
-This is a Next.js project bootstrapped with create-next-app.
-
-## Quick start
-
-1. Install dependencies:
-```bash
-# production deps
-npm install next react react-dom sass classnames next-themes zustand immer sonner zod react-hook-form @hookform/resolvers react-countdown react-textarea-autosize react-quill dayjs @tanstack/react-query @tanstack/react-query-devtools react-date-range date-fns react-datepicker next-auth@beta @prisma/client ua-parser-js chartjs-plugin-datalabels mathjs node-fetch uuid nodemailer jsonwebtoken
-
-# dev deps
-npm install -D prettier eslint-config-prettier eslint-plugin-prettier typescript-plugin-css-modules @types/negotiator @types/bcryptjs @types/jsonwebtoken @types/uuid @types/nodemailer @types/ua-parser-js @tanstack/eslint-plugin-query prisma
-
-npm run dev
-# Open http://localhost:3000
-```
-
-
-2. 프로젝트:
+1. 프로젝트:
 📁 admin
 ├── 📁 app
 │   ├── 📁 api

@@ -55,7 +55,7 @@ const DeleteConfirmModal = ({ row, uids, onDeleted }: Props) => {
               <p
                 dangerouslySetInnerHTML={{
                   __html: t('common.confirm_delete_single', {
-                    name: row.name,
+                    name: row.idx,
                   }),
                 }}
               />
