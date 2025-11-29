@@ -37,6 +37,7 @@ import FormSwitch from '@/components/common/form/FormSwitch';
 import UserSelect from '@/components/common/UserSelect';
 import { getPostStatusOptions, getPostVisibilityOptions } from '@/constants';
 import BlogCategorySelect from '@/components/common/BlogCategorySelect';
+import ImageUploader from './ImageUploader';
 
 type Props = {
   uid: string;
@@ -55,6 +56,9 @@ export default function EditForm({ uid }: Props) {
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | undefined>('');
   const [isResultOpen, setIsResultOpen] = useState<boolean>(false);
+
+  const [uploadedImages, setUploadedImages] = useState<any[]>([]); // ✅ 업로드된 이미지 상태
+  const [deletedImages, setDeletedImages] = useState<string[]>([]);
 
   const statusOptions = getPostStatusOptions(locale);
   const visibilityOptions = getPostVisibilityOptions(locale);
@@ -106,10 +110,24 @@ export default function EditForm({ uid }: Props) {
     setValue('status', data.status ?? '', { shouldValidate: true });
     setValue('visibility', data.visibility ?? '', { shouldValidate: true });
     setValue('linkUrl', data.linkUrl ?? '', { shouldValidate: true });
-    setValue('categoryCode', (data as any).categoryCode ?? 0);
+    setValue('categoryCode', (data as any).categoryCode ?? '');
     setValue('isPinned', !!(data as any).isPinned);
     setValue('isUse', !!(data as any).isUse);
     setValue('isVisible', !!(data as any).isVisible);
+
+    if (data.images && Array.isArray(data.images)) {
+      const initialImages =
+        data.images.map((file: any) => ({
+          preview: staticUrl + file.url,
+          name: file.name,
+          url: file.url,
+          originalName: file.originalName, // ✅ 원본 파일명
+          size: file.size, // ✅ 파일 크기
+          ext: file.ext, // ✅ 확장자
+          type: file.type, // ✅ MIME 타입
+        })) ?? [];
+      setUploadedImages(initialImages);
+    }
 
     seededRef.current = true;
   }, [data, setValue, staticUrl]);
@@ -135,6 +153,8 @@ export default function EditForm({ uid }: Props) {
       try {
         const finalData = {
           ...data,
+          images: uploadedImages,
+          deleteFileUrls: deletedImages, // ✅ 삭제된 이미지들
         };
         console.log(finalData);
         const response = await updateAction(finalData);
@@ -332,6 +352,34 @@ export default function EditForm({ uid }: Props) {
                           disabled={isPending}
                           onChange={() => handleInputChange(`isVisible`)}
                           onBlur={() => handleInputChange(`isVisible`)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-md-12 mb-2">
+              <div className="card">
+                <div className="card-header">
+                  <h5 className="card-title m-0">
+                    {t('common.additional_info')}
+                  </h5>
+                </div>
+                <div className="card-body">
+                  <div className="row">
+                    <div className="col">
+                      <div className="mb-2">
+                        <ImageUploader
+                          dir={'post'}
+                          pid={watch('uid')}
+                          onChange={(images, removed) => {
+                            setUploadedImages(images); // ✅ 남아있는 이미지들
+                            setDeletedImages(removed ?? []); // ✅ 삭제된 이미지들
+                          }}
+                          initialImages={uploadedImages}
+                          mode="edit"
                         />
                       </div>
                     </div>

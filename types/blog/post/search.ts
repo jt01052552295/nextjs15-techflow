@@ -4,7 +4,7 @@ import type { ListParams } from '@/types/blog/post';
 export type BlogPostBaseParams = Omit<ListParams, 'cursor'>;
 
 export const DEFAULTS: BlogPostBaseParams = {
-  sortBy: 'idx',
+  sortBy: 'sortOrder',
   order: 'desc',
   limit: 20,
 };

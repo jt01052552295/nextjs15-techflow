@@ -7,7 +7,7 @@ import type {
   DeleteInput,
   DeleteResult,
 } from '@/types/blog/post';
-import { IBlogPost } from '@/types/blog/post';
+import { IBlogPostListRow } from '@/types/blog/post';
 import type { CreateType } from '@/actions/blog/post/create/schema';
 import type { UpdateType } from '@/actions/blog/post/update/schema';
 
@@ -27,7 +27,7 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
     isUse,
     isVisible,
 
-    sortBy = 'idx',
+    sortBy = 'sortOrder',
     order = 'desc',
 
     limit = 20,
@@ -107,6 +107,10 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
     orderBy,
     take: safeLimit + 1,
     include: {
+      _count: {
+        select: { comments: true, images: true },
+      },
+      images: { orderBy: { createdAt: 'desc' }, take: 1 },
       user: {
         include: {
           profile: true,
@@ -133,7 +137,7 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
 }
 
 /** 보기 */
-export async function show(uid: string): Promise<IBlogPost> {
+export async function show(uid: string): Promise<IBlogPostListRow> {
   // 먼저 존재 확인 (선택)
   const exists = await prisma.blogPost.findUnique({
     where: { uid },
@@ -144,6 +148,8 @@ export async function show(uid: string): Promise<IBlogPost> {
   const rs = await prisma.blogPost.findUnique({
     where: { uid },
     include: {
+      comments: { orderBy: { createdAt: 'desc' } },
+      images: { orderBy: { createdAt: 'desc' } },
       user: {
         include: {
           profile: true,
@@ -169,6 +175,7 @@ export async function create(input: CreateType) {
     isPinned = false,
     isUse = true,
     isVisible = true,
+    images = [],
   } = input;
 
   const exists = await prisma.blogPost.findUnique({
@@ -191,7 +198,23 @@ export async function create(input: CreateType) {
         isUse,
         isVisible,
       },
+      include: {
+        images: true,
+      },
     };
+
+    // 파일
+    if (images && images.length > 0) {
+      const fileRecords = images.map((f) => ({
+        name: f.name ?? '',
+        originalName: f.originalName,
+        url: f.url,
+        size: f.size,
+        ext: f.ext,
+        type: f.type,
+      }));
+      createData.data.images = { create: fileRecords };
+    }
 
     const created = await tx.blogPost.create(createData);
 
@@ -203,6 +226,9 @@ export async function create(input: CreateType) {
     // 관계 포함 최종 반환
     const withRelations = await tx.blogPost.findUnique({
       where: { uid: created.uid },
+      include: {
+        images: true,
+      },
     });
 
     return withRelations!;
@@ -225,6 +251,8 @@ export async function update(input: UpdateType) {
     isPinned = false,
     isUse,
     isVisible,
+    images,
+    deleteFileUrls,
   } = input;
 
   const exist = await prisma.blogPost.findUnique({
@@ -234,6 +262,13 @@ export async function update(input: UpdateType) {
   if (!exist) throw new Error('NOT_FOUND');
 
   const rs = await prisma.$transaction(async (tx) => {
+    // 2) 파일 삭제 (프론트에서 제거한 URL만)
+    if (deleteFileUrls && deleteFileUrls.length > 0) {
+      await tx.blogPostImage.deleteMany({
+        where: { postId: uid, url: { in: deleteFileUrls } },
+      });
+    }
+
     // 3) 본문 업데이트 + 관계 include
     const data: any = {
       userId,
@@ -247,9 +282,34 @@ export async function update(input: UpdateType) {
       isVisible,
     };
 
+    // 3-1) 새 파일 추가 (기존과 중복 URL 제외)
+    if (images && images.length > 0) {
+      const existing = await tx.blogPostImage.findMany({
+        where: { postId: uid },
+        select: { url: true },
+      });
+      const existingUrls = new Set(existing.map((f) => f.url));
+      const newFiles = images.filter((f) => f.url && !existingUrls.has(f.url));
+      if (newFiles.length > 0) {
+        data.images = {
+          create: newFiles.map((f) => ({
+            name: f.name ?? '',
+            originalName: f.originalName,
+            url: f.url,
+            size: f.size,
+            ext: f.ext,
+            type: f.type,
+          })),
+        };
+      }
+    }
+
     const updated = await tx.blogPost.update({
       where: { uid },
       data,
+      include: {
+        images: true,
+      },
     });
 
     return updated;

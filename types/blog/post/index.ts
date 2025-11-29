@@ -34,12 +34,21 @@ export interface IBlogPost {
   // 관계 (필요할 때만 씀)
   blogCategory?: IBlogCategory | null;
   user?: IUser | null;
+
+  comments: any; // 관계된 댓글
+  images: IBlogPostFile[]; // 관계된 파일
 }
 export type IBlogPostPart = Partial<IBlogPost>;
+
+export type IBlogPostCounts = {
+  comments: number;
+  images: number;
+};
 
 export type IBlogPostListRow = IBlogPost & {
   createdAt: string; // DTO에서 ISO 문자열로 변환
   updatedAt: string; // DTO에서 ISO 문자열로 변환
+  _count: IBlogPostCounts;
 };
 
 export type ListEditCell = 'name';
@@ -71,7 +80,7 @@ export type ListParams = {
   cursor?: string | null;
 };
 
-export type ListResult<T = IBlogPost> = {
+export type ListResult<T = IBlogPostListRow> = {
   items: T[];
   nextCursor?: string;
   totalAll: number;
@@ -88,3 +97,22 @@ export type DeleteResult = {
   mode: 'single' | 'bulk';
   affected: number; // 업데이트(soft) or 삭제(hard)된 개수
 };
+
+export interface IBlogPostFile {
+  idx: number;
+  uid: string;
+  postId: string;
+  originalName: string; // ✅ 유저가 업로드한 원본 파일명
+  url: string; // 서버 저장 URL
+  size: number; // ✅ 파일 크기 (bytes)
+  ext: string; // ✅ 확장자명 (pdf, zip, jpg 등)
+  type: string; // ✅ MIME 타입 (application/pdf, image/png 등)
+  createdAt: Date; // ✅ 업로드 시각 (ISO string)
+  updatedAt: Date; // ✅ 수정 시각 (ISO string)
+}
+export type IBlogPostFileWithoutIDX = Omit<IBlogPostFile, 'idx'>;
+
+export interface IBlogPostFileWithPreview extends IBlogPostFile {
+  previewUrl?: string;
+}
+export type IBlogPostFilePart = Partial<IBlogPostFileWithPreview>;

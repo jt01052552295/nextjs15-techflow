@@ -1844,7 +1844,8 @@ model BlogPostImage {
   idx          Int      @id @default(autoincrement())
   uid          String   @unique @default(uuid())
 
-  postId       Int
+  postId       String
+  name         String   @db.VarChar(255)
   url          String   @db.VarChar(255)
   ext          String?  @db.VarChar(10)
   originalName String
@@ -1853,11 +1854,13 @@ model BlogPostImage {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
 
-  post         BlogPost @relation(fields: [postId], references: [idx], onDelete: Cascade)
+  post         BlogPost @relation(fields: [postId], references: [uid], onDelete: Cascade)
 
   @@index([postId], map: "postId_index")
   @@map("ec_post_image")
 }
+
+
 
 /// 1차 댓글 + 2차 답글 구조
 model BlogPostComment {

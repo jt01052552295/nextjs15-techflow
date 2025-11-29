@@ -86,7 +86,7 @@ export default function SearchForm({
       sortOrder: t('columns.blogPost.sortOrder'),
     };
     const by =
-      map[value.sortBy ?? DEFAULTS.sortBy!] ?? t('columns.blogPost.idx');
+      map[value.sortBy ?? DEFAULTS.sortBy!] ?? t('columns.blogPost.sortOrder');
     const arrow = (value.order ?? DEFAULTS.order) === 'desc' ? '↓' : '↑';
     return `${by} ${arrow}`;
   })();
@@ -479,7 +479,7 @@ export default function SearchForm({
               <div className="col">
                 <select
                   className="form-select"
-                  value={f.sortBy ?? 'idx'}
+                  value={f.sortBy ?? 'sortOrder'}
                   onChange={(e) =>
                     setF({ ...f, sortBy: e.target.value as any })
                   }
@@ -865,7 +865,7 @@ export default function SearchForm({
             <div className="col">
               <select
                 className="form-select"
-                value={f.sortBy ?? 'idx'}
+                value={f.sortBy ?? 'sortOrder'}
                 onChange={(e) => setF({ ...f, sortBy: e.target.value as any })}
               >
                 <option value="createdAt">

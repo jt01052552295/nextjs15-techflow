@@ -30,6 +30,7 @@ import FormSwitch from '@/components/common/form/FormSwitch';
 import UserSelect from '@/components/common/UserSelect';
 import { getPostStatusOptions, getPostVisibilityOptions } from '@/constants';
 import BlogCategorySelect from '@/components/common/BlogCategorySelect';
+import ImageUploader from './ImageUploader';
 
 export default function CreateForm() {
   const { dictionary, locale, t } = useLanguage();
@@ -39,6 +40,7 @@ export default function CreateForm() {
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | undefined>('');
   const [isResultOpen, setIsResultOpen] = useState<boolean>(false);
+  const [uploadedImages, setUploadedImages] = useState<any[]>([]); // ✅ 업로드된 이미지 상태
 
   const statusOptions = getPostStatusOptions(locale);
   const visibilityOptions = getPostVisibilityOptions(locale);
@@ -77,6 +79,7 @@ export default function CreateForm() {
       try {
         const finalData = {
           ...data,
+          images: uploadedImages,
         };
         // console.log(finalData);
         const response = await createAction(finalData);
@@ -89,6 +92,7 @@ export default function CreateForm() {
           toast.success(response.message);
 
           reset();
+          setUploadedImages([]); // ✅ 이미지 초기화
           setIsResultOpen(true);
 
           queryClient.invalidateQueries({ queryKey: ['blogPost', 'list'] });
@@ -119,6 +123,7 @@ export default function CreateForm() {
   const formReset = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     reset(); // update form back to default values
+    setUploadedImages([]);
   };
 
   return (
@@ -249,6 +254,30 @@ export default function CreateForm() {
                           disabled={isPending}
                           onChange={() => handleInputChange(`isPinned`)}
                           onBlur={() => handleInputChange(`isPinned`)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-md-12 mb-2">
+              <div className="card">
+                <div className="card-header">
+                  <h5 className="card-title m-0">
+                    {t('common.additional_info')}
+                  </h5>
+                </div>
+                <div className="card-body">
+                  <div className="row">
+                    <div className="col">
+                      <div className="mb-2">
+                        <ImageUploader
+                          dir={'post'}
+                          pid={watch('uid')}
+                          onChange={setUploadedImages} // ✅ 작성폼은 업로드된 이미지만 관리
+                          mode="create"
                         />
                       </div>
                     </div>

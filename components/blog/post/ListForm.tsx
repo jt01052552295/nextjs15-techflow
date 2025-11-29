@@ -9,7 +9,7 @@ import ListRowSkeleton from './ListRowSkeleton';
 import ListRow from './ListRow';
 import type { IBlogPost, IBlogPostListRow } from '@/types/blog/post';
 import ScrollToTopButton from '@/components/common/ScrollToTopButton';
-
+import { listSortAction } from '@/actions/blog/post/list/sort';
 import {
   DEFAULTS,
   isSameBaseParams,
@@ -21,6 +21,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faSquareCheck,
   faTrash,
+  faArrowUpWideShort,
+  faArrowUp,
+  faArrowDown,
+  faArrowDownWideShort,
   faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import { faSquare } from '@fortawesome/free-regular-svg-icons';
@@ -96,7 +100,7 @@ const ListForm = ({ baseParams }: Props) => {
 
   const [selectedRow, setSelectedRow] = useState<IBlogPost | null>(null);
   const [selectedUids, setSelectedUids] = useState<string[]>([]);
-
+  const isSingleSelected = selectedUids.length === 1;
   const [checkAll, setCheckAll] = useState(false);
   const [modalType, setModalType] = useState<'single' | 'bulk'>('single');
 
@@ -112,6 +116,25 @@ const ListForm = ({ baseParams }: Props) => {
       setSelectedUids(items.map((item) => item.uid));
     } else {
       setSelectedUids([]);
+    }
+  };
+
+  const handleMove = async (direction: 'up' | 'down' | 'top' | 'bottom') => {
+    if (selectedUids.length !== 1) {
+      toast.warning(t('common.sort_single_only'));
+      return;
+    }
+
+    const selectedUid = selectedUids[0];
+    // console.log(selectedUid, direction);
+
+    const res = await listSortAction(selectedUid, direction);
+    console.log(res);
+    if (res.status === 'success') {
+      queryClient.invalidateQueries({ queryKey: ['practice', params] });
+      toast.success(res.message);
+    } else {
+      toast.error(res.message);
     }
   };
 
@@ -182,6 +205,52 @@ const ListForm = ({ baseParams }: Props) => {
                     </button>
                   </div>
                 </div>
+              </div>
+              <div className="col-auto">
+                <button
+                  type="button"
+                  className="btn border-0  p-1"
+                  onClick={() => handleMove('top')}
+                  disabled={!isSingleSelected}
+                >
+                  <FontAwesomeIcon
+                    icon={faArrowUpWideShort}
+                    title={t('common.move_top')}
+                  />
+                </button>
+                <button
+                  type="button"
+                  className="btn border-0  p-1"
+                  onClick={() => handleMove('up')}
+                  disabled={!isSingleSelected}
+                >
+                  <FontAwesomeIcon
+                    icon={faArrowUp}
+                    title={t('common.move_up')}
+                  />
+                </button>
+                <button
+                  type="button"
+                  className="btn border-0  p-1"
+                  onClick={() => handleMove('down')}
+                  disabled={!isSingleSelected}
+                >
+                  <FontAwesomeIcon
+                    icon={faArrowDown}
+                    title={t('common.move_down')}
+                  />
+                </button>
+                <button
+                  type="button"
+                  className="btn border-0  p-1"
+                  onClick={() => handleMove('bottom')}
+                  disabled={!isSingleSelected}
+                >
+                  <FontAwesomeIcon
+                    icon={faArrowDownWideShort}
+                    title={t('common.move_bottom')}
+                  />
+                </button>
               </div>
             </div>
           </div>

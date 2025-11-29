@@ -1,0 +1,46 @@
+.galleryContainer {
+  display: flex;
+  gap: 10px; // ✅ 이미지 간격 추가
+  max-width: 400px; // ✅ 전체 가로폭 제한
+  cursor: pointer;
+}
+
+.firstImage,
+.secondImage {
+  position: relative;
+  flex: 1 1 50%; // ✅ 두 이미지가 동일 비율로 정사각형
+  aspect-ratio: 1 / 1; // ✅ 정사각형
+  border-radius: 12px; // ✅ 둥근 모서리
+  overflow: hidden;
+}
+
+.image {
+  object-fit: cover;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05); // ✅ 호버 시 약간 확대
+  }
+}
+
+.imageOverlay {
+  object-fit: cover;
+  filter: blur(3px) brightness(0.7); // ✅ 블러 + 어둡게
+}
+
+.overlayText {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%; // ✅ 전체 너비
+  height: 100%; // ✅ 전체 높이
+  background: rgba(0, 0, 0, 0.6); // ✅ 반투명 검정
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  border-radius: 12px; // ✅ 이미지 둥근 모서리와 맞춤
+}
