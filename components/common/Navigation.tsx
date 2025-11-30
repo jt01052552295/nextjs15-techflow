@@ -99,6 +99,7 @@ const Navigation = () => {
         { id: 'blogCategory-list', route: 'blogCategory.index' },
         { id: 'blogTag-list', route: 'blogTag.index' },
         { id: 'blogPost-list', route: 'blogPost.index' },
+        { id: 'blogComment-list', route: 'blogComment.index' },
       ],
     },
     {

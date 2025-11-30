@@ -1,15 +1,15 @@
-import type { ListParams } from '@/types/blog/post';
+import type { ListParams } from '@/types/blog/comment';
 
 // 커서 제외 타입
-export type BlogPostBaseParams = Omit<ListParams, 'cursor'>;
+export type BlogPostCommentBaseParams = Omit<ListParams, 'cursor'>;
 
-export const DEFAULTS: BlogPostBaseParams = {
-  sortBy: 'sortOrder',
+export const DEFAULTS: BlogPostCommentBaseParams = {
+  sortBy: 'idx',
   order: 'desc',
   limit: 20,
 };
 
-const sortBySet = new Set(['idx', 'sortOrder', 'createdAt', 'updatedAt']);
+const sortBySet = new Set(['idx', 'createdAt', 'updatedAt']);
 const orderSet = new Set(['asc', 'desc']);
 
 export function parseBool(v?: string): boolean | undefined {
@@ -20,7 +20,7 @@ export function parseBool(v?: string): boolean | undefined {
 
 export function toBaseParamsFromSearch(
   sp: URLSearchParams,
-): BlogPostBaseParams {
+): BlogPostCommentBaseParams {
   const sortBy = sp.get('sortBy') ?? DEFAULTS.sortBy!;
   const order = sp.get('order') ?? DEFAULTS.order!;
   const limit = Number(sp.get('limit') ?? DEFAULTS.limit);
@@ -40,7 +40,9 @@ export function toBaseParamsFromSearch(
   };
 }
 
-export function toSearchParamsFromBase(p: BlogPostBaseParams): URLSearchParams {
+export function toSearchParamsFromBase(
+  p: BlogPostCommentBaseParams,
+): URLSearchParams {
   const sp = new URLSearchParams();
   if (p.q) sp.set('q', p.q);
   // if (p.name) sp.set('name', p.name);
@@ -60,7 +62,10 @@ export function toSearchParamsFromBase(p: BlogPostBaseParams): URLSearchParams {
 // 빈 문자열/공백을 undefined로 정리(안전용)
 const norm = (v?: string) => (v && v.trim() ? v.trim() : undefined);
 
-export function isSameBaseParams(a: BlogPostBaseParams, b: BlogPostBaseParams) {
+export function isSameBaseParams(
+  a: BlogPostCommentBaseParams,
+  b: BlogPostCommentBaseParams,
+) {
   return (
     norm(a.q) === norm(b.q) &&
     // norm(a.name) === norm(b.name) &&
@@ -70,7 +75,7 @@ export function isSameBaseParams(a: BlogPostBaseParams, b: BlogPostBaseParams) {
     norm(a.endDate) === norm(b.endDate) &&
     (a.isUse ?? null) === (b.isUse ?? null) &&
     (a.isVisible ?? null) === (b.isVisible ?? null) &&
-    (a.sortBy ?? 'sortOrder') === (b.sortBy ?? 'sortOrder') &&
+    (a.sortBy ?? 'idx') === (b.sortBy ?? 'idx') &&
     (a.order ?? 'desc') === (b.order ?? 'desc') &&
     (a.limit ?? 20) === (b.limit ?? 20)
   );

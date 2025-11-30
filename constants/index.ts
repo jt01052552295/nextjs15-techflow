@@ -424,3 +424,20 @@ export function getPostVisibilityOptions(locale: LocaleType) {
     label: labels[locale] || labels.ko,
   }));
 }
+
+/** PostCommentStatus 라벨 */
+export const POST_COMMENT_STATUS_LABELS: Record<
+  string,
+  { ko: string; en: string }
+> = {
+  PENDING: { ko: '승인 대기', en: 'Pending' },
+  APPROVED: { ko: '정상 노출', en: 'Approved' },
+  HIDDEN: { ko: '숨김', en: 'Hidden' },
+  SPAM: { ko: '스팸', en: 'Spam' },
+};
+export function getPostCommentStatusOptions(locale: LocaleType) {
+  return Object.entries(POST_COMMENT_STATUS_LABELS).map(([value, labels]) => ({
+    value,
+    label: labels[locale] || labels.ko,
+  }));
+}

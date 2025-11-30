@@ -6,10 +6,10 @@ import type {
   ListResult,
   DeleteInput,
   DeleteResult,
-} from '@/types/blog/post';
-import { IBlogPostListRow } from '@/types/blog/post';
-import type { CreateType } from '@/actions/blog/post/create/schema';
-import type { UpdateType } from '@/actions/blog/post/update/schema';
+} from '@/types/blog/comment';
+import { IBlogPostCommentListRow } from '@/types/blog/comment';
+import type { CreateType } from '@/actions/blog/comment/create/schema';
+import type { UpdateType } from '@/actions/blog/comment/update/schema';
 
 /**
  * 목록: 커서 기반(keyset) + 정렬/검색/필터 + 카운트 2종 + 풀컬럼
@@ -27,7 +27,7 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
     isUse,
     isVisible,
 
-    sortBy = 'sortOrder',
+    sortBy = 'idx',
     order = 'desc',
 
     limit = 20,
@@ -39,13 +39,16 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
   // ───────────────────────────────────
   // where (검색/필터)
   // ───────────────────────────────────
-  const baseWhere: Prisma.BlogPostWhereInput = {
+  const baseWhere: Prisma.BlogPostCommentWhereInput = {
     isUse: typeof isUse === 'boolean' ? isUse : true,
     isVisible: typeof isVisible === 'boolean' ? isVisible : true,
+
+    parentIdx: null,
+    depth: 1,
   };
 
   // 통합 검색(q)이 들어오면 name/email OR 매칭. 없으면 기존 name/email 개별 필드 사용
-  const filteredWhere: Prisma.BlogPostWhereInput = q
+  const filteredWhere: Prisma.BlogPostCommentWhereInput = q
     ? {
         ...baseWhere,
         OR: [{ content: { contains: q } }],
@@ -72,7 +75,7 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
   //   (A > a0) OR (A = a0 AND idx > i0)   // asc
   //   (A < a0) OR (A = a0 AND idx < i0)   // desc
   // ───────────────────────────────────
-  let keysetWhere: Prisma.BlogPostWhereInput | undefined;
+  let keysetWhere: Prisma.BlogPostCommentWhereInput | undefined;
   if (cursor) {
     const c = b64d(cursor) as { sortValue: any; idx: number };
     const cmpOp = order === 'asc' ? 'gt' : 'lt';
@@ -93,24 +96,31 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
   // ───────────────────────────────────
   // orderBy
   // ───────────────────────────────────
-  const orderBy: Prisma.BlogPostOrderByWithRelationInput[] = [
+  const orderBy: Prisma.BlogPostCommentOrderByWithRelationInput[] = [
     { [sortBy]: order },
     { idx: order }, // tie-breaker도 동일 방향
   ];
 
-  const whereForPage: Prisma.BlogPostWhereInput = keysetWhere
+  const whereForPage: Prisma.BlogPostCommentWhereInput = keysetWhere
     ? { AND: [filteredWhere, keysetWhere] }
     : filteredWhere;
 
-  const rows = await prisma.blogPost.findMany({
+  const rows = await prisma.blogPostComment.findMany({
     where: whereForPage,
     orderBy,
     take: safeLimit + 1,
     include: {
       _count: {
-        select: { comments: true, images: true },
+        select: { replies: true },
       },
-      images: { orderBy: { createdAt: 'desc' }, take: 1 },
+      replies: {
+        orderBy: { idx: 'asc' }, // 대댓글은 보통 작성 순서(asc)로 봅니다.
+        include: {
+          user: {
+            include: { profile: true },
+          },
+        },
+      },
       user: {
         include: {
           profile: true,
@@ -129,40 +139,62 @@ export async function list(params: ListParams = {}): Promise<ListResult> {
   }
 
   const [totalAll, totalFiltered] = await Promise.all([
-    prisma.blogPost.count({ where: baseWhere }),
-    prisma.blogPost.count({ where: filteredWhere }),
+    prisma.blogPostComment.count({ where: baseWhere }),
+    prisma.blogPostComment.count({ where: filteredWhere }),
   ]);
 
   return { items: items as any, nextCursor, totalAll, totalFiltered };
 }
 
 /** 보기 */
-export async function show(uid: string): Promise<IBlogPostListRow> {
+export async function show(uid: string): Promise<IBlogPostCommentListRow> {
   // 먼저 존재 확인 (선택)
-  const exists = await prisma.blogPost.findUnique({
+  const exists = await prisma.blogPostComment.findUnique({
     where: { uid },
     select: { uid: true },
   });
   if (!exists) throw new Error('NOT_FOUND');
 
-  const rs = await prisma.blogPost.findUnique({
+  const rs = await prisma.blogPostComment.findUnique({
     where: { uid },
     include: {
       _count: {
-        select: { comments: true, images: true },
+        select: { replies: true },
       },
-      comments: { orderBy: { createdAt: 'desc' } },
-      images: { orderBy: { createdAt: 'desc' } },
       user: {
         include: {
           profile: true,
+        },
+      },
+      post: true, // 부모 글 정보
+      parent: {
+        // 부모 댓글 정보 (2차 답글인 경우)
+        include: {
+          user: {
+            include: {
+              profile: true,
+            },
+          },
+        },
+      },
+      replies: {
+        // 대댓글 목록
+        orderBy: {
+          createdAt: 'asc',
+        },
+        include: {
+          user: {
+            include: {
+              profile: true,
+            },
+          },
         },
       },
     },
   });
 
   if (!rs) throw new Error('NOT_FOUND');
-  return rs as any;
+  return rs as IBlogPostCommentListRow;
 }
 
 /** 작성 */
@@ -171,17 +203,14 @@ export async function create(input: CreateType) {
     uid,
     userId,
     content,
-    categoryCode = null,
-    linkUrl = null,
+    author = null,
+    ipAddress = null,
     status,
-    visibility,
-    isPinned = false,
     isUse = true,
     isVisible = true,
-    images = [],
   } = input;
 
-  const exists = await prisma.blogPost.findUnique({
+  const exists = await prisma.blogPostComment.findUnique({
     where: { uid },
     select: { uid: true },
   });
@@ -193,11 +222,9 @@ export async function create(input: CreateType) {
         uid,
         userId,
         content,
-        categoryCode,
-        linkUrl,
+        author,
+        ipAddress,
         status,
-        visibility,
-        isPinned,
         isUse,
         isVisible,
       },
@@ -206,32 +233,11 @@ export async function create(input: CreateType) {
       },
     };
 
-    // 파일
-    if (images && images.length > 0) {
-      const fileRecords = images.map((f) => ({
-        name: f.name ?? '',
-        originalName: f.originalName,
-        url: f.url,
-        size: f.size,
-        ext: f.ext,
-        type: f.type,
-      }));
-      createData.data.images = { create: fileRecords };
-    }
-
-    const created = await tx.blogPost.create(createData);
-
-    await tx.blogPost.update({
-      where: { idx: created.idx },
-      data: { sortOrder: created.idx },
-    });
+    const created = await tx.blogPostComment.create(createData);
 
     // 관계 포함 최종 반환
-    const withRelations = await tx.blogPost.findUnique({
+    const withRelations = await tx.blogPostComment.findUnique({
       where: { uid: created.uid },
-      include: {
-        images: true,
-      },
     });
 
     return withRelations!;
@@ -244,75 +250,36 @@ export async function create(input: CreateType) {
 export async function update(input: UpdateType) {
   const {
     uid,
-    cid,
     userId,
     content,
-    categoryCode = null,
-    linkUrl = null,
+    author = null,
+    ipAddress = null,
     status,
-    visibility,
-    isPinned = false,
     isUse,
     isVisible,
-    images,
-    deleteFileUrls,
   } = input;
 
-  const exist = await prisma.blogPost.findUnique({
-    where: { uid, cid },
-    select: { uid: true, cid: true },
+  const exist = await prisma.blogPostComment.findUnique({
+    where: { uid },
+    select: { uid: true },
   });
   if (!exist) throw new Error('NOT_FOUND');
 
   const rs = await prisma.$transaction(async (tx) => {
-    // 2) 파일 삭제 (프론트에서 제거한 URL만)
-    if (deleteFileUrls && deleteFileUrls.length > 0) {
-      await tx.blogPostImage.deleteMany({
-        where: { postId: uid, url: { in: deleteFileUrls } },
-      });
-    }
-
     // 3) 본문 업데이트 + 관계 include
     const data: any = {
       userId,
       content,
-      categoryCode,
-      linkUrl,
+      author,
+      ipAddress,
       status,
-      visibility,
-      isPinned,
       isUse,
       isVisible,
     };
 
-    // 3-1) 새 파일 추가 (기존과 중복 URL 제외)
-    if (images && images.length > 0) {
-      const existing = await tx.blogPostImage.findMany({
-        where: { postId: uid },
-        select: { url: true },
-      });
-      const existingUrls = new Set(existing.map((f) => f.url));
-      const newFiles = images.filter((f) => f.url && !existingUrls.has(f.url));
-      if (newFiles.length > 0) {
-        data.images = {
-          create: newFiles.map((f) => ({
-            name: f.name ?? '',
-            originalName: f.originalName,
-            url: f.url,
-            size: f.size,
-            ext: f.ext,
-            type: f.type,
-          })),
-        };
-      }
-    }
-
-    const updated = await tx.blogPost.update({
+    const updated = await tx.blogPostComment.update({
       where: { uid },
       data,
-      include: {
-        images: true,
-      },
     });
 
     return updated;
@@ -334,12 +301,12 @@ export async function remove(input: DeleteInput): Promise<DeleteResult> {
   if (uids && uids.length > 0) {
     return await prisma.$transaction(async (tx) => {
       if (hard) {
-        const rs = await tx.blogPost.deleteMany({
+        const rs = await tx.blogPostComment.deleteMany({
           where: { uid: { in: uids } },
         });
         return { mode: 'bulk', affected: rs.count };
       } else {
-        const rs = await tx.blogPost.updateMany({
+        const rs = await tx.blogPostComment.updateMany({
           where: { uid: { in: uids } },
           data: { isUse: false, isVisible: false },
         });
@@ -349,7 +316,7 @@ export async function remove(input: DeleteInput): Promise<DeleteResult> {
   }
 
   // Single
-  const category = await prisma.blogPost.findUnique({
+  const category = await prisma.blogPostComment.findUnique({
     where: { uid: uid! },
     select: { uid: true },
   });
@@ -357,10 +324,10 @@ export async function remove(input: DeleteInput): Promise<DeleteResult> {
 
   return await prisma.$transaction(async (tx) => {
     if (hard) {
-      const rs = await tx.blogPost.delete({ where: { uid: uid! } });
+      const rs = await tx.blogPostComment.delete({ where: { uid: uid! } });
       return { mode: 'single', affected: rs ? 1 : 0 };
     } else {
-      const rs = await tx.blogPost.update({
+      const rs = await tx.blogPostComment.update({
         where: { uid: uid! },
         data: { isUse: false, isVisible: false },
       });

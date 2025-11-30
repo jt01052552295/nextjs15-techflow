@@ -709,5 +709,23 @@
       "name": "수정",
       "desc": ""
     }
+  },
+  "blogComment": {
+    "index": {
+      "name": "댓글",
+      "desc": ""
+    },
+    "create": {
+      "name": "생성",
+      "desc": ""
+    },
+    "show": {
+      "name": "보기",
+      "desc": ""
+    },
+    "edit": {
+      "name": "수정",
+      "desc": ""
+    }
   }
 }

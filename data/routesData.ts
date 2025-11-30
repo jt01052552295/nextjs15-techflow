@@ -233,4 +233,10 @@ export const routesData = {
     show: '/blog/post/{id}',
     edit: '/blog/post/{id}/edit',
   },
+  blogComment: {
+    index: '/blog/comment',
+    create: '/blog/comment/p/create',
+    show: '/blog/comment/{id}',
+    edit: '/blog/comment/{id}/edit',
+  },
 };
