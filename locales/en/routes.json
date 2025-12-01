@@ -424,5 +424,307 @@
       "name": "Edit",
       "desc": ""
     }
+  },
+  "payment": {
+    "index": {
+      "name": "Payment Methods",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "address": {
+    "index": {
+      "name": "Address Book",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "setup": {
+    "index": {
+      "name": "Basic Settings",
+      "desc": ""
+    },
+    "create": {
+      "name": "Basic Settings",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "badge": {
+    "index": {
+      "name": "Badge Management",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "point": {
+    "index": {
+      "name": "Point Management",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "fcmTemplates": {
+    "index": {
+      "name": "FCM Templates",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "fcmTokens": {
+    "index": {
+      "name": "FCM Tokens",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "fcmMessages": {
+    "index": {
+      "name": "FCM Messages",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "fcmAlarms": {
+    "index": {
+      "name": "FCM Alarms",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "shopCategory": {
+    "index": {
+      "name": "Categories",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "shopItem": {
+    "index": {
+      "name": "Products",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "shopOrder": {
+    "index": {
+      "name": "Orders",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "shopReview": {
+    "index": {
+      "name": "Reviews",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "blogCategory": {
+    "index": {
+      "name": "Categories",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "blogTag": {
+    "index": {
+      "name": "Tags",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "blogPost": {
+    "index": {
+      "name": "Posts",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
+  },
+  "blogComment": {
+    "index": {
+      "name": "Comments",
+      "desc": ""
+    },
+    "create": {
+      "name": "Create",
+      "desc": ""
+    },
+    "show": {
+      "name": "View",
+      "desc": ""
+    },
+    "edit": {
+      "name": "Edit",
+      "desc": ""
+    }
   }
 }
