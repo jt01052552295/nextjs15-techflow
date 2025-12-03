@@ -6,7 +6,6 @@ import { getRouteUrl } from '@/utils/routes';
 import PageHeader from '@/components/common/PageHeader';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import CreateForm from '@/components/blog/comment/CreateForm';
-import { getCategoryCode } from '@/lib/blog/comment-utils';
 
 type Props = {
   params: { language: LocaleType };
@@ -30,14 +29,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function Page({ params, searchParams }: Props) {
+export default async function Page({ params }: Props) {
   const { language } = await params;
-  const { code } = await searchParams;
   const dictionary = await getDictionary(language);
   const metadata = getRouteMetadata('blogComment.index', dictionary, language);
   const url = getRouteUrl('blogComment.index', language);
-
-  const newCode = await getCategoryCode(code);
 
   const breadcrumbPaths = [
     {
@@ -56,7 +52,7 @@ export default async function Page({ params, searchParams }: Props) {
         <PageHeader meta={metadata} />
         <Breadcrumb paths={breadcrumbPaths} />
       </div>
-      <CreateForm newCode={newCode} />
+      <CreateForm />
     </div>
   );
 }

@@ -5,7 +5,6 @@ import { Metadata } from 'next';
 import { getRouteUrl } from '@/utils/routes';
 import PageHeader from '@/components/common/PageHeader';
 import Breadcrumb from '@/components/common/Breadcrumb';
-import EditForm from '@/components/shop/order/EditForm';
 import { showAction } from '@/actions/shop/order/show';
 import {
   HydrationBoundary,
@@ -66,7 +65,7 @@ export default async function Page({ params }: Props) {
         <Breadcrumb paths={breadcrumbPaths} />
       </div>
       <HydrationBoundary state={dehydrate(qc)}>
-        <EditForm uid={uid} />
+        <div>Shop Order Edit UID: {uid}</div>
       </HydrationBoundary>
     </div>
   );

@@ -5,9 +5,7 @@ import { Metadata } from 'next';
 import { getRouteUrl } from '@/utils/routes';
 import PageHeader from '@/components/common/PageHeader';
 import Breadcrumb from '@/components/common/Breadcrumb';
-import ShowForm from '@/components/setting/ShowForm';
 import { showAction } from '@/actions/setting/show';
-import { listAction as commentsAction } from '@/actions/setting/comments';
 import {
   HydrationBoundary,
   dehydrate,
@@ -49,20 +47,6 @@ export default async function Page({ params }: Props) {
     queryFn: () => showAction(uid),
   });
 
-  // 루트 댓글(첫 페이지만)
-  const rootBase = {
-    todoId: uid,
-    sortBy: 'createdAt',
-    order: 'desc',
-    limit: 20,
-  } as const;
-  await qc.prefetchInfiniteQuery({
-    queryKey: settingQK.comments(rootBase),
-    queryFn: ({ pageParam }) =>
-      commentsAction({ ...rootBase, cursor: pageParam ?? null }),
-    initialPageParam: null,
-  });
-
   const breadcrumbPaths = [
     {
       name: metadata.name,
@@ -81,7 +65,7 @@ export default async function Page({ params }: Props) {
         <Breadcrumb paths={breadcrumbPaths} />
       </div>
       <HydrationBoundary state={dehydrate(qc)}>
-        <ShowForm uid={uid} />
+        <div>Setting UID: {uid}</div>
       </HydrationBoundary>
     </div>
   );

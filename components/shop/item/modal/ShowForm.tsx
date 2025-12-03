@@ -15,7 +15,6 @@ import { UpdateType, UpdateSchema } from '@/actions/shop/item/update/schema';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IShopItemOption } from '@/types/shop/item';
-import CommentSection from '../comment/CommentSection';
 import ImageView from '../ImageView';
 import { useQuery } from '@tanstack/react-query';
 import { shopItemQK } from '@/lib/queryKeys/shop/item';
@@ -353,19 +352,6 @@ export default function ShowForm({ uid }: Props) {
                       <div className="row g-4">
                         <ImageView images={uploadedImages} />
                       </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-md-12 mb-2">
-                  <div className="card">
-                    <div className="card-header">
-                      <h5 className="card-title m-0">
-                        {t('columns.shopItem.TodosComment')}
-                      </h5>
-                    </div>
-                    <div className="card-body">
-                      <CommentSection todoId={uid} />
                     </div>
                   </div>
                 </div>

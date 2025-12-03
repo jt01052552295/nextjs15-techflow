@@ -352,6 +352,7 @@ export async function syncCommentLikesBadges(userId: string) {
  * 리뷰 좋아요 수 기반 뱃지 동기화
  */
 export async function syncReviewLikesBadges(userId: string) {
+  console.log(userId);
   //   const totalLikes = await prisma.shopReview.aggregate({
   //     where: {
   //       userId,

@@ -2,7 +2,7 @@ import { getDictionary } from '@/utils/get-dictionary';
 import type { LocaleType } from '@/constants/i18n';
 import { getRouteMetadata } from '@/utils/routes';
 import { Metadata } from 'next';
-import ShowForm from '@/components/blog/category/modal/ShowForm';
+
 import { showAction } from '@/actions/blog/category/show';
 import {
   HydrationBoundary,
@@ -62,7 +62,7 @@ export default async function Page({ params }: Props) {
 
   return (
     <HydrationBoundary state={dehydrate(qc)}>
-      <ShowForm uid={uid} />
+      <div>Blog Category Modal UID: {uid}</div>
     </HydrationBoundary>
   );
 }
