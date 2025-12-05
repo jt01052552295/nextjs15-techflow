@@ -33,7 +33,7 @@ const RegisterForm = () => {
   const { dictionary, locale, t } = useLanguage();
   const router = useRouter();
 
-  const [step, setStep] = useState<number>(3);
+  const [step, setStep] = useState<number>(1);
   const [emailSent, setEmailSent] = useState<boolean>(false);
   const [isEmailSentLoading, setIsEmailSentLoading] = useState<boolean>(false);
   const [emailCodeSent, setEmailCodeSent] = useState<boolean>(false);
@@ -611,42 +611,6 @@ const RegisterForm = () => {
                         </div>
                       )}
                     </div>
-                  </div>
-
-                  <div className="form-check mb-3">
-                    <input
-                      type="checkbox"
-                      id="privacy"
-                      className="form-check-input"
-                      {...register('privacy')}
-                    />
-                    <label className="form-check-label" htmlFor="privacy">
-                      {t('common.form.privacy')}
-                    </label>
-                    <div className="mt-2 small">
-                      <Link
-                        href={`?modal=terms`}
-                        className="me-2 text-decoration-none"
-                        scroll={false} // 스크롤 방지
-                        prefetch={true} // 미리 가져오기
-                      >
-                        {t('common.policy.terms.title')}
-                      </Link>
-                      <span className="mx-1">|</span>
-                      <Link
-                        href={`?modal=privacy`}
-                        className="ms-2 text-decoration-none"
-                        scroll={false} // 스크롤 방지
-                        prefetch={true} // 미리 가져오기
-                      >
-                        {t('common.policy.privacy.title')}
-                      </Link>
-                    </div>
-                    {errors.privacy?.message && (
-                      <div className="invalid-feedback">
-                        {errors.privacy?.message}
-                      </div>
-                    )}
                   </div>
 
                   <div className="d-grid">
