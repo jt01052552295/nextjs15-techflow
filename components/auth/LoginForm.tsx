@@ -43,7 +43,7 @@ const LoginForm = () => {
     resolver: zodResolver(loginSchema(dictionary.common.form)),
     defaultValues: {
       email: '',
-      password: 'a1111!',
+      password: '',
       rememberEmail: false,
     },
     mode: 'onChange',
