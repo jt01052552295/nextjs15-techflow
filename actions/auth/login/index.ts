@@ -2,10 +2,6 @@
 import { __ts, getDictionary } from '@/utils/get-dictionary';
 import { loginSchema, LoginType } from './schema';
 import { User } from '@prisma/client';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import 'dayjs/locale/ko';
-import { getRouteUrl } from '@/utils/routes';
 import { ckLocale } from '@/lib/cookie';
 import { getUserByEmail } from '@/actions/user/info';
 import { createAuthSession } from '@/lib/auth-utils';
@@ -13,6 +9,7 @@ import { createAuthSession } from '@/lib/auth-utils';
 type ReturnType = {
   status: string;
   message: string;
+  callbackUrl?: string | null;
   data?: User;
   twoFactor?: boolean;
   expiresAt?: string; // 만료 시간 추가
@@ -52,7 +49,9 @@ export const authLoginAction = async (
   }
 
   try {
-    const expiresAt = await createAuthSession(existingUser, { expiryDays: 30 });
+    const { expiresAt } = await createAuthSession(existingUser, {
+      expiryDays: 30,
+    });
 
     // revalidatePath(`/ko/main`, 'layout');
 
@@ -71,6 +70,7 @@ export const authLoginAction = async (
       status: 'success',
       message: resultComplete,
       expiresAt: expiresAt.toISOString(), // 만료 시간 반환
+      callbackUrl: callbackUrl || null,
     };
   } catch (error) {
     throw error;

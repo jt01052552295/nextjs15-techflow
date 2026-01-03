@@ -2,16 +2,12 @@
 
 import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
-import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/prisma';
 import {
   registerSchema,
   RegisterType,
 } from '@/actions/auth/register/social-schema';
 import { getUserByEmail, getUserByPhone } from '@/actions/user/info';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import 'dayjs/locale/ko';
 import { __ts, getDictionary } from '@/utils/get-dictionary';
 import { ckLocale } from '@/lib/cookie';
 import { makeRandString } from '@/lib/util';
@@ -20,6 +16,7 @@ import { createAuthSession } from '@/lib/auth-utils';
 type ReturnType = {
   status: string;
   message: string;
+  callbackUrl?: string | null;
   data?: any;
   twoFactor?: boolean;
   expiresAt?: string; // 만료 시간 추가
@@ -132,7 +129,9 @@ export const oauthSocialRegisterAction = async (
       return { user };
     });
 
-    const expiresAt = await createAuthSession(result.user, { expiryDays: 30 });
+    const { expiresAt } = await createAuthSession(result.user, {
+      expiryDays: 30,
+    });
 
     const registerButton = await __ts(
       'common.auth.register.registerButton',
@@ -154,6 +153,7 @@ export const oauthSocialRegisterAction = async (
       message: resultComplete,
       data: result.user,
       expiresAt: expiresAt.toISOString(), // 만료 시간 반환
+      callbackUrl: callbackUrl || null,
     };
   } catch (error) {
     throw error;

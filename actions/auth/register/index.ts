@@ -1,14 +1,10 @@
 'use server';
 
 import bcrypt from 'bcryptjs';
-import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/prisma';
 import { registerSchema, RegisterType } from '@/actions/auth/register/schema';
 import { getUserByEmail, getUserByPhone } from '@/actions/user/info';
 import { User } from '@prisma/client';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import 'dayjs/locale/ko';
 import { __ts, getDictionary } from '@/utils/get-dictionary';
 import { ckLocale } from '@/lib/cookie';
 import { createAuthSession } from '@/lib/auth-utils';
@@ -16,6 +12,7 @@ import { createAuthSession } from '@/lib/auth-utils';
 type ReturnType = {
   status: string;
   message: string;
+  callbackUrl?: string | null;
   data?: User;
   twoFactor?: boolean;
   expiresAt?: string; // 만료 시간 추가
@@ -85,7 +82,9 @@ export const authRegisterAction = async (
       return { user };
     });
 
-    const expiresAt = await createAuthSession(result.user, { expiryDays: 30 });
+    const { expiresAt } = await createAuthSession(result.user, {
+      expiryDays: 30,
+    });
 
     const registerButton = await __ts(
       'common.auth.register.registerButton',
@@ -103,6 +102,7 @@ export const authRegisterAction = async (
       message: resultComplete,
       data: result.user,
       expiresAt: expiresAt.toISOString(), // 만료 시간 반환
+      callbackUrl: callbackUrl || null,
     };
   } catch (error) {
     throw error;

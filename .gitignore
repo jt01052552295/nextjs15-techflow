@@ -51,3 +51,4 @@ next-env.d.ts
 /public/editor
 /public/logs
 /public/dummy
+.ai

@@ -19,7 +19,7 @@ interface SessionOptions {
 export async function createAuthSession(
   user: User,
   options: SessionOptions = {},
-): Promise<Date> {
+): Promise<{ expiresAt: Date; token: string }> {
   // 기본값 설정
   const expiryDays = options.expiryDays || 30;
   const jwtSecret =
@@ -78,7 +78,7 @@ export async function createAuthSession(
     path: '/',
   });
 
-  return expiresAt;
+  return { expiresAt, token };
 }
 
 export async function getAuthSession(): Promise<any | null> {
