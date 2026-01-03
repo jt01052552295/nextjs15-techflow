@@ -1,7 +1,7 @@
 import { User } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import { sign } from 'jsonwebtoken';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import prisma from '@/lib/prisma';
 import { verify } from 'jsonwebtoken';
 
@@ -84,7 +84,16 @@ export async function createAuthSession(
 export async function getAuthSession(): Promise<any | null> {
   const cookieStore = await cookies();
 
-  const authToken = cookieStore.get('auth_token')?.value;
+  let authToken = cookieStore.get('auth_token')?.value;
+
+  // 쿠키에 토큰이 없다면 헤더(Authorization: Bearer ...) 확인 (RN 앱 대응)
+  if (!authToken) {
+    const headersList = await headers();
+    const authHeader = headersList.get('authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      authToken = authHeader.substring(7);
+    }
+  }
 
   if (!authToken) {
     return null;
