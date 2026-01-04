@@ -16,7 +16,9 @@ export async function POST() {
     }
 
     // 사용자 정보 다시 조회 (최신 상태 반영)
-    const user = await prisma.user.findUnique({ where: { id: session.id } });
+    const user = await prisma.user.findUnique({
+      where: { id: session.id, isUse: true, isSignout: false },
+    });
     if (!user)
       return NextResponse.json(
         { success: false, code: API_CODE.ERROR.USER_NOT_FOUND },

@@ -1,13 +1,13 @@
 import sendEmail from './send-email';
-import fs from 'fs';
+import fs from 'fs/promises';
 import path from 'path';
 import { __ts } from '@/utils/get-dictionary';
 import { ckLocale } from '@/lib/cookie';
 
-const loadTemplate = (
+const loadTemplate = async (
   templateName: string,
   replacements: { [key: string]: string },
-): string | null => {
+): Promise<string | null> => {
   const templatePath = path.join(
     process.cwd(),
     'public',
@@ -16,7 +16,7 @@ const loadTemplate = (
   );
 
   try {
-    let template = fs.readFileSync(templatePath, 'utf-8');
+    let template = await fs.readFile(templatePath, 'utf-8');
     for (const key in replacements) {
       template = template.replace(
         new RegExp(`{{${key}}}`, 'g'),
@@ -58,7 +58,7 @@ export const sendVerificationEmail = async (
   );
   const footer = await __ts('common.email.verification.footer', {}, language);
 
-  const html = loadTemplate('verification', {
+  const html = await loadTemplate('verification', {
     code,
     subject,
     greeting,

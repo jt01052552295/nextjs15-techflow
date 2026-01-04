@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
     // 사용자 확인
     const user = await prisma.user.findUnique({
-      where: { email, isUse: true },
+      where: { email, isUse: true, isSignout: false },
     });
 
     if (!user) {

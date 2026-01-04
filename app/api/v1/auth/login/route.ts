@@ -18,7 +18,10 @@ export async function POST(request: Request) {
 
     // 사용자 조회
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { email, isUse: true, isSignout: false },
+      include: {
+        profile: true,
+      },
     });
 
     if (!user || !user.password) {
