@@ -7,9 +7,9 @@ import { API_CODE } from '@/constants/api-code';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, password, name, nick, phone } = body;
+    const { email, password, name, phone, birthDate } = body;
 
-    if (!email || !password || !name || !nick) {
+    if (!email || !password || !name || !birthDate) {
       return NextResponse.json(
         { success: false, code: API_CODE.ERROR.MISSING_FIELDS },
         { status: 400 },
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     // 중복 체크
     const exists = await prisma.user.findFirst({
       where: {
-        OR: [{ email }, { nick }],
+        OR: [{ email }, { phone }, { name }],
       },
     });
 
@@ -39,7 +39,8 @@ export async function POST(request: Request) {
         email,
         password: hashedPassword,
         name,
-        nick,
+        nick: name,
+        birthDate,
         phone,
         role: 'USER',
         // 프로필 생성 (스키마에 따라 필드 조정 필요)
@@ -61,7 +62,7 @@ export async function POST(request: Request) {
       data: {
         token,
         expiresAt,
-        user: { id: newUser.id, email: newUser.email, nick: newUser.nick },
+        user: { id: newUser.id, email: newUser.email, name: newUser.name },
       },
     });
   } catch (error) {

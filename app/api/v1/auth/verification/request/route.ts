@@ -48,7 +48,7 @@ export async function POST(request: Request) {
       data: {
         identifier,
         code,
-        type,
+        type: type === 'email' ? 'EMAIL' : 'PHONE',
         purpose,
         expiresAt: expires,
       },

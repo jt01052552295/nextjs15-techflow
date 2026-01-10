@@ -16,10 +16,14 @@ model User {
   password           String
   name               String
   nick               String               @unique
+  gender             String?              @db.VarChar(10)
+  birthDate          String?              @map("birth_date") @db.VarChar(20)
   level              Int                  @default(1)
   zipcode            String?
   addr1              String?
   addr2              String?
+  lat                String?              @db.VarChar(50) // 위도
+  lng                String?              @db.VarChar(50) // 경도
   role               UserRole             @default(USER)
   createdAt          DateTime             @default(now()) @map("created_at")
   updatedAt          DateTime             @default(now()) @updatedAt @map("updated_at")
@@ -27,6 +31,9 @@ model User {
   isUse              Boolean              @default(true) @map("is_use")
   isVisible          Boolean              @default(true) @map("is_visible")
   isSignout          Boolean              @default(false) @map("is_signout")
+  marketingConsent   Boolean              @default(false) @map("marketing_consent")
+  lastLoginAt        DateTime?            @map("last_login_at")
+  provider           String               @default("email") @db.VarChar(50)
   followingCnt       Int @default(0) @map("following_cnt")  // 내가 팔로우하는 수
   followerCnt        Int @default(0) @map("follower_cnt")   // 나를 팔로우하는 수
 
