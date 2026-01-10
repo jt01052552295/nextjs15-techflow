@@ -9,10 +9,23 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { email, password, name, phone, birthDate } = body;
 
-    // 이메일 또는 전화번호 중 하나는 필수
-    if ((!email && !phone) || !password || !name || !birthDate) {
+    // 필수 필드 확인 및 누락된 필드 수집
+    const missingFields: string[] = [];
+    if (!name) missingFields.push('name');
+    if (!password) missingFields.push('password');
+    if (!birthDate) missingFields.push('birthDate');
+    if (!email && !phone) {
+      missingFields.push('email');
+      missingFields.push('phone');
+    }
+
+    if (missingFields.length > 0) {
       return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.MISSING_FIELDS },
+        {
+          success: false,
+          code: API_CODE.ERROR.MISSING_FIELDS,
+          details: missingFields,
+        },
         { status: 400 },
       );
     }
