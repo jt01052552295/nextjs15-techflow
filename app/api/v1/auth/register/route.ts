@@ -9,17 +9,23 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { email, password, name, phone, birthDate } = body;
 
-    if (!email || !password || !name || !birthDate) {
+    // 이메일 또는 전화번호 중 하나는 필수
+    if ((!email && !phone) || !password || !name || !birthDate) {
       return NextResponse.json(
         { success: false, code: API_CODE.ERROR.MISSING_FIELDS },
         { status: 400 },
       );
     }
 
+    // 중복 체크 조건 생성
+    const whereConditions: any[] = [{ name }];
+    if (email) whereConditions.push({ email });
+    if (phone) whereConditions.push({ phone });
+
     // 중복 체크
     const exists = await prisma.user.findFirst({
       where: {
-        OR: [{ email }, { phone }, { name }],
+        OR: whereConditions,
       },
     });
 
@@ -33,15 +39,20 @@ export async function POST(request: Request) {
     // 비밀번호 해싱
     const hashedPassword = await hash(password, 10);
 
+    // 랜덤 username 생성 (user_ + 랜덤 문자열)
+    const randomSuffix = Math.random().toString(36).substring(2, 10);
+    const username = `user_${randomSuffix}`;
+
     // 사용자 생성
     const newUser = await prisma.user.create({
       data: {
-        email,
+        username,
+        email: email || null,
+        phone: phone || null,
         password: hashedPassword,
         name,
         nick: name,
         birthDate,
-        phone,
         role: 'USER',
         // 프로필 생성 (스키마에 따라 필드 조정 필요)
         profile: {

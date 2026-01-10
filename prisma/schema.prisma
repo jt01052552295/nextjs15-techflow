@@ -10,9 +10,10 @@ datasource db {
 model User {
   idx                Int                  @id @default(autoincrement())
   id                 String               @unique @default(uuid())
-  email              String               @unique
+  username           String               @unique
+  email              String?              @unique
   emailVerified      DateTime?
-  phone              String               @unique
+  phone              String?              @unique
   password           String
   name               String
   nick               String               @unique
