@@ -120,6 +120,7 @@ export async function getAuthSession(): Promise<any | null> {
 
     const userWithProfiles = {
       id: user.id,
+      username: user.username,
       email: user.email,
       name: user.name,
       nick: user.nick,
