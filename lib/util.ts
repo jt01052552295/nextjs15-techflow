@@ -96,6 +96,23 @@ export const maskingEmail = (email: string | null): string => {
   return maskedName + '@' + maskedDomain;
 };
 
+export const maskingUserName = (str: string | null): string => {
+  if (!str) {
+    return '';
+  }
+  const length = str.length;
+  if (length <= 2) {
+    return str.charAt(0) + '*'.repeat(length - 1);
+  }
+
+  // 앞 3글자 노출, 나머지 마스킹
+  const visibleLength = 3;
+  const visiblePart = str.substring(0, visibleLength);
+  const maskedPart = '*'.repeat(length - visibleLength);
+
+  return visiblePart + maskedPart;
+};
+
 type FormatMessageParams = Record<string, string | number>;
 
 export const formatMessage = (

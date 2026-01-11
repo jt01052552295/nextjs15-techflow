@@ -1,26 +1,29 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { API_CODE } from '@/constants/api-code';
-import { maskingEmail } from '@/lib/util';
+import { maskingUserName } from '@/lib/util';
 
 // POST /api/v1/auth/find-id
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, phone } = body;
+    const { email, phone } = body;
 
-    if (!name || !phone) {
+    if (!email && !phone) {
       return NextResponse.json(
         { success: false, code: API_CODE.ERROR.MISSING_FIELDS },
         { status: 400 },
       );
     }
 
-    // 사용자 조회
+    // 사용자 조회 (이메일 또는 전화번호로 검색)
+    const whereConditions = [];
+    if (email) whereConditions.push({ email });
+    if (phone) whereConditions.push({ phone });
+
     const user = await prisma.user.findFirst({
       where: {
-        name,
-        phone,
+        OR: whereConditions,
         isUse: true,
       },
     });
@@ -35,7 +38,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       code: API_CODE.SUCCESS.FIND_ID,
-      email: maskingEmail(user.email), // 이메일 마스킹 처리하여 반환
+      username: maskingUserName(user.username),
     });
   } catch (error) {
     console.error(error);

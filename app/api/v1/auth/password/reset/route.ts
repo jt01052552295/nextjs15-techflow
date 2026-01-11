@@ -7,19 +7,22 @@ import { hash } from 'bcryptjs';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, code, newPassword } = body;
+    const { email, phone, code, newPassword } = body;
 
-    if (!email || !code || !newPassword) {
+    if ((!email && !phone) || !code || !newPassword) {
       return NextResponse.json(
         { success: false, code: API_CODE.ERROR.MISSING_FIELDS },
         { status: 400 },
       );
     }
 
+    // 식별자 결정
+    const identifier = email || phone;
+
     // 토큰 재검증 (보안을 위해 한 번 더 확인)
     const verification = await prisma.verification.findFirst({
       where: {
-        identifier: email,
+        identifier: identifier,
         code: code,
         purpose: 'PASSWORD_RESET',
       },
@@ -42,8 +45,11 @@ export async function POST(request: Request) {
     // 비밀번호 해싱 및 업데이트
     const hashedPassword = await hash(newPassword, 10);
 
+    // 업데이트할 사용자 식별 (이메일 우선, 없으면 전화번호)
+    const whereClause = email ? { email } : { phone };
+
     await prisma.user.update({
-      where: { email },
+      where: whereClause,
       data: {
         password: hashedPassword,
       },
@@ -51,7 +57,7 @@ export async function POST(request: Request) {
 
     // 사용된 토큰 삭제
     await prisma.verification.deleteMany({
-      where: { identifier: email, purpose: 'PASSWORD_RESET' },
+      where: { identifier: identifier, purpose: 'PASSWORD_RESET' },
     });
 
     return NextResponse.json({

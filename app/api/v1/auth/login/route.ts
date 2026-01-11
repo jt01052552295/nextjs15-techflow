@@ -7,18 +7,29 @@ import { API_CODE } from '@/constants/api-code';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, password } = body;
+    const { email, phone, username, password } = body;
 
-    if (!email || !password) {
+    // 이메일, 전화번호, 아이디 중 하나는 필수 + 비밀번호 필수
+    if ((!email && !phone && !username) || !password) {
       return NextResponse.json(
         { success: false, code: API_CODE.ERROR.MISSING_FIELDS },
         { status: 400 },
       );
     }
 
-    // 사용자 조회
-    const user = await prisma.user.findUnique({
-      where: { email, isUse: true, isSignout: false },
+    // 검색 조건 생성
+    const whereConditions = [];
+    if (email) whereConditions.push({ email });
+    if (phone) whereConditions.push({ phone });
+    if (username) whereConditions.push({ username });
+
+    // 사용자 조회 (OR 검색 + 사용 가능 여부 체크)
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: whereConditions,
+        isUse: true,
+        isSignout: false,
+      },
       include: {
         profile: true,
       },
@@ -52,7 +63,12 @@ export async function POST(request: Request) {
       data: {
         token,
         expiresAt,
-        user: { id: user.id, email: user.email, nick: user.nick },
+        user: {
+          id: user.id,
+          username: user.username,
+          name: user.name,
+          role: user.role,
+        },
       },
     });
   } catch (error) {

@@ -6,19 +6,22 @@ import { API_CODE } from '@/constants/api-code';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, code } = body;
+    const { email, phone, code } = body;
 
-    if (!email || !code) {
+    if ((!email && !phone) || !code) {
       return NextResponse.json(
         { success: false, code: API_CODE.ERROR.MISSING_FIELDS },
         { status: 400 },
       );
     }
 
+    // 식별자 결정 (이메일 우선, 없으면 전화번호)
+    const identifier = email || phone;
+
     // 토큰 조회
     const verification = await prisma.verification.findFirst({
       where: {
-        identifier: email,
+        identifier: identifier,
         code: code,
         purpose: 'PASSWORD_RESET',
       },
