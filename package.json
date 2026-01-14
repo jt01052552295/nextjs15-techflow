@@ -43,6 +43,7 @@
     "dayjs": "^1.11.13",
     "dotenv": "^17.2.3",
     "dotenv-cli": "^11.0.0",
+    "google-auth-library": "^10.5.0",
     "immer": "^10.1.1",
     "loadash": "^1.0.0",
     "mariadb": "^3.4.5",
