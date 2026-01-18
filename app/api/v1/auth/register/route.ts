@@ -86,7 +86,12 @@ export async function POST(request: Request) {
       data: {
         token,
         expiresAt,
-        user: { id: newUser.id, email: newUser.email, name: newUser.name },
+        user: {
+          id: newUser.id,
+          username: newUser.username,
+          name: newUser.name,
+          role: newUser.role,
+        },
       },
     });
   } catch (error) {
