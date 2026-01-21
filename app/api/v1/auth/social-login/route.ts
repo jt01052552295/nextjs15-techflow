@@ -138,13 +138,33 @@ export async function POST(request: Request) {
         const username = `user_${randomSuffix}`; // 랜덤 유저네임
         const tempPassword = await hash(makeRandString(16), 10); // 랜덤 비밀번호
 
+        // 닉네임 중복 처리
+        let nick = name;
+        let isUnique = false;
+        // 무한 루프 방지를 위한 카운터
+        let loopCount = 0;
+        while (!isUnique && loopCount < 5) {
+          const checkUser = await prisma.user.findUnique({ where: { nick } });
+          if (!checkUser) {
+            isUnique = true;
+          } else {
+            nick = `${name}_${makeRandString(4, 'alphanumericLower')}`;
+          }
+          loopCount++;
+        }
+
+        if (!isUnique) {
+          // 5번 시도해도 실패하면 타임스탬프 추가
+          nick = `${name}_${Date.now()}`;
+        }
+
         user = await prisma.user.create({
           data: {
             username,
             email: email || null,
             password: tempPassword,
             name: name,
-            nick: name, // 닉네임 중복 시 처리 필요할 수 있음
+            nick: nick,
             role: 'USER',
             provider: provider,
             emailVerified: new Date(),
