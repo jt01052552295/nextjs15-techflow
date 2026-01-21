@@ -74,6 +74,9 @@ export async function POST(request: Request) {
             url: '', // 기본 이미지 없음
           },
         },
+        userConfig: {
+          create: {}, // 빈 객체를 전달하면 Default 값으로 생성됨
+        },
       },
     });
 

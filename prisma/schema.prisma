@@ -72,6 +72,11 @@ model User {
   followingRelation     UserFollow[]    @relation("FollowingToUser")    // 내가 팔로우하는 사람들 관계
   blockerRelation       UserBlock[]     @relation("BlockerToUser")      // 내가 차단한 사람들 관계
   blockedRelation       UserBlock[]     @relation("BlockedToUser")      // 나를 차단한 사람들 관계
+  
+  // [X Clone] 설정 및 뮤트 관계 추가
+  userConfig            UserConfig?     // 유저 전역 설정 (1:1)
+  muterRelation         UserMute[]      @relation("MuterToUser")      // 내가 뮤트한 사람들
+  mutedRelation         UserMute[]      @relation("MutedToUser")      // 나를 뮤트한 사람들
 
   points              Point[] 
   ShopCart           ShopCart[]  
@@ -170,6 +175,36 @@ model UserAddress {
   @@index([userId])
   @@index([isDefault])
   @@map("ec_user_address")
+}
+
+// [X Clone] 사용자 전역 설정 테이블 (계정, 보안, 알림 통합)
+model UserConfig {
+  idx           Int      @id @default(autoincrement())
+  userId        String   @unique @map("user_id") // User와 1:1
+
+  // 1. 프라이버시 & 보안 (Privacy & Security)
+  isProtected   Boolean  @default(false) @map("is_protected") // 비공개 계정 (트윗 보호)
+  allowTagging  Boolean  @default(true)  @map("allow_tagging") // 나를 태그 허용 여부
+  allowDM       Boolean  @default(true)  @map("allow_dm")      // 쪽지 수신 허용 여부
+
+  // 2. 푸시 알림 상세 설정 (Notification - Push)
+  notiPushAll       Boolean @default(true) @map("noti_push_all")        // 전체 푸시 켜기/끄기
+  notiPushMention   Boolean @default(true) @map("noti_push_mention")    // 멘션 알림
+  notiPushReply     Boolean @default(true) @map("noti_push_reply")      // 대댓글 알림
+  notiPushLike      Boolean @default(true) @map("noti_push_like")       // 좋아요 알림
+  notiPushRetweet   Boolean @default(true) @map("noti_push_retweet")    // 리트윗 알림
+  notiPushFollow    Boolean @default(true) @map("noti_push_follow")     // 새 팔로워 알림
+  notiPushDM        Boolean @default(true) @map("noti_push_dm")         // 쪽지 알림
+
+  // 3. 이메일 알림 상세 설정 (Notification - Email)
+  notiEmailAll      Boolean @default(true) @map("noti_email_all")       // 전체 이메일 켜기/끄기
+  
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+
+  // 관계
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ec_user_config")
 }
 
 model Company {
@@ -1109,6 +1144,23 @@ model UserBlock {
   @@index([blockerIdx])
   @@index([blockedIdx])
   @@map("ec_user_block")
+}
+
+// [X Clone] 회원 뮤트 테이블
+model UserMute {
+  idx         Int      @id @default(autoincrement())
+  muterIdx    Int      @map("muter_idx") // 뮤트한 회원 idx (나)
+  mutedIdx    Int      @map("muted_idx") // 뮤트 대상 회원 idx (상대방)
+  muteDate    DateTime @default(now()) @map("mute_date") // 뮤트 일시
+  
+  // 관계 설정
+  muter       User     @relation("MuterToUser", fields: [muterIdx], references: [idx], onDelete: Cascade)
+  muted       User     @relation("MutedToUser", fields: [mutedIdx], references: [idx], onDelete: Cascade)
+
+  @@unique([muterIdx, mutedIdx]) // 중복 뮤트 방지
+  @@index([muterIdx])
+  @@index([mutedIdx])
+  @@map("ec_user_mute")
 }
 
 

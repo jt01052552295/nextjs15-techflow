@@ -183,6 +183,9 @@ export async function POST(request: Request) {
                 url: profileImage,
               },
             },
+            userConfig: {
+              create: {}, // 빈 객체를 전달하면 Default 값으로 생성됨
+            },
           },
         });
       }
