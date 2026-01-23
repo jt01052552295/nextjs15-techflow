@@ -2,11 +2,12 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { API_CODE } from '@/constants/api-code';
 import { hash } from 'bcryptjs';
+import { IResetPasswordRequest } from '@/types_api/auth';
 
 // POST /api/v1/auth/password/reset
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body = (await request.json()) as IResetPasswordRequest;
     const { email, phone, code, newPassword } = body;
 
     if ((!email && !phone) || !code || !newPassword) {

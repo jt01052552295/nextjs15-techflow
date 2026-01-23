@@ -3,10 +3,11 @@ import prisma from '@/lib/prisma';
 import { API_CODE } from '@/constants/api-code';
 import { makeRandString } from '@/lib/util';
 import { sendVerificationEmail } from '@/lib/mail';
+import { IVerificationRequest } from '@/types_api/auth';
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body = (await request.json()) as IVerificationRequest;
     const { email, phone, purpose = 'SIGNUP' } = body;
 
     if (!email && !phone) {
@@ -16,7 +17,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const identifier = email || phone;
+    const identifier = (email || phone)!;
     const type = email ? 'email' : 'phone';
 
     // 이미 가입된 사용자인지 확인 (회원가입용 인증인 경우)

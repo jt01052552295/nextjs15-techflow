@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-utils';
 import prisma from '@/lib/prisma';
 import { API_CODE } from '@/constants/api-code';
+import { IUpdatePrivacyRequest } from '@/types_api/user/settings';
 
 export async function GET() {
   try {
@@ -56,7 +57,7 @@ export async function PATCH(request: Request) {
       );
     }
 
-    const body = await request.json();
+    const body = (await request.json()) as IUpdatePrivacyRequest;
     const { isProtected, allowTagging, allowDM } = body;
 
     const updatedConfig = await prisma.userConfig.upsert({

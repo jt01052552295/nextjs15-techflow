@@ -9,17 +9,13 @@ import { getNaverProfile } from '@/lib/oauth/naver';
 import { getFacebookProfile } from '@/lib/oauth/facebook';
 import { OAuth2Client } from 'google-auth-library';
 import { GOOGLE_CLIENT_ID } from '@/lib/oauth/google';
+import { ISocialLoginRequest } from '@/types_api/auth';
 
 const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
-interface SocialLoginRequest {
-  provider: 'google' | 'kakao' | 'naver' | 'facebook';
-  token: string;
-}
-
 export async function POST(request: Request) {
   try {
-    const body: SocialLoginRequest = await request.json();
+    const body = (await request.json()) as ISocialLoginRequest;
     const { provider, token } = body;
 
     if (!provider || !token) {

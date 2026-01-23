@@ -3,10 +3,11 @@ import prisma from '@/lib/prisma';
 import { createAuthSession } from '@/lib/auth-utils';
 import { hash } from 'bcryptjs';
 import { API_CODE } from '@/constants/api-code';
+import { IRegisterRequest } from '@/types_api/auth';
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body = (await request.json()) as IRegisterRequest;
     const { email, password, name, phone, birthDate } = body;
 
     // 필수 필드 확인 및 누락된 필드 수집

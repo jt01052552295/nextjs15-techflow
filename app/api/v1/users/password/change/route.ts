@@ -3,6 +3,7 @@ import { getAuthSession } from '@/lib/auth-utils';
 import prisma from '@/lib/prisma';
 import { compare, hash } from 'bcryptjs';
 import { API_CODE } from '@/constants/api-code';
+import { IChangePasswordRequest } from '@/types_api/user/settings';
 
 export async function POST(request: Request) {
   try {
@@ -14,7 +15,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const { currentPassword, newPassword } = await request.json();
+    const { currentPassword, newPassword } =
+      (await request.json()) as IChangePasswordRequest;
 
     if (!currentPassword || !newPassword) {
       return NextResponse.json(

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-utils';
 import { API_CODE } from '@/constants/api-code';
 import prisma from '@/lib/prisma';
+import { IUpdateAccountRequest } from '@/types_api/user/settings';
 
 export async function GET() {
   try {
@@ -42,7 +43,7 @@ export async function PATCH(request: Request) {
       );
     }
 
-    const body = await request.json();
+    const body = (await request.json()) as IUpdateAccountRequest;
     const { username, phone, email, zipcode, addr1, addr2 } = body;
 
     await prisma.user.update({

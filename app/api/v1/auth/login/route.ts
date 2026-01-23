@@ -3,10 +3,11 @@ import prisma from '@/lib/prisma';
 import { createAuthSession } from '@/lib/auth-utils';
 import { compare } from 'bcryptjs';
 import { API_CODE } from '@/constants/api-code';
+import { ILoginRequest } from '@/types_api/auth';
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body = (await request.json()) as ILoginRequest;
     const { email, phone, username, password } = body;
 
     // 이메일, 전화번호, 아이디 중 하나는 필수 + 비밀번호 필수

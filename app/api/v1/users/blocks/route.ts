@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-utils';
 import prisma from '@/lib/prisma';
 import { API_CODE } from '@/constants/api-code';
+import { IBlockUserRequest } from '@/types_api/user/settings';
 
 export async function GET() {
   try {
@@ -79,7 +80,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { targetUserId } = await request.json();
+    const { targetUserId } = (await request.json()) as IBlockUserRequest;
     if (!targetUserId) {
       return NextResponse.json(
         { success: false, code: API_CODE.ERROR.MISSING_FIELDS },
@@ -166,7 +167,7 @@ export async function DELETE(request: Request) {
       );
     }
 
-    const { targetUserId } = await request.json();
+    const { targetUserId } = (await request.json()) as IBlockUserRequest;
     if (!targetUserId) {
       return NextResponse.json(
         { success: false, code: API_CODE.ERROR.MISSING_FIELDS },

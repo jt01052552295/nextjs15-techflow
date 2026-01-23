@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-utils';
 import prisma from '@/lib/prisma';
 import { API_CODE } from '@/constants/api-code';
+import { IUpdateNotificationRequest } from '@/types_api/user/settings';
 
 export async function GET() {
   try {
@@ -66,17 +67,27 @@ export async function PATCH(request: Request) {
       );
     }
 
-    const body = await request.json();
-    const {
-      notiPushAll,
+    const body = (await request.json()) as IUpdateNotificationRequest;
+
+    const { notiPushAll, notiEmailAll } = body;
+
+    let {
       notiPushMention,
       notiPushReply,
       notiPushLike,
       notiPushRetweet,
       notiPushFollow,
       notiPushDM,
-      notiEmailAll,
     } = body;
+
+    if (notiPushAll === false) {
+      notiPushMention = false;
+      notiPushReply = false;
+      notiPushLike = false;
+      notiPushRetweet = false;
+      notiPushFollow = false;
+      notiPushDM = false;
+    }
 
     const updatedConfig = await prisma.userConfig.upsert({
       where: { userId: session.id },

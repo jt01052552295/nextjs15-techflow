@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { API_CODE } from '@/constants/api-code';
+import { IVerificationConfirmRequest } from '@/types_api/auth';
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body = (await request.json()) as IVerificationConfirmRequest;
     const { email, phone, code, purpose = 'SIGNUP' } = body;
 
     if ((!email && !phone) || !code) {
