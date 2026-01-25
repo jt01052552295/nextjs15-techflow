@@ -3,7 +3,7 @@ import prisma from '@/lib/prisma';
 import { API_CODE } from '@/constants/api-code';
 import { makeRandString } from '@/lib/util';
 import { sendVerificationEmail } from '@/lib/mail';
-import { IVerificationRequest } from '@/types_api/auth';
+import { IVerificationRequest, IApiResult } from '@/types_api/auth';
 
 export async function POST(request: Request) {
   try {
@@ -11,8 +11,12 @@ export async function POST(request: Request) {
     const { email, phone, purpose = 'SIGNUP' } = body;
 
     if (!email && !phone) {
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.MISSING_FIELDS },
+      return NextResponse.json<IApiResult<null>>(
+        {
+          success: false,
+          code: API_CODE.ERROR.MISSING_FIELDS,
+          message: '이메일 또는 전화번호가 필요합니다.',
+        },
         { status: 400 },
       );
     }
@@ -27,8 +31,12 @@ export async function POST(request: Request) {
       });
 
       if (existingUser) {
-        return NextResponse.json(
-          { success: false, code: API_CODE.ERROR.ALREADY_EXISTS },
+        return NextResponse.json<IApiResult<null>>(
+          {
+            success: false,
+            code: API_CODE.ERROR.ALREADY_EXISTS,
+            message: '이미 가입된 사용자입니다.',
+          },
           { status: 409 },
         );
       }
@@ -60,8 +68,12 @@ export async function POST(request: Request) {
       const isSent = await sendVerificationEmail(identifier, code);
 
       if (!isSent) {
-        return NextResponse.json(
-          { success: false, code: API_CODE.ERROR.SERVER_ERROR },
+        return NextResponse.json<IApiResult<null>>(
+          {
+            success: false,
+            code: API_CODE.ERROR.SERVER_ERROR,
+            message: '이메일 발송에 실패했습니다.',
+          },
           { status: 500 },
         );
       }
@@ -70,14 +82,19 @@ export async function POST(request: Request) {
       // await sendVerificationSMS(identifier, code);
     }
 
-    return NextResponse.json({
+    return NextResponse.json<IApiResult<null>>({
       success: true,
       code: API_CODE.SUCCESS.CONNECTION_OK,
+      message: '인증 번호가 발송되었습니다.',
     });
   } catch (error) {
     console.error('Verification request error:', error);
-    return NextResponse.json(
-      { success: false, code: API_CODE.ERROR.SERVER_ERROR },
+    return NextResponse.json<IApiResult<null>>(
+      {
+        success: false,
+        code: API_CODE.ERROR.SERVER_ERROR,
+        message: '서버 오류가 발생했습니다.',
+      },
       { status: 500 },
     );
   }

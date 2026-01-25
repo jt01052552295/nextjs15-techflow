@@ -3,7 +3,7 @@ import prisma from '@/lib/prisma';
 import { createAuthSession } from '@/lib/auth-utils';
 import { compare } from 'bcryptjs';
 import { API_CODE } from '@/constants/api-code';
-import { ILoginRequest } from '@/types_api/auth';
+import { IApiResult, ILoginRequest } from '@/types_api/auth';
 
 export async function POST(request: Request) {
   try {
@@ -12,10 +12,11 @@ export async function POST(request: Request) {
 
     // 이메일, 전화번호, 아이디 중 하나는 필수 + 비밀번호 필수
     if ((!email && !phone && !username) || !password) {
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.MISSING_FIELDS },
-        { status: 400 },
-      );
+      const response: IApiResult = {
+        success: false,
+        code: API_CODE.ERROR.MISSING_FIELDS,
+      };
+      return NextResponse.json(response, { status: 400 });
     }
 
     // 검색 조건 생성
@@ -37,28 +38,27 @@ export async function POST(request: Request) {
     });
 
     if (!user || !user.password) {
-      return NextResponse.json(
-        {
-          success: false,
-          code: API_CODE.ERROR.INVALID_CREDENTIALS,
-        },
-        { status: 401 },
-      );
+      const response: IApiResult = {
+        success: false,
+        code: API_CODE.ERROR.INVALID_CREDENTIALS,
+      };
+      return NextResponse.json(response, { status: 401 });
     }
 
     // 비밀번호 확인
     const isMatch = await compare(password, user.password);
     if (!isMatch) {
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.INVALID_CREDENTIALS },
-        { status: 401 },
-      );
+      const response: IApiResult = {
+        success: false,
+        code: API_CODE.ERROR.INVALID_CREDENTIALS,
+      };
+      return NextResponse.json(response, { status: 401 });
     }
 
     // 세션 생성 및 토큰 발급
     const { token, expiresAt } = await createAuthSession(user);
 
-    return NextResponse.json({
+    const response: IApiResult = {
       success: true,
       code: API_CODE.SUCCESS.LOGIN,
       data: {
@@ -71,12 +71,15 @@ export async function POST(request: Request) {
           role: user.role,
         },
       },
-    });
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
     console.error('Login Error:', error);
-    return NextResponse.json(
-      { success: false, code: API_CODE.ERROR.SERVER_ERROR },
-      { status: 500 },
-    );
+    const response: IApiResult = {
+      success: false,
+      code: API_CODE.ERROR.SERVER_ERROR,
+    };
+    return NextResponse.json(response, { status: 500 });
   }
 }

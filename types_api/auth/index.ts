@@ -81,4 +81,17 @@ export interface IResetPasswordRequest {
   newPassword?: string;
 }
 
+/**
+ * 7. 아이디 찾기 (Request)
+ * POST /api/v1/auth/find-id
+ */
+export interface IFindIdRequest {
+  email?: string;
+  phone?: string;
+}
+
+export interface IFindIdResponse {
+  username: string;
+}
+
 export type { IApiResult }; // Re-export for convenience

@@ -2,20 +2,24 @@ import { NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-utils';
 import { API_CODE } from '@/constants/api-code';
 import prisma from '@/lib/prisma';
-import { IUpdateAccountRequest } from '@/types_api/user/settings';
+import { IUpdateAccountRequest, IApiResult } from '@/types_api/user/settings';
 
 export async function GET() {
   try {
     const user = await getAuthSession();
 
     if (!user) {
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.UNAUTHORIZED },
+      return NextResponse.json<IApiResult<null>>(
+        {
+          success: false,
+          code: API_CODE.ERROR.UNAUTHORIZED,
+          message: '인증되지 않은 사용자입니다.',
+        },
         { status: 401 },
       );
     }
 
-    return NextResponse.json(
+    return NextResponse.json<IApiResult<typeof user>>(
       {
         success: true,
         code: API_CODE.SUCCESS.FETCH_USER,
@@ -25,8 +29,12 @@ export async function GET() {
     );
   } catch (error) {
     console.error('Fetch User Error:', error);
-    return NextResponse.json(
-      { success: false, code: API_CODE.ERROR.SERVER_ERROR },
+    return NextResponse.json<IApiResult<null>>(
+      {
+        success: false,
+        code: API_CODE.ERROR.SERVER_ERROR,
+        message: '서버 오류가 발생했습니다.',
+      },
       { status: 500 },
     );
   }
@@ -37,8 +45,12 @@ export async function PATCH(request: Request) {
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.UNAUTHORIZED },
+      return NextResponse.json<IApiResult<null>>(
+        {
+          success: false,
+          code: API_CODE.ERROR.UNAUTHORIZED,
+          message: '인증되지 않은 사용자입니다.',
+        },
         { status: 401 },
       );
     }
@@ -58,7 +70,7 @@ export async function PATCH(request: Request) {
       },
     });
 
-    return NextResponse.json(
+    return NextResponse.json<IApiResult<null>>(
       {
         success: true,
         code: API_CODE.SUCCESS.UPDATE_USER,
@@ -68,8 +80,12 @@ export async function PATCH(request: Request) {
     );
   } catch (error) {
     console.error('Update User Error:', error);
-    return NextResponse.json(
-      { success: false, code: API_CODE.ERROR.SERVER_ERROR },
+    return NextResponse.json<IApiResult<null>>(
+      {
+        success: false,
+        code: API_CODE.ERROR.SERVER_ERROR,
+        message: '서버 오류가 발생했습니다.',
+      },
       { status: 500 },
     );
   }

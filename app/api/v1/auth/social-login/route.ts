@@ -9,7 +9,7 @@ import { getNaverProfile } from '@/lib/oauth/naver';
 import { getFacebookProfile } from '@/lib/oauth/facebook';
 import { OAuth2Client } from 'google-auth-library';
 import { GOOGLE_CLIENT_ID } from '@/lib/oauth/google';
-import { ISocialLoginRequest } from '@/types_api/auth';
+import { IApiResult, ISocialLoginRequest } from '@/types_api/auth';
 
 const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
@@ -19,10 +19,11 @@ export async function POST(request: Request) {
     const { provider, token } = body;
 
     if (!provider || !token) {
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.MISSING_FIELDS },
-        { status: 400 },
-      );
+      const response: IApiResult = {
+        success: false,
+        code: API_CODE.ERROR.MISSING_FIELDS,
+      };
+      return NextResponse.json(response, { status: 400 });
     }
 
     let snsId: string = '';
@@ -78,17 +79,21 @@ export async function POST(request: Request) {
           break;
 
         default:
-          return NextResponse.json(
-            { success: false, error: 'Unsupported provider' },
-            { status: 400 },
-          );
+          const response: IApiResult = {
+            success: false,
+            code: API_CODE.ERROR.INVALID_CODE, // Or a better code
+            message: 'Unsupported provider',
+          };
+          return NextResponse.json(response, { status: 400 });
       }
     } catch (error) {
       console.error(`[SocialLogin] ${provider} verification failed:`, error);
-      return NextResponse.json(
-        { success: false, error: 'Token verification failed' },
-        { status: 401 },
-      );
+      const response: IApiResult = {
+        success: false,
+        code: API_CODE.ERROR.UNAUTHORIZED,
+        message: 'Token verification failed',
+      };
+      return NextResponse.json(response, { status: 401 });
     }
 
     // 2. DB 확인 및 로그인/회원가입 처리
@@ -188,26 +193,31 @@ export async function POST(request: Request) {
     }
 
     if (!user) {
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.SERVER_ERROR },
-        { status: 500 },
-      );
+      const response: IApiResult = {
+        success: false,
+        code: API_CODE.ERROR.SERVER_ERROR,
+      };
+      return NextResponse.json(response, { status: 500 });
     }
 
     // 3. JWT 토큰 발급
     const { token: appToken } = await createAuthSession(user);
 
-    return NextResponse.json({
+    const response: IApiResult = {
       success: true,
+      code: API_CODE.SUCCESS.LOGIN,
       data: {
         token: appToken,
       },
-    });
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
     console.error('Social Login Error:', error);
-    return NextResponse.json(
-      { success: false, code: API_CODE.ERROR.SERVER_ERROR },
-      { status: 500 },
-    );
+    const response: IApiResult = {
+      success: false,
+      code: API_CODE.ERROR.SERVER_ERROR,
+    };
+    return NextResponse.json(response, { status: 500 });
   }
 }

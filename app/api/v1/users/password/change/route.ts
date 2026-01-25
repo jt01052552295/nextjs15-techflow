@@ -3,14 +3,18 @@ import { getAuthSession } from '@/lib/auth-utils';
 import prisma from '@/lib/prisma';
 import { compare, hash } from 'bcryptjs';
 import { API_CODE } from '@/constants/api-code';
-import { IChangePasswordRequest } from '@/types_api/user/settings';
+import { IChangePasswordRequest, IApiResult } from '@/types_api/user/settings';
 
 export async function POST(request: Request) {
   try {
     const session = await getAuthSession();
     if (!session) {
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.UNAUTHORIZED },
+      return NextResponse.json<IApiResult<null>>(
+        {
+          success: false,
+          code: API_CODE.ERROR.UNAUTHORIZED,
+          message: '인증되지 않은 사용자입니다.',
+        },
         { status: 401 },
       );
     }
@@ -19,24 +23,36 @@ export async function POST(request: Request) {
       (await request.json()) as IChangePasswordRequest;
 
     if (!currentPassword || !newPassword) {
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.MISSING_FIELDS },
+      return NextResponse.json<IApiResult<null>>(
+        {
+          success: false,
+          code: API_CODE.ERROR.MISSING_FIELDS,
+          message: '모든 필드를 입력해주세요.',
+        },
         { status: 400 },
       );
     }
 
     const user = await prisma.user.findUnique({ where: { id: session.id } });
     if (!user) {
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.USER_NOT_FOUND },
+      return NextResponse.json<IApiResult<null>>(
+        {
+          success: false,
+          code: API_CODE.ERROR.USER_NOT_FOUND,
+          message: '사용자를 찾을 수 없습니다.',
+        },
         { status: 404 },
       );
     }
 
     const isMatch = await compare(currentPassword, user.password);
     if (!isMatch) {
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.INVALID_CREDENTIALS },
+      return NextResponse.json<IApiResult<null>>(
+        {
+          success: false,
+          code: API_CODE.ERROR.INVALID_CREDENTIALS,
+          message: '현재 비밀번호가 일치하지 않습니다.',
+        },
         { status: 400 },
       );
     }
@@ -48,7 +64,7 @@ export async function POST(request: Request) {
       data: { password: hashedPassword },
     });
 
-    return NextResponse.json(
+    return NextResponse.json<IApiResult<null>>(
       {
         success: true,
         code: API_CODE.SUCCESS.CHANGE_PASSWORD,
@@ -58,8 +74,12 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     console.error('Change Password Error:', error);
-    return NextResponse.json(
-      { success: false, code: API_CODE.ERROR.SERVER_ERROR },
+    return NextResponse.json<IApiResult<null>>(
+      {
+        success: false,
+        code: API_CODE.ERROR.SERVER_ERROR,
+        message: '서버 오류가 발생했습니다.',
+      },
       { status: 500 },
     );
   }

@@ -2,14 +2,18 @@ import { NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-utils';
 import prisma from '@/lib/prisma';
 import { API_CODE } from '@/constants/api-code';
-import { IBlockUserRequest } from '@/types_api/user/settings';
+import { IBlockUserRequest, IApiResult } from '@/types_api/user/settings';
 
 export async function GET() {
   try {
     const session = await getAuthSession();
     if (!session) {
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.UNAUTHORIZED },
+      return NextResponse.json<IApiResult<null>>(
+        {
+          success: false,
+          code: API_CODE.ERROR.UNAUTHORIZED,
+          message: '인증되지 않은 사용자입니다.',
+        },
         { status: 401 },
       );
     }
@@ -21,8 +25,12 @@ export async function GET() {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.USER_NOT_FOUND },
+      return NextResponse.json<IApiResult<null>>(
+        {
+          success: false,
+          code: API_CODE.ERROR.USER_NOT_FOUND,
+          message: '사용자를 찾을 수 없습니다.',
+        },
         { status: 404 },
       );
     }
@@ -53,18 +61,22 @@ export async function GET() {
 
     // Schema says profile UserProfile[], so it is array.
 
-    return NextResponse.json(
+    return NextResponse.json<IApiResult<typeof formattedList>>(
       {
         success: true,
         code: API_CODE.SUCCESS.FETCH_BLOCKS,
-        list: formattedList,
+        data: formattedList,
       },
       { status: 200 },
     );
   } catch (error) {
     console.error('Fetch Blocks Error:', error);
-    return NextResponse.json(
-      { success: false, code: API_CODE.ERROR.SERVER_ERROR },
+    return NextResponse.json<IApiResult<null>>(
+      {
+        success: false,
+        code: API_CODE.ERROR.SERVER_ERROR,
+        message: '서버 오류가 발생했습니다.',
+      },
       { status: 500 },
     );
   }
@@ -74,16 +86,24 @@ export async function POST(request: Request) {
   try {
     const session = await getAuthSession();
     if (!session) {
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.UNAUTHORIZED },
+      return NextResponse.json<IApiResult<null>>(
+        {
+          success: false,
+          code: API_CODE.ERROR.UNAUTHORIZED,
+          message: '인증되지 않은 사용자입니다.',
+        },
         { status: 401 },
       );
     }
 
     const { targetUserId } = (await request.json()) as IBlockUserRequest;
     if (!targetUserId) {
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.MISSING_FIELDS },
+      return NextResponse.json<IApiResult<null>>(
+        {
+          success: false,
+          code: API_CODE.ERROR.MISSING_FIELDS,
+          message: '필수 필드가 누락되었습니다.',
+        },
         { status: 400 },
       );
     }
@@ -94,8 +114,12 @@ export async function POST(request: Request) {
       select: { idx: true },
     });
     if (!user)
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.USER_NOT_FOUND },
+      return NextResponse.json<IApiResult<null>>(
+        {
+          success: false,
+          code: API_CODE.ERROR.USER_NOT_FOUND,
+          message: '사용자를 찾을 수 없습니다.',
+        },
         { status: 404 },
       );
 
@@ -105,15 +129,23 @@ export async function POST(request: Request) {
       select: { idx: true },
     });
     if (!target)
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.USER_NOT_FOUND },
+      return NextResponse.json<IApiResult<null>>(
+        {
+          success: false,
+          code: API_CODE.ERROR.USER_NOT_FOUND,
+          message: '차단하려는 사용자를 찾을 수 없습니다.',
+        },
         { status: 404 },
       );
 
     if (user.idx === target.idx) {
       // Cannot block self
-      return NextResponse.json(
-        { success: false, message: 'Cannot block yourself' },
+      return NextResponse.json<IApiResult<null>>(
+        {
+          success: false,
+          code: API_CODE.ERROR.INVALID_REQUEST,
+          message: '자기 자신을 차단할 수 없습니다.',
+        },
         { status: 400 },
       );
     }
@@ -140,7 +172,7 @@ export async function POST(request: Request) {
       });
     }
 
-    return NextResponse.json(
+    return NextResponse.json<IApiResult<null>>(
       {
         success: true,
         code: API_CODE.SUCCESS.BLOCK_USER,
@@ -150,8 +182,12 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     console.error('Block User Error:', error);
-    return NextResponse.json(
-      { success: false, code: API_CODE.ERROR.SERVER_ERROR },
+    return NextResponse.json<IApiResult<null>>(
+      {
+        success: false,
+        code: API_CODE.ERROR.SERVER_ERROR,
+        message: '서버 오류가 발생했습니다.',
+      },
       { status: 500 },
     );
   }
@@ -161,16 +197,24 @@ export async function DELETE(request: Request) {
   try {
     const session = await getAuthSession();
     if (!session) {
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.UNAUTHORIZED },
+      return NextResponse.json<IApiResult<null>>(
+        {
+          success: false,
+          code: API_CODE.ERROR.UNAUTHORIZED,
+          message: '인증되지 않은 사용자입니다.',
+        },
         { status: 401 },
       );
     }
 
     const { targetUserId } = (await request.json()) as IBlockUserRequest;
     if (!targetUserId) {
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.MISSING_FIELDS },
+      return NextResponse.json<IApiResult<null>>(
+        {
+          success: false,
+          code: API_CODE.ERROR.MISSING_FIELDS,
+          message: '필수 필드가 누락되었습니다.',
+        },
         { status: 400 },
       );
     }
@@ -181,8 +225,12 @@ export async function DELETE(request: Request) {
       select: { idx: true },
     });
     if (!user)
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.USER_NOT_FOUND },
+      return NextResponse.json<IApiResult<null>>(
+        {
+          success: false,
+          code: API_CODE.ERROR.USER_NOT_FOUND,
+          message: '사용자를 찾을 수 없습니다.',
+        },
         { status: 404 },
       );
 
@@ -192,8 +240,12 @@ export async function DELETE(request: Request) {
       select: { idx: true },
     });
     if (!target)
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.USER_NOT_FOUND },
+      return NextResponse.json<IApiResult<null>>(
+        {
+          success: false,
+          code: API_CODE.ERROR.USER_NOT_FOUND,
+          message: '차단 해제하려는 사용자를 찾을 수 없습니다.',
+        },
         { status: 404 },
       );
 
@@ -206,7 +258,7 @@ export async function DELETE(request: Request) {
       },
     });
 
-    return NextResponse.json(
+    return NextResponse.json<IApiResult<null>>(
       {
         success: true,
         code: API_CODE.SUCCESS.UNBLOCK_USER,
@@ -217,7 +269,7 @@ export async function DELETE(request: Request) {
   } catch (error) {
     if ((error as any).code === 'P2025') {
       // Record not found
-      return NextResponse.json(
+      return NextResponse.json<IApiResult<null>>(
         {
           success: true,
           code: API_CODE.SUCCESS.UNBLOCK_USER,
@@ -227,8 +279,12 @@ export async function DELETE(request: Request) {
       );
     }
     console.error('Unblock User Error:', error);
-    return NextResponse.json(
-      { success: false, code: API_CODE.ERROR.SERVER_ERROR },
+    return NextResponse.json<IApiResult<null>>(
+      {
+        success: false,
+        code: API_CODE.ERROR.SERVER_ERROR,
+        message: '서버 오류가 발생했습니다.',
+      },
       { status: 500 },
     );
   }

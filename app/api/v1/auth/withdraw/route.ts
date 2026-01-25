@@ -3,6 +3,7 @@ import { getAuthSession } from '@/lib/auth-utils';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { API_CODE } from '@/constants/api-code';
+import { IApiResult } from '@/types_api/auth';
 
 // DELETE /api/v1/auth/withdraw
 export async function DELETE() {
@@ -10,8 +11,12 @@ export async function DELETE() {
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json(
-        { success: false, code: API_CODE.ERROR.UNAUTHORIZED },
+      return NextResponse.json<IApiResult<null>>(
+        {
+          success: false,
+          code: API_CODE.ERROR.UNAUTHORIZED,
+          message: '인증되지 않은 사용자입니다.',
+        },
         { status: 401 },
       );
     }
@@ -50,14 +55,19 @@ export async function DELETE() {
     cookieStore.delete('naver_oauth_state');
     cookieStore.delete('oauth_data');
 
-    return NextResponse.json({
+    return NextResponse.json<IApiResult<null>>({
       success: true,
       code: API_CODE.SUCCESS.WITHDRAW,
+      message: '회원 탈퇴가 완료되었습니다.',
     });
   } catch (error) {
     console.error('Withdraw Error:', error);
-    return NextResponse.json(
-      { success: false, code: API_CODE.ERROR.SERVER_ERROR },
+    return NextResponse.json<IApiResult<null>>(
+      {
+        success: false,
+        code: API_CODE.ERROR.SERVER_ERROR,
+        message: '서버 오류가 발생했습니다.',
+      },
       { status: 500 },
     );
   }
