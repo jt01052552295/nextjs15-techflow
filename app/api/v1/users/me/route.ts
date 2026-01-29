@@ -58,6 +58,66 @@ export async function PATCH(request: Request) {
     const body = (await request.json()) as IUpdateAccountRequest;
     const { username, phone, email, zipcode, addr1, addr2 } = body;
 
+    if (username) {
+      const exists = await prisma.user.findFirst({
+        where: {
+          username: username,
+          id: { not: session.id }, // ★ 중요: 내 아이디는 제외하고 검색
+        },
+      });
+
+      if (exists) {
+        return NextResponse.json<IApiResult<null>>(
+          {
+            success: false,
+            code: API_CODE.ERROR.DUPLICATE_USERNAME,
+            message: '이미 사용 중인 아이디입니다.',
+          },
+          { status: 409 }, // 409 Conflict
+        );
+      }
+    }
+
+    if (phone) {
+      const exists = await prisma.user.findFirst({
+        where: {
+          phone: phone,
+          id: { not: session.id },
+        },
+      });
+
+      if (exists) {
+        return NextResponse.json<IApiResult<null>>(
+          {
+            success: false,
+            code: API_CODE.ERROR.DUPLICATE_PHONE,
+            message: '이미 사용 중인 전화번호입니다.',
+          },
+          { status: 409 },
+        );
+      }
+    }
+
+    if (email) {
+      const exists = await prisma.user.findFirst({
+        where: {
+          email: email,
+          id: { not: session.id },
+        },
+      });
+
+      if (exists) {
+        return NextResponse.json<IApiResult<null>>(
+          {
+            success: false,
+            code: API_CODE.ERROR.DUPLICATE_EMAIL,
+            message: '이미 사용 중인 이메일입니다.',
+          },
+          { status: 409 },
+        );
+      }
+    }
+
     await prisma.user.update({
       where: { id: session.id },
       data: {
