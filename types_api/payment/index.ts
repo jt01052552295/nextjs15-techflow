@@ -35,15 +35,12 @@ export interface IPaymentApproveRequest {
 export interface IPaymentApproveData {
   paymentKey: string;
   orderId: string;
-  status: string;
+  orderName: string;
+  status: string; // "DONE", "CANCELED", etc.
   totalAmount: number;
-  approvedAt: string;
-  method?: string;
-  card?: {
-    company: string;
-    number: string;
-    installmentPlanMonths: number;
-  };
+  approvedAt: string | null;
+  method: string; // "카드", "간편결제", etc.
+  card?: ITossCardInfo | null; // TossPay Payment 객체의 card 필드
 }
 
 // ===============================
@@ -92,32 +89,92 @@ export interface IPaymentCancelData {
 }
 
 // ===============================
-// TossPay API 응답 타입
+// TossPay API 응답 타입 (공식 문서 기준)
+// https://docs.tosspayments.com/reference#payment-객체
 // ===============================
-export interface ITossPaymentConfirmResponse {
-  paymentKey: string;
-  orderId: string;
-  status: string;
-  totalAmount: number;
-  method: string;
-  approvedAt: string;
-  card?: {
-    company: string;
-    number: string;
-    installmentPlanMonths: number;
-  };
+
+/**
+ * Payment 객체 내 card 필드
+ */
+export interface ITossCardInfo {
+  issuerCode: string; // 카드 발급사 코드 (2자리)
+  acquirerCode: string; // 카드 매입사 코드 (2자리)
+  number: string; // 마스킹된 카드번호
+  installmentPlanMonths: number; // 할부 개월 수 (일시불: 0)
+  isInterestFree: boolean; // 무이자 여부
+  interestPayer: string | null; // 할부 수수료 부담 주체
+  approveNo: string; // 카드사 승인 번호
+  useCardPoint: boolean; // 카드사 포인트 사용 여부
+  cardType: string; // "신용", "체크", "기프트"
+  ownerType: string; // "개인", "법인", "미확인"
+  acquireStatus: string; // 매입 상태
+  amount: number; // 카드 결제 금액
 }
 
-export interface ITossPaymentCancelResponse {
+/**
+ * Payment 객체 내 cancels 배열 요소
+ */
+export interface ITossCancelInfo {
+  transactionKey: string;
+  cancelReason: string;
+  taxExemptionAmount: number;
+  canceledAt: string;
+  easyPayDiscountAmount?: number;
+  receiptKey: string | null;
+  cancelAmount: number;
+  taxFreeAmount: number;
+  refundableAmount: number;
+  cancelStatus: string;
+  cancelRequestId: string | null;
+}
+
+/**
+ * 결제 승인/조회 응답 (Payment 객체)
+ */
+export interface ITossPaymentConfirmResponse {
+  mId: string;
+  lastTransactionKey: string;
   paymentKey: string;
   orderId: string;
-  status: string;
-  cancels: Array<{
-    cancelAmount: number;
-    cancelReason: string;
-    canceledAt: string;
-  }>;
+  orderName: string;
+  taxExemptionAmount: number;
+  status: string; // "DONE", "CANCELED", "WAITING_FOR_DEPOSIT", etc.
+  requestedAt: string;
+  approvedAt: string | null;
+  useEscrow: boolean;
+  cultureExpense: boolean;
+  card: ITossCardInfo | null;
+  virtualAccount: unknown | null;
+  transfer: unknown | null;
+  mobilePhone: unknown | null;
+  giftCertificate: unknown | null;
+  cashReceipt: unknown | null;
+  cashReceipts: unknown | null;
+  discount: unknown | null;
+  cancels: ITossCancelInfo[] | null;
+  secret: string | null;
+  type: string; // "NORMAL", "BILLING", "BRANDPAY"
+  easyPay: { provider: string; amount: number; discountAmount: number } | null;
+  country: string;
+  failure: { code: string; message: string } | null;
+  isPartialCancelable: boolean;
+  receipt: { url: string } | null;
+  checkout: { url: string } | null;
+  currency: string;
+  totalAmount: number;
+  balanceAmount: number;
+  suppliedAmount: number;
+  vat: number;
+  taxFreeAmount: number;
+  metadata: Record<string, string> | null;
+  method: string;
+  version: string;
 }
+
+/**
+ * 결제 취소 응답 (Payment 객체와 동일)
+ */
+export type ITossPaymentCancelResponse = ITossPaymentConfirmResponse;
 
 export interface ITossErrorResponse {
   code: string;

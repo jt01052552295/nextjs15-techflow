@@ -138,6 +138,7 @@ model UserPayment {
   
   // 관계 설정
   user         User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ShopSubscription ShopSubscription[]
 
   @@index([userId])
   @@map("ec_user_payment")
@@ -1631,17 +1632,25 @@ model ShopSubscription {
   usageQuota  Int       @default(0) @map("usage_quota") // 총 허용 사용량
   createdAt   DateTime  @default(now()) @map("created_at") // 생성일 추가 (다른 테이블과 일관성)
   updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") // 수정일 추가
+  userPaymentId  Int?      @map("user_payment_id")  // 결제에 사용된 카드 (UserPayment.idx)
+  nextPaymentAt  DateTime? @map("next_payment_at")  // 다음 결제 예정일
+  lastPaymentAt  DateTime? @map("last_payment_at")  // 마지막 결제일
+  retryCount     Int       @default(0) @map("retry_count")  // 결제 실패 재시도 횟수
+  failedAt       DateTime? @map("failed_at")        // 마지막 결제 실패 일시
   
   // 관계 설정
   User        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
   ShopOrder   ShopOrder @relation(fields: [orderId], references: [idx], onDelete: Restrict)
   ShopItem    ShopItem  @relation(fields: [itemId], references: [idx], onDelete: Restrict)
+  UserPayment    UserPayment? @relation(fields: [userPaymentId], references: [idx])
   
   @@index([userId])
   @@index([orderId])
   @@index([itemId])
   @@index([ordNo])
   @@index([status])
+  @@index([userPaymentId])
+  @@index([nextPaymentAt])
   @@map("ec_shop_order_subscription")
 }
 

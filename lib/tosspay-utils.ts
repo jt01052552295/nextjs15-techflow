@@ -170,3 +170,148 @@ export async function getPayment(
     };
   }
 }
+
+// ===============================
+// 빌링 API (자동결제)
+// ===============================
+
+import {
+  ITossBillingKeyResponse,
+  ITossBillingPaymentResponse,
+} from '@/types_api/billing';
+
+/**
+ * 빌링키 발급 API 호출
+ * POST https://api.tosspayments.com/v1/billing/authorizations/issue
+ */
+export async function issueBillingKey(
+  authKey: string,
+  customerKey: string,
+): Promise<
+  | { success: true; data: ITossBillingKeyResponse }
+  | { success: false; error: ITossErrorResponse }
+> {
+  try {
+    const response = await fetch(
+      `${TOSS_API_URL}/billing/authorizations/issue`,
+      {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({
+          authKey,
+          customerKey,
+        }),
+      },
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: data as ITossErrorResponse,
+      };
+    }
+
+    return {
+      success: true,
+      data: data as ITossBillingKeyResponse,
+    };
+  } catch (error) {
+    console.error('TossPay issueBillingKey error:', error);
+    return {
+      success: false,
+      error: {
+        code: 'NETWORK_ERROR',
+        message: '빌링키 발급 요청 중 오류가 발생했습니다.',
+      },
+    };
+  }
+}
+
+/**
+ * 빌링키로 결제 API 호출
+ * POST https://api.tosspayments.com/v1/billing/{billingKey}
+ */
+export async function payWithBillingKey(
+  billingKey: string,
+  customerKey: string,
+  amount: number,
+  orderId: string,
+  orderName: string,
+): Promise<
+  | { success: true; data: ITossBillingPaymentResponse }
+  | { success: false; error: ITossErrorResponse }
+> {
+  try {
+    const response = await fetch(`${TOSS_API_URL}/billing/${billingKey}`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({
+        customerKey,
+        amount,
+        orderId,
+        orderName,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: data as ITossErrorResponse,
+      };
+    }
+
+    return {
+      success: true,
+      data: data as ITossBillingPaymentResponse,
+    };
+  } catch (error) {
+    console.error('TossPay payWithBillingKey error:', error);
+    return {
+      success: false,
+      error: {
+        code: 'NETWORK_ERROR',
+        message: '빌링 결제 요청 중 오류가 발생했습니다.',
+      },
+    };
+  }
+}
+
+/**
+ * 빌링키 삭제 API 호출
+ * DELETE https://api.tosspayments.com/v1/billing/{billingKey}
+ */
+export async function deleteBillingKey(
+  billingKey: string,
+): Promise<{ success: true } | { success: false; error: ITossErrorResponse }> {
+  try {
+    const response = await fetch(`${TOSS_API_URL}/billing/${billingKey}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+    });
+
+    // 성공 시 200 응답 (빈 body)
+    if (response.ok) {
+      return { success: true };
+    }
+
+    // 실패 시 에러 객체 반환
+    const data = await response.json();
+    return {
+      success: false,
+      error: data as ITossErrorResponse,
+    };
+  } catch (error) {
+    console.error('TossPay deleteBillingKey error:', error);
+    return {
+      success: false,
+      error: {
+        code: 'NETWORK_ERROR',
+        message: '빌링키 삭제 요청 중 오류가 발생했습니다.',
+      },
+    };
+  }
+}

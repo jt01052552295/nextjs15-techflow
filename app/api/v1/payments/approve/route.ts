@@ -120,6 +120,11 @@ export async function POST(request: Request) {
     const expiresAt = new Date(now);
     expiresAt.setMonth(expiresAt.getMonth() + 1); // 1개월 후 만료
 
+    // paidAt 계산 (approvedAt이 null일 수 있음)
+    const paidAtTimestamp = result.data.approvedAt
+      ? Math.floor(new Date(result.data.approvedAt).getTime() / 1000)
+      : Math.floor(Date.now() / 1000);
+
     // DB 트랜잭션으로 주문 + 결제 + 구독 저장
     await prisma.$transaction(async (tx) => {
       // 1. 주문 생성
@@ -150,12 +155,12 @@ export async function POST(request: Request) {
           merchantUid: orderId,
           name: plan?.planName || 'Premium Subscription',
           paidAmount: result.data.totalAmount,
-          paidAt: Math.floor(new Date(result.data.approvedAt).getTime() / 1000),
+          paidAt: paidAtTimestamp,
           payMethod: result.data.method || 'card',
           pgProvider: 'tosspayments',
           pgTid: paymentKey,
           status: 'paid',
-          cardName: result.data.card?.company || '',
+          cardName: result.data.card?.cardType || '',
           cardNumber: result.data.card?.number || '',
           cardQuota: result.data.card?.installmentPlanMonths || 0,
         },
@@ -200,11 +205,12 @@ export async function POST(request: Request) {
         data: {
           paymentKey: result.data.paymentKey,
           orderId: result.data.orderId,
+          orderName: result.data.orderName,
           status: result.data.status,
           totalAmount: result.data.totalAmount,
-          approvedAt: result.data.approvedAt,
+          approvedAt: result.data.approvedAt ?? null,
           method: result.data.method,
-          card: result.data.card,
+          card: result.data.card ?? null,
         },
       },
       { status: 200 },
