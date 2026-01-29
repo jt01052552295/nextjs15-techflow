@@ -149,11 +149,17 @@ export async function POST(request: Request) {
     // 결제 정보 저장 (ShopOrderPayment)
     await prisma.shopOrderPayment.create({
       data: {
+        gubun: 'subscription',
+        applyNum: paymentKey,
         orderId: shopOrder.idx,
         merchantUid: orderId,
-        impUid: paymentKey,
+        buyerName: user.name || '',
+        buyerEmail: user.email || '',
+        cardNumber: result.data.card?.number || '',
         amount: plan.price,
         paidAmount: plan.price,
+        pgProvider: 'tosspayments',
+        pgTid: paymentKey,
         status: 'paid',
         payMethod: 'billing',
         paidAt: Math.floor(new Date(approvedAt).getTime() / 1000),

@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-utils';
 import { API_CODE } from '@/constants/api-code';
 import prisma from '@/lib/prisma';
-import { IBillingUnsubscribeResult, PLANS, PlanId } from '@/types_api/billing';
+import { IBillingUnsubscribeResult, PlanId } from '@/types_api/billing';
 
 export async function POST() {
   try {
@@ -53,7 +53,6 @@ export async function POST() {
     });
 
     const planId = subscription.gubun as PlanId;
-    const plan = PLANS[planId] || { planName: subscription.gubun };
     const expiresAt = subscription.endDate || subscription.nextPaymentAt;
 
     return NextResponse.json<IBillingUnsubscribeResult>({
