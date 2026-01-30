@@ -10,6 +10,7 @@ import {
   USER_IMAGE_CONFIG,
   ALLOWED_IMAGE_TYPES,
 } from '@/types_api/user';
+import { getFullImageUrl } from '@/lib/util';
 
 /**
  * static 서버에 이미지 업로드
@@ -177,12 +178,26 @@ export async function POST(request: Request) {
       );
     }
 
+    const imageUrl = uploadResult.url;
+    const fullImageUrl = getFullImageUrl(imageUrl);
+
+    if (!imageUrl || fullImageUrl === null) {
+      return NextResponse.json<IUserImageUploadResult>(
+        {
+          success: false,
+          code: API_CODE.ERROR.UPLOAD_FAILED,
+          message: '업로드된 파일 URL을 가져올 수 없습니다.',
+        },
+        { status: 500 },
+      );
+    }
+
     // 6. DB 업데이트
     const updateField =
       imageType === 'profile' ? 'profileImage' : 'bannerImage';
     await prisma.user.update({
       where: { id: user.id },
-      data: { [updateField]: uploadResult.url },
+      data: { [updateField]: imageUrl },
     });
 
     return NextResponse.json<IUserImageUploadResult>(
@@ -190,7 +205,7 @@ export async function POST(request: Request) {
         success: true,
         code: API_CODE.SUCCESS.USER_IMAGE_UPLOADED,
         data: {
-          url: uploadResult.url,
+          url: fullImageUrl,
           type: imageType,
         },
       },
