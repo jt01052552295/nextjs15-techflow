@@ -6,7 +6,6 @@
 import { NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-utils';
 import { API_CODE } from '@/constants/api-code';
-import { v4 as uuidv4 } from 'uuid';
 
 interface IApiResult<T = any> {
   success: boolean;
@@ -87,21 +86,18 @@ export async function POST(request: Request) {
 
     // Static 서버로 업로드
     const uploadedUrls: string[] = [];
-    // const staticDomain =
-    //   process.env.NEXT_PUBLIC_STATIC_DOMAIN || 'https://static.vaion.co.kr';
+    const staticDomain =
+      process.env.NEXT_PUBLIC_STATIC_DOMAIN || 'https://static.vaion.co.kr';
     const uploadEndpoint =
       process.env.STATIC_UPLOAD_ENDPOINT || 'https://static.vaion.co.kr/upload';
 
     for (const file of files) {
-      const uid = uuidv4();
-      const ext = file.name.split('.').pop() || 'jpg';
-      const fileName = `${uid}.${ext}`;
-
       const uploadFormData = new FormData();
-      uploadFormData.append('file', file);
+      // static 서버가 기대하는 필드명: 'image[]'
+      uploadFormData.append('image[]', file);
       uploadFormData.append('domain', 'admin');
-      uploadFormData.append('dir', `posts/${session.id}`);
-      uploadFormData.append('name', fileName);
+      uploadFormData.append('dir', 'posts');
+      uploadFormData.append('pid', session.id);
 
       try {
         const uploadResponse = await fetch(uploadEndpoint, {
@@ -115,16 +111,20 @@ export async function POST(request: Request) {
         }
 
         const result = await uploadResponse.json();
-        if (result.success && result.url) {
-          uploadedUrls.push(result.url);
-        } else {
-          // 상대 경로로 저장
-          uploadedUrls.push(`/uploads/admin/posts/${session.id}/${fileName}`);
+        // static 서버 응답: { status: 'success', files: [{ fileUrl, fileName, originalName }] }
+        if (
+          result.status === 'success' &&
+          result.files &&
+          result.files.length > 0
+        ) {
+          const fileUrl = result.files[0].fileUrl;
+          const fullUrl = fileUrl.startsWith('http')
+            ? fileUrl
+            : `${staticDomain}${fileUrl}`;
+          uploadedUrls.push(fullUrl);
         }
       } catch (uploadError) {
         console.error('Upload error:', uploadError);
-        // 실패 시 상대 경로 사용
-        uploadedUrls.push(`/uploads/admin/posts/${session.id}/${fileName}`);
       }
     }
 
