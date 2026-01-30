@@ -83,6 +83,8 @@ model User {
   muterRelation         UserMute[]      @relation("MuterToUser")      // 내가 뮤트한 사람들
   mutedRelation         UserMute[]      @relation("MutedToUser")      // 나를 뮤트한 사람들
 
+  blogPostBookmarks    BlogPostBookmark[] @relation("UserToBlogPostBookmarks")
+
   points              Point[] 
   ShopCart           ShopCart[]  
   ShopOrders         ShopOrder[]
@@ -1847,6 +1849,7 @@ model BlogPost {
   tags          BlogPostTagMap[]
   comments      BlogPostComment[]
   likes         BlogPostLike[]     // 블로그 포스트 좋아요 목록
+  bookmarks     BlogPostBookmark[]
 
   @@index([uid], map: "uid_index")
   @@index([cid], map: "cid_index")
@@ -2014,7 +2017,19 @@ model BlogPostCommentLike {
   @@map("ec_post_comment_like")
 }
 
+model BlogPostBookmark {
+  idx       Int      @id @default(autoincrement())
+  postId    Int
+  userId    String
 
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post      BlogPost @relation(fields: [postId], references: [idx], onDelete: Cascade)
+  user      User     @relation("UserToBlogPostBookmarks", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@map("ec_post_bookmark")
+}
 
 
 // 쿠폰 관련 enum 정의
@@ -2273,7 +2288,7 @@ enum PostStatus {
 // 게시글 공개 범위
 enum PostVisibility {
   PUBLIC    // 전체 공개
-  MEMBERS   // 회원 전용
+  FOLLOWERS_ONLY   // 팔로워 전용
   PRIVATE   // 비공개
 }
 
