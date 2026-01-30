@@ -333,3 +333,23 @@ export function formatKrw(value: number | null | undefined) {
   if (value == null) return '-';
   return `${value.toLocaleString('ko-KR')}원`;
 }
+
+/**
+ * 이미지 경로를 전체 URL로 변환
+ */
+export const getFullImageUrl = (imagePath: string | null): string | null => {
+  if (!imagePath) return null;
+
+  // 이미 전체 URL인 경우 그대로 반환
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
+  }
+
+  const staticDomain =
+    process.env.NEXT_PUBLIC_STATIC_DOMAIN || 'https://static.vaion.co.kr';
+
+  // 경로가 /로 시작하면 그대로, 아니면 / 추가
+  const path = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+
+  return `${staticDomain}${path}`;
+};

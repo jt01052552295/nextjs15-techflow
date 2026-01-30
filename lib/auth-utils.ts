@@ -4,6 +4,7 @@ import { sign } from 'jsonwebtoken';
 import { cookies, headers } from 'next/headers';
 import prisma from '@/lib/prisma';
 import { verify } from 'jsonwebtoken';
+import { getFullImageUrl } from '@/lib/util';
 
 interface SessionOptions {
   expiryDays?: number; // 세션 만료 일수 (기본값: 30일)
@@ -125,10 +126,13 @@ export async function getAuthSession(): Promise<any | null> {
       name: user.name,
       nick: user.nick,
       phone: user.phone,
-      isUse: user.isUse,
-      isVisible: user.isVisible,
-      isSignout: user.isSignout,
       role: user.role,
+      bio: user.bio,
+      location: user.location,
+      website: user.website,
+      profileImage: getFullImageUrl(user.profileImage),
+      bannerImage: getFullImageUrl(user.bannerImage),
+      isSignout: user.isSignout,
       createdAt: user.createdAt,
       profile: user.profile || [],
     };
