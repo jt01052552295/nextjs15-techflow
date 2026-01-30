@@ -35,7 +35,21 @@ export async function POST(request: Request) {
     }
 
     const formData = await request.formData();
-    const files = formData.getAll('files') as File[];
+
+    // 모든 파일 수집 (key가 'files' 또는 'files[]' 또는 'file' 등 다양한 경우 처리)
+    const files: File[] = [];
+    for (const [, value] of formData.entries()) {
+      // File 객체인지 확인 (Blob이고 name 속성이 있으면 File)
+      if (value instanceof File && value.size > 0) {
+        files.push(value);
+      }
+    }
+
+    console.log('[Upload] Received files count:', files.length);
+    console.log(
+      '[Upload] File names:',
+      files.map((f) => f.name),
+    );
 
     if (!files || files.length === 0) {
       return NextResponse.json<IApiResult<null>>(
