@@ -98,48 +98,67 @@ export async function POST(request: Request) {
       }
     }
 
-    // Static 서버로 업로드
-    const uploadedUrls: string[] = [];
+    // Static 서버로 업로드 (한 번의 요청에 모든 파일 전송)
     const staticDomain =
       process.env.NEXT_PUBLIC_STATIC_DOMAIN || 'https://static.vaion.co.kr';
     const uploadEndpoint =
       process.env.STATIC_UPLOAD_ENDPOINT || 'https://static.vaion.co.kr/upload';
 
+    const uploadFormData = new FormData();
+    // 모든 파일을 'image[]' 배열로 추가
     for (const file of files) {
-      const uploadFormData = new FormData();
-      // static 서버가 기대하는 필드명: 'image[]'
       uploadFormData.append('image[]', file);
-      uploadFormData.append('domain', 'admin');
-      uploadFormData.append('dir', 'posts');
-      uploadFormData.append('pid', session.id);
+    }
+    uploadFormData.append('domain', 'admin');
+    uploadFormData.append('dir', 'posts');
+    uploadFormData.append('pid', session.id);
 
-      try {
-        const uploadResponse = await fetch(uploadEndpoint, {
-          method: 'POST',
-          body: uploadFormData,
-        });
+    let uploadedUrls: string[] = [];
 
-        if (!uploadResponse.ok) {
-          console.error('Upload failed:', await uploadResponse.text());
-          continue;
-        }
+    try {
+      const uploadResponse = await fetch(uploadEndpoint, {
+        method: 'POST',
+        body: uploadFormData,
+      });
 
-        const result = await uploadResponse.json();
-        // static 서버 응답: { status: 'success', files: [{ fileUrl, fileName, originalName }] }
-        if (
-          result.status === 'success' &&
-          result.files &&
-          result.files.length > 0
-        ) {
-          const fileUrl = result.files[0].fileUrl;
-          const fullUrl = fileUrl.startsWith('http')
+      if (!uploadResponse.ok) {
+        console.error('Upload failed:', await uploadResponse.text());
+        return NextResponse.json<IApiResult<null>>(
+          {
+            success: false,
+            code: API_CODE.ERROR.UPLOAD_FAILED,
+            message: '이미지 업로드에 실패했습니다.',
+          },
+          { status: 500 },
+        );
+      }
+
+      const result = await uploadResponse.json();
+      console.log('[Upload] Static server response:', JSON.stringify(result));
+
+      // static 서버 응답: { status: 'success', files: [{ fileUrl, fileName, originalName }, ...] }
+      if (
+        result.status === 'success' &&
+        result.files &&
+        result.files.length > 0
+      ) {
+        uploadedUrls = result.files.map((f: { fileUrl: string }) => {
+          const fileUrl = f.fileUrl;
+          return fileUrl.startsWith('http')
             ? fileUrl
             : `${staticDomain}${fileUrl}`;
-          uploadedUrls.push(fullUrl);
-        }
-      } catch (uploadError) {
-        console.error('Upload error:', uploadError);
+        });
       }
+    } catch (uploadError) {
+      console.error('Upload error:', uploadError);
+      return NextResponse.json<IApiResult<null>>(
+        {
+          success: false,
+          code: API_CODE.ERROR.UPLOAD_FAILED,
+          message: '이미지 업로드에 실패했습니다.',
+        },
+        { status: 500 },
+      );
     }
 
     if (uploadedUrls.length === 0) {
