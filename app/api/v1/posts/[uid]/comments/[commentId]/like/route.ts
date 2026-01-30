@@ -1,5 +1,5 @@
 /**
- * POST /api/v1/posts/:uid/comments/:commentIdx/like - 댓글 좋아요 토글
+ * POST /api/v1/posts/:uid/comments/:commentId/like - 댓글 좋아요 토글
  */
 
 import { NextResponse } from 'next/server';
@@ -15,7 +15,7 @@ interface IApiResult<T = any> {
 }
 
 interface RouteParams {
-  params: Promise<{ uid: string; commentIdx: string }>;
+  params: Promise<{ uid: string; commentId: string }>;
 }
 
 export async function POST(request: Request, { params }: RouteParams) {
@@ -33,21 +33,23 @@ export async function POST(request: Request, { params }: RouteParams) {
       );
     }
 
-    const { commentIdx } = await params;
-    const idx = parseInt(commentIdx, 10);
+    const { commentId } = await params;
 
-    if (isNaN(idx)) {
-      return NextResponse.json<IApiResult<null>>(
-        {
-          success: false,
-          code: API_CODE.ERROR.INVALID_REQUEST,
-          message: '잘못된 댓글 ID입니다.',
-        },
-        { status: 400 },
+    // commentId가 숫자(idx)인지 uid인지 판단
+    const isNumeric = /^\d+$/.test(commentId);
+
+    let result;
+    if (isNumeric) {
+      result = await CommentService.toggleCommentLike(
+        parseInt(commentId, 10),
+        session.id,
+      );
+    } else {
+      result = await CommentService.toggleCommentLikeByUid(
+        commentId,
+        session.id,
       );
     }
-
-    const result = await CommentService.toggleCommentLike(idx, session.id);
 
     if (!result) {
       return NextResponse.json<IApiResult<null>>(

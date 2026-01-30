@@ -1,6 +1,6 @@
 /**
- * PATCH  /api/v1/posts/:uid/comments/:commentUid - 댓글 수정
- * DELETE /api/v1/posts/:uid/comments/:commentUid - 댓글 삭제
+ * PATCH  /api/v1/posts/:uid/comments/:commentId - 댓글 수정
+ * DELETE /api/v1/posts/:uid/comments/:commentId - 댓글 삭제
  */
 
 import { NextResponse } from 'next/server';
@@ -16,7 +16,7 @@ interface IApiResult<T = any> {
 }
 
 interface RouteParams {
-  params: Promise<{ uid: string; commentUid: string }>;
+  params: Promise<{ uid: string; commentId: string }>;
 }
 
 const MAX_COMMENT_LENGTH = 500;
@@ -36,7 +36,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       );
     }
 
-    const { commentUid } = await params;
+    const { commentId } = await params;
     const body = await request.json();
     const { content } = body;
 
@@ -64,7 +64,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     }
 
     const comment = await CommentService.updateComment(
-      commentUid,
+      commentId,
       session.id,
       content.trim(),
     );
@@ -127,8 +127,8 @@ export async function DELETE(request: Request, { params }: RouteParams) {
       );
     }
 
-    const { commentUid } = await params;
-    const deleted = await CommentService.deleteComment(commentUid, session.id);
+    const { commentId } = await params;
+    const deleted = await CommentService.deleteComment(commentId, session.id);
 
     if (!deleted) {
       return NextResponse.json<IApiResult<null>>(
