@@ -44,6 +44,25 @@ function toPostImage(image: any): IPostImage {
 }
 
 /**
+ * 전체 URL에서 상대 경로 추출
+ * https://static.vaion.co.kr/uploads/admin/posts/xxx/yyy.jpg
+ * → /uploads/admin/posts/xxx/yyy.jpg
+ */
+function toRelativePath(url: string): string {
+  if (!url) return url;
+
+  // 이미 상대 경로면 그대로 반환
+  if (url.startsWith('/')) return url;
+
+  try {
+    const urlObj = new URL(url);
+    return urlObj.pathname; // '/uploads/admin/posts/xxx/yyy.jpg'
+  } catch {
+    return url;
+  }
+}
+
+/**
  * 게시물 → IPostResponse 변환
  */
 function toPostResponse(
@@ -475,18 +494,22 @@ export async function createPost(
       data: { sortOrder: post.idx },
     });
 
-    // 이미지 연결
+    // 이미지 연결 (상대 경로로 저장)
     if (imageUrls.length > 0) {
       await tx.blogPostImage.createMany({
-        data: imageUrls.map((url) => ({
-          uid: uuidv4(),
-          postId: uid,
-          name: url.split('/').pop() || 'image',
-          originalName: url.split('/').pop() || 'image',
-          url,
-          ext: url.split('.').pop() || null,
-          type: null,
-        })),
+        data: imageUrls.map((url) => {
+          const relativePath = toRelativePath(url);
+          const fileName = relativePath.split('/').pop() || 'image';
+          return {
+            uid: uuidv4(),
+            postId: uid,
+            name: fileName,
+            originalName: fileName,
+            url: relativePath, // 상대 경로 저장
+            ext: fileName.split('.').pop() || null,
+            type: null,
+          };
+        }),
       });
     }
 
