@@ -41,6 +41,7 @@ export interface IPostUpdateRequest {
 
 // 댓글 응답 타입
 export interface ICommentResponse {
+  idx: number;
   uid: string;
   content: string;
   createdAt: string;

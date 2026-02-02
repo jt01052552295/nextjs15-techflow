@@ -37,6 +37,7 @@ function toCommentResponse(
   likedCommentIds: Set<number>,
 ): ICommentResponse {
   return {
+    idx: comment.idx,
     uid: comment.uid,
     content: comment.content,
     createdAt: comment.createdAt.toISOString(),
