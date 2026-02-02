@@ -545,15 +545,64 @@ export async function updatePost(
     throw new Error('NOT_OWNER');
   }
 
-  const updated = await prisma.blogPost.update({
-    where: { uid },
-    data: {
-      ...(data.content !== undefined && { content: data.content }),
-    },
-    include: {
-      user: true,
-      images: { orderBy: { createdAt: 'asc' } },
-    },
+  const { content, deleteImageUrls = [], newImageUrls = [] } = data;
+
+  const updated = await prisma.$transaction(async (tx) => {
+    // 1. 이미지 삭제 (deleteImageUrls에 포함된 URL)
+    if (deleteImageUrls.length > 0) {
+      // 상대 경로로 변환하여 삭제 (DB에는 상대 경로로 저장됨)
+      const relativeDeleteUrls = deleteImageUrls.map(toRelativePath);
+      await tx.blogPostImage.deleteMany({
+        where: {
+          postId: uid,
+          url: { in: relativeDeleteUrls },
+        },
+      });
+    }
+
+    // 2. 새 이미지 추가 (newImageUrls)
+    if (newImageUrls.length > 0) {
+      // 기존 이미지 URL 조회 (중복 방지)
+      const existingImages = await tx.blogPostImage.findMany({
+        where: { postId: uid },
+        select: { url: true },
+      });
+      const existingUrls = new Set(existingImages.map((img) => img.url));
+
+      // 중복되지 않는 새 이미지만 추가
+      const newImages = newImageUrls
+        .map(toRelativePath)
+        .filter((url) => !existingUrls.has(url));
+
+      if (newImages.length > 0) {
+        await tx.blogPostImage.createMany({
+          data: newImages.map((url) => {
+            const fileName = url.split('/').pop() || 'image';
+            return {
+              uid: uuidv4(),
+              postId: uid,
+              name: fileName,
+              originalName: fileName,
+              url,
+              ext: fileName.split('.').pop() || null,
+              type: null,
+            };
+          }),
+        });
+      }
+    }
+
+    // 3. 본문 업데이트
+    return await tx.blogPost.update({
+      where: { uid },
+      data: {
+        ...(content !== undefined && { content }),
+      },
+      include: {
+        user: true,
+        images: { orderBy: { createdAt: 'asc' } },
+      },
+    });
   });
 
   const [like, bookmark] = await Promise.all([

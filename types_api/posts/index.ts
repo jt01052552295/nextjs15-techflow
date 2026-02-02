@@ -35,6 +35,8 @@ export interface IPostCreateRequest {
 
 export interface IPostUpdateRequest {
   content?: string;
+  deleteImageUrls?: string[]; // 삭제할 기존 이미지 URL
+  newImageUrls?: string[]; // 새로 추가할 이미지 URL (업로드 API에서 받은 URL)
 }
 
 // 댓글 응답 타입

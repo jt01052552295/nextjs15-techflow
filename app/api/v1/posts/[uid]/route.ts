@@ -90,7 +90,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
     const { uid } = await params;
     const body = (await request.json()) as IPostUpdateRequest;
-    const { content } = body;
+    const { content, deleteImageUrls, newImageUrls } = body;
 
     // 유효성 검사
     if (content !== undefined) {
@@ -119,6 +119,8 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
     const post = await PostService.updatePost(uid, session.id, {
       content: content?.trim(),
+      deleteImageUrls,
+      newImageUrls,
     });
 
     if (!post) {
